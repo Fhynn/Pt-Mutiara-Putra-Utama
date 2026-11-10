@@ -1,0 +1,230 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { AlertTriangle, Banknote, BriefcaseBusiness, ExternalLink, FileText } from "lucide-react";
+import { Breadcrumb } from "@/components/public/breadcrumb";
+import { CompactList } from "@/components/public/compact-list";
+import { EmptyState } from "@/components/public/empty-state";
+import { prisma } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
+
+function stringList(value: unknown) {
+  return Array.isArray(value) ? value.map(String).filter(Boolean) : [];
+}
+
+function formatReviewedAt(value: Date | null) {
+  if (!value) return null;
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Jakarta"
+  }).format(value);
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  try {
+    const country = await prisma.country.findFirst({ where: { slug, status: "PUBLISHED" } });
+    if (!country)
+      return { title: "Negara tidak tersedia", robots: { index: false, follow: false } };
+    return {
+      title: country.metaTitle ?? `Kriteria dan persyaratan kerja ke ${country.name}`,
+      description: country.metaDescription ?? country.summary,
+      alternates: { canonical: `/negara-tujuan/${slug}` }
+    };
+  } catch {
+    return { title: "Negara Tujuan" };
+  }
+}
+
+export default async function CountryDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const country = await prisma.country
+    .findFirst({
+      where: { slug, status: "PUBLISHED" },
+      include: {
+        jobs: {
+          where: { status: "OPEN", OR: [{ deadline: null }, { deadline: { gte: new Date() } }] }
+        }
+      }
+    })
+    .catch(() => null);
+  if (!country) notFound();
+
+  const criteria = stringList(country.criteria);
+  const documents = stringList(country.requirements);
+  const salaryDetails = stringList(country.salaryDetails);
+  const reviewedAt = formatReviewedAt(country.requirementsReviewedAt);
+  const statusLabel =
+    country.programStatus === "AVAILABLE"
+      ? "Program tersedia"
+      : country.programStatus === "NOT_OPEN"
+        ? "Program belum dibuka"
+        : "Konfirmasi program kepada petugas MPU";
+
+  return (
+    <>
+      <section className="page-hero country-page-hero">
+        <div className="container">
+          <Breadcrumb
+            items={[{ label: "Negara Tujuan", href: "/negara-tujuan" }, { label: country.name }]}
+          />
+          <span className="eyebrow">Negara Tujuan · {statusLabel}</span>
+          <h1 className="page-title">Kriteria &amp; Persyaratan Kerja ke {country.name}</h1>
+          <p>{country.summary}</p>
+        </div>
+      </section>
+
+      <section className="section country-requirements-section">
+        <div className="container">
+          <div className="country-program-intro">
+            <div>
+              <span className="eyebrow">Informasi Program</span>
+              <h2 className="section-title">Persyaratan program {country.name}</h2>
+              <p className="lead">
+                {country.programDescription ??
+                  `Penjelasan program ${country.name} belum dipublikasikan. Hubungi petugas MPU untuk informasi terbaru.`}
+              </p>
+            </div>
+            <div className="country-program-action">
+              <span className="status-pill">{statusLabel}</span>
+              <Link className="button button-primary" href={`/daftar?country=${country.slug}`}>
+                Daftar Minat ke {country.name}
+              </Link>
+            </div>
+          </div>
+
+          <div className="country-requirements-grid">
+            <article className="requirement-panel">
+              <div className="requirement-panel-heading">
+                <span className="requirement-icon">
+                  <span aria-hidden="true">✓</span>
+                </span>
+                <div>
+                  <span>Calon pekerja</span>
+                  <h2>Kriteria</h2>
+                </div>
+              </div>
+              {criteria.length ? (
+                <CompactList items={criteria} label="kriteria" />
+              ) : (
+                <p className="country-empty-copy">
+                  Kriteria belum dipublikasikan. Hubungi petugas MPU sebelum mendaftar.
+                </p>
+              )}
+            </article>
+
+            <article className="requirement-panel">
+              <div className="requirement-panel-heading">
+                <span className="requirement-icon">
+                  <FileText aria-hidden="true" />
+                </span>
+                <div>
+                  <span>Tahap lanjutan</span>
+                  <h2>Dokumen yang perlu disiapkan</h2>
+                </div>
+              </div>
+              {documents.length ? (
+                <CompactList items={documents} label="dokumen" />
+              ) : (
+                <p className="country-empty-copy">
+                  Daftar dokumen belum dipublikasikan. Mintalah daftar tertulis dari petugas MPU.
+                </p>
+              )}
+              <p className="document-safety-note">
+                Siapkan dokumen untuk verifikasi tahap lanjutan. Penyerahan dilakukan melalui
+                petugas dan kanal resmi MPU—bukan melalui kolom pesan pada formulir pendaftaran
+                awal.
+              </p>
+            </article>
+          </div>
+
+          <div className="country-detail-grid">
+            <article className="country-detail-card country-salary-card">
+              <Banknote aria-hidden="true" />
+              <div>
+                <span className="detail-kicker">Informasi yang pernah dipublikasikan MPU</span>
+                <h2>Gaji</h2>
+                {salaryDetails.length ? (
+                  <ul>
+                    {salaryDetails.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>Rincian gaji belum dipublikasikan.</p>
+                )}
+              </div>
+            </article>
+
+            <article className="country-detail-card">
+              <BriefcaseBusiness aria-hidden="true" />
+              <div>
+                <span className="detail-kicker">Jenis pekerjaan</span>
+                <h2>Keterangan sektor</h2>
+                <dl className="sector-definition-list">
+                  <div>
+                    <dt>Informal</dt>
+                    <dd>{country.informalSectorInfo ?? "Informasi belum dipublikasikan."}</dd>
+                  </div>
+                  <div>
+                    <dt>Formal</dt>
+                    <dd>{country.formalSectorInfo ?? "Informasi belum dipublikasikan."}</dd>
+                  </div>
+                </dl>
+              </div>
+            </article>
+          </div>
+
+          <div className="country-source-notice">
+            <AlertTriangle aria-hidden="true" />
+            <div>
+              <strong>
+                {country.requirementsDisclaimer ??
+                  "Syarat dan ketentuan dapat berubah mengikuti aturan yang berlaku."}
+              </strong>
+              <p>
+                Nominal di atas berasal dari halaman persyaratan pada situs MPU sebelumnya dan bukan
+                penawaran kerja atau jaminan penghasilan. Periksa lowongan, kontrak kerja, potongan,
+                fasilitas, serta kurs yang berlaku sebelum menyetujui program.
+              </p>
+              {country.requirementsSourceUrl ? (
+                <a href={country.requirementsSourceUrl} target="_blank" rel="noopener noreferrer">
+                  Buka sumber persyaratan
+                  <ExternalLink aria-hidden="true" />
+                </a>
+              ) : null}
+              {reviewedAt ? <small>Sumber terakhir diperiksa: {reviewedAt}</small> : null}
+            </div>
+          </div>
+
+          <div className="country-jobs-section">
+            <div className="country-jobs-heading">
+              <span className="eyebrow">Lowongan Terverifikasi</span>
+              <h2 className="section-title">Lowongan aktif untuk {country.name}</h2>
+            </div>
+            {country.jobs.length ? (
+              <div className="content-grid">
+                {country.jobs.map((job) => (
+                  <article className="content-card" key={job.id}>
+                    <h3>{job.title}</h3>
+                    <p>{job.summary}</p>
+                    <Link className="text-link" href={`/lowongan/${job.slug}`}>
+                      Lihat rincian lowongan
+                    </Link>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                title={`Belum ada lowongan aktif untuk ${country.name}`}
+                description="Kriteria negara tetap dapat dipelajari, tetapi pendaftaran minat tidak berarti lowongan sedang dibuka."
+              />
+            )}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

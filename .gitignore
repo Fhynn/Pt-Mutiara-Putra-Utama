@@ -1,0 +1,26 @@
+node_modules/
+.next/
+.vercel/
+src/generated/
+coverage/
+playwright-report/
+test-results/
+tmp/
+artifacts/
+*.tsbuildinfo
+*.log
+.DS_Store
+
+# Local and production credentials. Commit the template only.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Client source material and review screenshots are not deploy assets.
+drive-download-20261105T084821Z-1-001/
+Compro MPU (Eng Version) (edited).pdf
+revisi/

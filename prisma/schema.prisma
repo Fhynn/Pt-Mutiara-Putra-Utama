@@ -1,0 +1,675 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  runtime             = "nodejs"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum PublicationStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+  ARCHIVED
+}
+
+enum ProgramStatus {
+  AVAILABLE
+  NOT_OPEN
+  MORE_INFO
+}
+
+enum MediaKind {
+  IMAGE
+  VIDEO
+  PDF
+  EMBED
+}
+
+enum MediaVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  EXPIRED
+  ARCHIVED
+}
+
+enum ApplicationStatus {
+  NEW
+  CONTACTED
+  SCREENING
+  IN_PROCESS
+  COMPLETED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ContactStatus {
+  UNREAD
+  READ
+  FOLLOW_UP
+  RESOLVED
+  SPAM
+  ARCHIVED
+}
+
+enum TestimonialApproval {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AuditAction {
+  LOGIN_SUCCESS
+  LOGIN_FAILED
+  LOGOUT
+  CREATE
+  UPDATE
+  DELETE
+  PUBLISH
+  UNPUBLISH
+  EXPORT
+  VIEW_SENSITIVE
+  PASSWORD_CHANGE
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String
+  passwordHash       String
+  role               Role      @default(VIEWER)
+  permissions        String[]  @default([])
+  isActive           Boolean   @default(true)
+  mustChangePassword Boolean   @default(true)
+  failedLoginCount   Int       @default(0)
+  lockedUntil        DateTime?
+  lastLoginAt        DateTime?
+  passwordChangedAt  DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  uploadedMedia        MediaAsset[]      @relation("MediaUploader")
+  authoredArticles     Article[]         @relation("ArticleAuthor")
+  assignedApplications Application[]     @relation("ApplicationAssignee")
+  applicationNotes     ApplicationNote[] @relation("ApplicationNoteAuthor")
+  assignedMessages     ContactMessage[]  @relation("ContactAssignee")
+  contactNotes         ContactNote[]     @relation("ContactNoteAuthor")
+  auditLogs            AuditLog[]        @relation("AuditActor")
+
+  @@index([role, isActive])
+  @@index([createdAt])
+}
+
+model SiteSetting {
+  id                     String   @id @default("default")
+  legalName              String
+  brandName              String
+  tagline                String?
+  primaryEmail           String?
+  alternateEmail         String?
+  phone                  String?
+  whatsappE164           String?
+  address                String?
+  mapUrl                 String?
+  officeHours            String?
+  socialLinks            Json?
+  announcement           String?
+  announcementEnabled    Boolean  @default(false)
+  maintenanceMode        Boolean  @default(false)
+  defaultMetaTitle       String?
+  defaultMetaDescription String?
+  defaultOgImage         String?
+  logoUrl                String?
+  faviconUrl             String?
+  privacyPolicy          String?
+  terms                  String?
+  analyticsId            String?
+  updatedById            String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model NavigationItem {
+  id           String   @id @default(cuid())
+  label        String
+  href         String
+  location     String   @default("HEADER")
+  displayOrder Int      @default(0)
+  isVisible    Boolean  @default(true)
+  parentId     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([location, displayOrder])
+}
+
+model Page {
+  id              String            @id @default(cuid())
+  slug            String            @unique
+  title           String
+  excerpt         String?
+  status          PublicationStatus @default(DRAFT)
+  metaTitle       String?
+  metaDescription String?
+  canonicalUrl    String?
+  ogImage         String?
+  publishedAt     DateTime?
+  updatedById     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  sections        PageSection[]
+
+  @@index([status, publishedAt])
+  @@index([updatedAt])
+}
+
+model PageSection {
+  id           String            @id @default(cuid())
+  pageId       String
+  key          String
+  title        String?
+  content      Json
+  status       PublicationStatus @default(DRAFT)
+  displayOrder Int               @default(0)
+  publishedAt  DateTime?
+  updatedById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  page         Page              @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, key])
+  @@index([pageId, status, displayOrder])
+}
+
+model MediaAsset {
+  id               String          @id @default(cuid())
+  objectKey        String          @unique
+  publicUrl        String?
+  originalName     String
+  safeName         String
+  kind             MediaKind
+  visibility       MediaVisibility @default(PUBLIC)
+  mimeType         String
+  sizeBytes        BigInt
+  width            Int?
+  height           Int?
+  durationSeconds  Int?
+  altText          String          @default("")
+  title            String?
+  caption          String?
+  photographer     String?
+  source           String?
+  license          String?
+  permissionStatus String          @default("NEEDS_CONFIRMATION")
+  tags             String[]        @default([])
+  folder           String?
+  focalX           Float           @default(0.5)
+  focalY           Float           @default(0.5)
+  embedUrl         String?
+  checksum         String?
+  isDeleted        Boolean         @default(false)
+  deletedAt        DateTime?
+  uploaderId       String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  uploader         User?           @relation("MediaUploader", fields: [uploaderId], references: [id], onDelete: SetNull)
+  usages           MediaUsage[]
+  galleryItems     GalleryItem[]
+
+  @@index([kind, visibility, isDeleted])
+  @@index([folder, createdAt])
+  @@index([createdAt])
+}
+
+model MediaUsage {
+  id         String     @id @default(cuid())
+  assetId    String
+  entityType String
+  entityId   String
+  field      String
+  createdAt  DateTime   @default(now())
+  asset      MediaAsset @relation(fields: [assetId], references: [id], onDelete: Restrict)
+
+  @@unique([assetId, entityType, entityId, field])
+  @@index([entityType, entityId])
+}
+
+model GalleryAlbum {
+  id           String            @id @default(cuid())
+  title        String
+  slug         String            @unique
+  description  String?
+  category     String
+  coverMediaId String?
+  eventDate    DateTime?
+  location     String?
+  status       PublicationStatus @default(DRAFT)
+  isFeatured   Boolean           @default(false)
+  displayOrder Int               @default(0)
+  publishedAt  DateTime?
+  createdById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  items        GalleryItem[]
+
+  @@index([status, isFeatured, displayOrder])
+  @@index([eventDate])
+}
+
+model GalleryItem {
+  id           String       @id @default(cuid())
+  albumId      String
+  mediaId      String
+  caption      String?
+  displayOrder Int          @default(0)
+  isCover      Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  album        GalleryAlbum @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  media        MediaAsset   @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@unique([albumId, mediaId])
+  @@index([albumId, displayOrder])
+}
+
+model Country {
+  id                     String            @id @default(cuid())
+  name                   String
+  slug                   String            @unique
+  isoCode                String?
+  flagUrl                String?
+  coverMediaId           String?
+  summary                String?
+  programDescription     String?
+  criteria               Json?
+  requirements           Json?
+  salaryDetails          Json?
+  informalSectorInfo     String?
+  formalSectorInfo       String?
+  requirementsDisclaimer String?
+  requirementsSourceUrl  String?
+  requirementsReviewedAt DateTime?
+  sectors                String[]          @default([])
+  programStatus          ProgramStatus     @default(MORE_INFO)
+  status                 PublicationStatus @default(DRAFT)
+  isFeatured             Boolean           @default(false)
+  displayOrder           Int               @default(0)
+  metaTitle              String?
+  metaDescription        String?
+  publishedAt            DateTime?
+  updatedById            String?
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+  jobs                   Job[]
+  applications           Application[]
+
+  @@index([status, programStatus, displayOrder])
+}
+
+model Sector {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  jobs        Job[]
+}
+
+model Job {
+  id               String        @id @default(cuid())
+  title            String
+  slug             String        @unique
+  countryId        String
+  sectorId         String?
+  employmentType   String?
+  summary          String
+  description      String
+  responsibilities Json?
+  requirements     Json?
+  qualifications   Json?
+  facilities       Json?
+  compensationMin  Decimal?      @db.Decimal(18, 2)
+  compensationMax  Decimal?      @db.Decimal(18, 2)
+  currency         String?
+  positions        Int?
+  deadline         DateTime?
+  sourceReference  String?
+  sourceUrl        String?
+  feeNotes         String?
+  status           JobStatus     @default(DRAFT)
+  isFeatured       Boolean       @default(false)
+  publishedAt      DateTime?
+  archivedAt       DateTime?
+  createdById      String?
+  updatedById      String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  country          Country       @relation(fields: [countryId], references: [id], onDelete: Restrict)
+  sector           Sector?       @relation(fields: [sectorId], references: [id], onDelete: SetNull)
+  applications     Application[]
+
+  @@index([status, deadline, publishedAt])
+  @@index([countryId, status])
+  @@index([sectorId, status])
+}
+
+model TrainingProgram {
+  id           String            @id @default(cuid())
+  title        String
+  slug         String            @unique
+  description  String
+  materials    Json?
+  coverMediaId String?
+  status       PublicationStatus @default(DRAFT)
+  isFeatured   Boolean           @default(false)
+  displayOrder Int               @default(0)
+  publishedAt  DateTime?
+  updatedById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([status, isFeatured, displayOrder])
+}
+
+model Service {
+  id           String            @id @default(cuid())
+  title        String
+  slug         String            @unique
+  icon         String
+  description  String
+  detail       String?
+  href         String?
+  status       PublicationStatus @default(DRAFT)
+  displayOrder Int               @default(0)
+  updatedById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([status, displayOrder])
+}
+
+model PlacementStep {
+  id           String            @id @default(cuid())
+  title        String
+  description  String?
+  icon         String
+  status       PublicationStatus @default(DRAFT)
+  displayOrder Int               @default(0)
+  updatedById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([status, displayOrder])
+}
+
+model TeamMember {
+  id           String            @id @default(cuid())
+  name         String
+  position     String
+  bio          String?
+  photoMediaId String?
+  status       PublicationStatus @default(DRAFT)
+  displayOrder Int               @default(0)
+  updatedById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([status, displayOrder])
+}
+
+model CompanyProfile {
+  id               String   @id @default("default")
+  history          String
+  directorName     String?
+  directorTitle    String?
+  directorMessage  String?
+  directorPhoto    String?
+  vision           Json
+  mission          Json
+  teamSummary      String?
+  portfolioFields  String[] @default([])
+  developmentPlans Json?
+  updatedById      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model CompanyValue {
+  id           String            @id @default(cuid())
+  name         String            @unique
+  description  String
+  icon         String
+  status       PublicationStatus @default(PUBLISHED)
+  displayOrder Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([status, displayOrder])
+}
+
+model LegalDocument {
+  id              String            @id @default(cuid())
+  title           String
+  permitType      String
+  permitNumber    String?
+  issuedAt        DateTime?
+  issuedYear      Int?
+  validUntil      DateTime?
+  description     String?
+  sourceUrl       String?
+  sourceLabel     String?
+  verifiedAt      DateTime?
+  documentMediaId String?
+  needsReview     Boolean           @default(true)
+  status          PublicationStatus @default(DRAFT)
+  displayOrder    Int               @default(0)
+  updatedById     String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([status, displayOrder])
+  @@index([verifiedAt])
+}
+
+model Testimonial {
+  id               String              @id @default(cuid())
+  displayName      String
+  country          String?
+  occupation       String?
+  quote            String
+  photoMediaId     String?
+  consentToPublish Boolean             @default(false)
+  consentEvidence  String?
+  approval         TestimonialApproval @default(PENDING)
+  status           PublicationStatus   @default(DRAFT)
+  isFeatured       Boolean             @default(false)
+  displayOrder     Int                 @default(0)
+  testimonialDate  DateTime?
+  updatedById      String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@index([approval, status, consentToPublish])
+}
+
+model ArticleCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  articles    Article[]
+}
+
+model Article {
+  id              String            @id @default(cuid())
+  title           String
+  slug            String            @unique
+  excerpt         String
+  body            String
+  coverMediaId    String?
+  categoryId      String?
+  tags            String[]          @default([])
+  status          PublicationStatus @default(DRAFT)
+  isFeatured      Boolean           @default(false)
+  metaTitle       String?
+  metaDescription String?
+  publishedAt     DateTime?
+  authorId        String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  author          User?             @relation("ArticleAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  category        ArticleCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([status, publishedAt])
+  @@index([categoryId, status])
+}
+
+model Faq {
+  id           String            @id @default(cuid())
+  category     String
+  question     String
+  answer       String
+  status       PublicationStatus @default(DRAFT)
+  displayOrder Int               @default(0)
+  updatedById  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  @@index([status, category, displayOrder])
+}
+
+model Application {
+  id                   String            @id @default(cuid())
+  referenceNumber      String            @unique
+  fullName             String
+  phone                String
+  email                String?
+  domicile             String
+  countryId            String?
+  jobId                String?
+  workExperience       String?
+  message              String?
+  status               ApplicationStatus @default(NEW)
+  consent              Boolean
+  consentAt            DateTime
+  privacyPolicyVersion String
+  source               String?
+  idempotencyKey       String?           @unique
+  assignedToId         String?
+  notificationStatus   String            @default("NOT_CONFIGURED")
+  anonymizedAt         DateTime?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  country              Country?          @relation(fields: [countryId], references: [id], onDelete: SetNull)
+  job                  Job?              @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  assignedTo           User?             @relation("ApplicationAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  notes                ApplicationNote[]
+
+  @@index([status, createdAt])
+  @@index([countryId, status])
+  @@index([jobId, status])
+  @@index([assignedToId, status])
+}
+
+model ApplicationNote {
+  id            String      @id @default(cuid())
+  applicationId String
+  authorId      String?
+  note          String
+  createdAt     DateTime    @default(now())
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  author        User?       @relation("ApplicationNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([applicationId, createdAt])
+}
+
+model ContactMessage {
+  id                   String        @id @default(cuid())
+  name                 String
+  email                String?
+  phone                String?
+  subject              String
+  message              String
+  status               ContactStatus @default(UNREAD)
+  consent              Boolean
+  consentAt            DateTime
+  privacyPolicyVersion String
+  assignedToId         String?
+  notificationStatus   String        @default("NOT_CONFIGURED")
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  assignedTo           User?         @relation("ContactAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  notes                ContactNote[]
+
+  @@index([status, createdAt])
+  @@index([assignedToId, status])
+}
+
+model ContactNote {
+  id        String         @id @default(cuid())
+  messageId String
+  authorId  String?
+  note      String
+  createdAt DateTime       @default(now())
+  message   ContactMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  author    User?          @relation("ContactNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([messageId, createdAt])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  actorId    String?
+  action     AuditAction
+  entityType String
+  entityId   String?
+  summary    String
+  metadata   Json?
+  ipHash     String?
+  createdAt  DateTime    @default(now())
+  actor      User?       @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId, createdAt])
+  @@index([entityType, entityId, createdAt])
+  @@index([action, createdAt])
+}
+
+model RateLimitBucket {
+  id          String   @id @default(cuid())
+  key         String
+  action      String
+  windowStart DateTime
+  count       Int      @default(1)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([key, action, windowStart])
+  @@index([expiresAt])
+}
+
+model RegistrationCounter {
+  id           String   @id @default(cuid())
+  year         Int      @unique
+  currentValue Int      @default(0)
+  updatedAt    DateTime @updatedAt
+}
