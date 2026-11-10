@@ -52,7 +52,7 @@ export async function getHomeData() {
       prisma.country.findMany({
         where: { status: "PUBLISHED", isFeatured: true },
         orderBy: { displayOrder: "asc" },
-        take: 4
+        take: 5
       }),
       prisma.placementStep.findMany({
         where: { status: "PUBLISHED" },

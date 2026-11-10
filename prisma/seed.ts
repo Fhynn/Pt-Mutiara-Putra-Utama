@@ -72,7 +72,7 @@ const countries = [
     slug: "taiwan",
     isoCode: "TW",
     summary:
-      "Informasi MPU mencantumkan peluang sektor informal untuk perawatan lansia/orang sakit dan asisten rumah tangga, serta sektor formal pabrik dan nelayan.",
+      "Pilihan pekerjaan yang diinformasikan MPU meliputi perawatan lansia, asisten rumah tangga, pabrik, nelayan, serta ABK (anak buah kapal). Ketersediaan program perlu dikonfirmasi.",
     programDescription:
       "Rangkuman ini mengikuti informasi persyaratan Taiwan yang pernah dipublikasikan MPU. Konfirmasikan ketersediaan program, biaya, dan rincian kontrak kepada petugas sebelum memulai proses.",
     criteria: [
@@ -92,8 +92,15 @@ const countries = [
       "NT$25.000 (sekitar Rp14.000.000) — sektor formal"
     ],
     informalSectorInfo: "Penjaga jompo/lansia, orang sakit, dan asisten rumah tangga.",
-    formalSectorInfo: "Pabrik dan nelayan.",
-    sectors: ["Perawatan lansia", "Asisten rumah tangga", "Pabrik", "Nelayan"],
+    formalSectorInfo:
+      "Pabrik, nelayan, dan ABK (anak buah kapal). Rincian pekerjaan di kapal mengikuti program terkait.",
+    sectors: [
+      "ABK (anak buah kapal)",
+      "Perawatan lansia",
+      "Asisten rumah tangga",
+      "Pabrik",
+      "Nelayan"
+    ],
     sourceUrl: "https://ptmutiaraputrautama.com/Syarat-Taiwan/"
   },
   {
@@ -148,7 +155,7 @@ const countries = [
     slug: "malaysia",
     isoCode: "MY",
     summary:
-      "Informasi MPU mencantumkan sektor informal untuk penjaga anak/bayi, perawatan lansia, dan asisten rumah tangga. Sektor formal belum tersedia pada sumber yang diperiksa.",
+      "Pilihan pekerjaan yang diinformasikan MPU meliputi penjaga anak/bayi, perawatan lansia, asisten rumah tangga, konstruksi, dan pekerja kebun sawit atau karet.",
     programDescription:
       "Rangkuman ini mengikuti informasi persyaratan Malaysia yang pernah dipublikasikan MPU. Konfirmasikan ketersediaan program, biaya, dan rincian kontrak kepada petugas sebelum memulai proses.",
     criteria: [
@@ -162,9 +169,32 @@ const countries = [
     requirements: sharedDocumentRequirements,
     salaryDetails: ["RM1.500 (sekitar Rp7.000.000) — sektor informal"],
     informalSectorInfo: "Penjaga anak/bayi, perawatan lansia, dan asisten rumah tangga.",
-    formalSectorInfo: "Belum tersedia pada informasi MPU yang diperiksa.",
-    sectors: ["Penjaga anak/bayi", "Perawatan lansia", "Asisten rumah tangga"],
+    formalSectorInfo:
+      "Konstruksi dan pekerjaan kebun sawit/karet diinformasikan klien. Klasifikasi sektor serta rincian kontrak mengikuti program terkait.",
+    sectors: [
+      "Konstruksi",
+      "Pekerja kebun sawit/karet",
+      "Penjaga anak/bayi",
+      "Perawatan lansia",
+      "Asisten rumah tangga"
+    ],
     sourceUrl: "https://ptmutiaraputrautama.com/Syarat-Malaysia/"
+  },
+  {
+    name: "Brunei Darussalam",
+    slug: "brunei-darussalam",
+    isoCode: "BN",
+    summary:
+      "MPU menginformasikan pilihan pekerjaan sektor formal di Brunei Darussalam, termasuk konstruksi dan pembuatan kue. Rincian program dan ketersediaan lowongan perlu dikonfirmasi kepada petugas.",
+    programDescription:
+      "Informasi awal dari revisi klien 10 November 2026. Kriteria, dokumen, gaji, biaya, dan kontrak akan dijelaskan sesuai program yang berlaku.",
+    criteria: [],
+    requirements: [],
+    salaryDetails: [],
+    informalSectorInfo: "Tidak disebutkan dalam informasi yang diberikan klien.",
+    formalSectorInfo: "Konstruksi, pembuatan kue, dan bidang formal lain sesuai program.",
+    sectors: ["Konstruksi", "Pembuat kue"],
+    sourceUrl: null
   }
 ] as const;
 
@@ -187,7 +217,7 @@ const faqs = [
   [
     "Negara",
     "Negara tujuan apa yang tersedia?",
-    "Taiwan, Hong Kong, Singapura, dan Malaysia tersedia sebagai pilihan minat awal. Status program dan lowongan aktif harus dikonfirmasi pada halaman lowongan atau kepada petugas MPU."
+    "Taiwan, Hong Kong, Singapura, Malaysia, dan Brunei Darussalam tersedia sebagai pilihan minat awal. Status program dan lowongan aktif harus dikonfirmasi pada halaman lowongan atau kepada petugas MPU."
   ],
   [
     "Biaya",
@@ -415,7 +445,8 @@ async function main() {
       requirementsDisclaimer:
         "Syarat, nominal gaji, sektor, dan ketentuan dapat berubah sewaktu-waktu mengikuti program, kontrak kerja, dan peraturan yang berlaku.",
       requirementsSourceUrl: country.sourceUrl,
-      requirementsReviewedAt: new Date("2026-11-07T00:00:00.000Z"),
+      requirementsReviewedAt:
+        country.slug === "brunei-darussalam" ? null : new Date("2026-11-07T00:00:00.000Z"),
       programStatus: "MORE_INFO" as const,
       status: "PUBLISHED" as const,
       isFeatured: true,
@@ -460,7 +491,7 @@ async function main() {
       directorTitle: "Direktur Utama",
       directorMessage:
         "Kami berupaya menyediakan layanan yang sesuai dengan kebutuhan calon pekerja dan mitra melalui pengetahuan serta pengalaman di bidang ketenagakerjaan.",
-      directorPhoto: "/client/director-portrait.jpg",
+      directorPhoto: "/client/director-martua-2026.png",
       vision: [
         "Menjadi perusahaan penempatan yang bereputasi dan turut memperkuat perekonomian nasional.",
         "Berkontribusi pada peningkatan kualitas pekerja Indonesia.",

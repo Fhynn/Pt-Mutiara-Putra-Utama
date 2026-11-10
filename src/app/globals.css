@@ -3532,7 +3532,7 @@ body {
 }
 
 .section .media-frame .director-photo {
-  object-position: center 18%;
+  object-position: center 80%;
 }
 
 .services-page-grid {
@@ -4173,6 +4173,20 @@ body {
   font-family: var(--font-display), Arial, sans-serif;
   font-size: 1.28rem;
   line-height: 1.2;
+}
+
+/* Lima negara tetap memakai kartu berukuran sama pada layar lebar. */
+@media (min-width: 1101px) {
+  .country-grid:has(> .country-card:nth-child(5)),
+  .mpu-home .country-grid:has(> .country-card:nth-child(5)) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.country-grid .country-flag-brunei,
+.mpu-home .country-flag-brunei {
+  object-fit: contain;
+  background: #f7e110;
 }
 
 @media (max-width: 520px) {

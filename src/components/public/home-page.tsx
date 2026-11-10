@@ -141,7 +141,7 @@ const fallbackFaqs = [
   ],
   [
     "Negara tersedia",
-    "Taiwan, Hong Kong, Singapura, dan Malaysia tersedia sebagai pilihan minat. Status program harus dikonfirmasi."
+    "Taiwan, Hong Kong, Singapura, Malaysia, dan Brunei Darussalam tersedia sebagai pilihan minat. Status program harus dikonfirmasi."
   ],
   [
     "Informasi biaya",

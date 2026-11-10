@@ -9,7 +9,7 @@ Data berikut masih perlu ditentukan atau diperbarui untuk akurasi informasi yang
 - Alamat utama yang dipakai, hubungan alamat lama Jl. At Taqwa, alamat KH Sanip, serta daftar cabang yang aktif.
 - Nomor WhatsApp resmi dalam format E.164. Telepon fixed line tidak diasumsikan sebagai WhatsApp.
 - Jam operasional, akun sosial resmi, dan Google Maps URL. Email utama `mpu_setu@yahoo.com` sudah dikonfirmasi klien.
-- Status aktual program Taiwan, Hong Kong, Singapura, dan Malaysia; semuanya di-seed sebagai `Informasi lebih lanjut`.
+- Status aktual program Taiwan, Hong Kong, Singapura, Malaysia, dan Brunei Darussalam; semuanya di-seed sebagai `Informasi lebih lanjut`.
 - Job order, posisi, kuota, upah, fasilitas, biaya, dan batas pendaftaran. Tidak ada lowongan contoh yang dipublikasikan.
 - Testimoni hanya ditayangkan bila ada kutipan dan identitas alumni yang diserahkan klien untuk publikasi; nama pada mockup bukan testimoni nyata.
 - Naskah final kebijakan privasi, syarat ketentuan, masa retensi data, dan prosedur permintaan penghapusan.

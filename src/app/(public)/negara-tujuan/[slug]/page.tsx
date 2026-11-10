@@ -185,9 +185,9 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
                   "Syarat dan ketentuan dapat berubah mengikuti aturan yang berlaku."}
               </strong>
               <p>
-                Nominal di atas berasal dari halaman persyaratan pada situs MPU sebelumnya dan bukan
-                penawaran kerja atau jaminan penghasilan. Periksa lowongan, kontrak kerja, potongan,
-                fasilitas, serta kurs yang berlaku sebelum menyetujui program.
+                {salaryDetails.length
+                  ? "Nominal di atas berasal dari halaman persyaratan pada situs MPU sebelumnya dan bukan penawaran kerja atau jaminan penghasilan. Periksa lowongan, kontrak kerja, potongan, fasilitas, serta kurs yang berlaku sebelum menyetujui program."
+                  : "Rincian gaji, biaya, persyaratan, dan kontrak perlu dikonfirmasi kepada petugas MPU sesuai program yang berlaku."}
               </p>
               {country.requirementsSourceUrl ? (
                 <a href={country.requirementsSourceUrl} target="_blank" rel="noopener noreferrer">

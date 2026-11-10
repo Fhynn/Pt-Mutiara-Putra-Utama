@@ -18,7 +18,7 @@ const fallback = {
   directorTitle: "Direktur Utama",
   directorMessage:
     "Kami berupaya menyediakan layanan yang sesuai dengan kebutuhan calon pekerja dan mitra melalui pengetahuan serta pengalaman di bidang ketenagakerjaan.",
-  directorPhoto: "/client/director-portrait.jpg",
+  directorPhoto: "/client/director-martua-2026.png",
   vision: [
     "Menjadi perusahaan penempatan yang bereputasi dan turut memperkuat perekonomian nasional.",
     "Berkontribusi pada peningkatan kualitas pekerja Indonesia.",
@@ -83,7 +83,7 @@ export default async function AboutPage() {
           <div className="media-frame">
             <Image
               className="director-photo"
-              src={profile.directorPhoto ?? "/client/director-portrait.jpg"}
+              src={profile.directorPhoto ?? "/client/director-martua-2026.png"}
               alt="Foto Direktur Utama PT Mutiara Putra Utama"
               width={700}
               height={950}

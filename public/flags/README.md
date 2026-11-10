@@ -9,3 +9,7 @@ File PNG lokal ini diunduh dari Wikimedia Commons pada 10 November 2026. Nama ne
 | `sg.png`      | https://commons.wikimedia.org/wiki/File:Flag_of_Singapore.svg             | Public domain; simbol resmi dapat tunduk pada aturan penggunaan tersendiri.                            |
 | `my.png`      | https://commons.wikimedia.org/wiki/File:Flag_of_Malaysia.svg              | Public domain; simbol resmi dapat tunduk pada aturan penggunaan tersendiri.                            |
 | `my-card.png` | https://commons.wikimedia.org/wiki/File:Flag_of_Malaysia_(3-2).svg        | Varian ilustrasi 3:2, public domain menurut Commons; bukan rasio resmi bendera Malaysia.               |
+
+# Bendera negara
+
+Bendera Brunei pada `bn.png` berasal dari [Wikimedia Commons, Flag of Brunei.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Brunei.svg) dalam domain publik. Gambar dipakai tanpa memotong lambang pada bagian tengah.

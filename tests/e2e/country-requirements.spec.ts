@@ -51,3 +51,25 @@ test("empat negara memiliki persyaratan spesifik dari sumber MPU", async ({ page
     await expect(page.getByRole("heading", { name: "Dokumen yang perlu disiapkan" })).toBeVisible();
   }
 });
+
+test("revisi klien menampilkan Brunei, ABK Taiwan, dan pekerjaan Malaysia", async ({ page }) => {
+  await page.goto("/negara-tujuan/brunei-darussalam");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Brunei Darussalam");
+  await expect(
+    page.getByText("Konstruksi, pembuatan kue, dan bidang formal lain sesuai program.")
+  ).toBeVisible();
+  await expect(page.getByText("Rincian gaji belum dipublikasikan.")).toBeVisible();
+  await expect(page.getByText("Konfirmasi program kepada petugas MPU").first()).toBeVisible();
+
+  await page.goto("/negara-tujuan/taiwan");
+  await expect(page.getByText(/ABK \(anak buah kapal\)/).first()).toBeVisible();
+
+  await page.goto("/negara-tujuan/malaysia");
+  await expect(page.getByText(/Konstruksi dan pekerjaan kebun sawit\/karet/)).toBeVisible();
+
+  await page.goto("/tentang-kami");
+  await expect(page.getByAltText("Foto Direktur Utama PT Mutiara Putra Utama")).toHaveAttribute(
+    "src",
+    /director-martua-2026/
+  );
+});

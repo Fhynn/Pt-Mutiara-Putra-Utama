@@ -1,5 +1,12 @@
 # QA Report — 5 November 2026
 
+## Revisi negara dan foto direktur — 10 November 2026
+
+- Data Neon diperbarui: Brunei Darussalam ditambahkan sebagai informasi sektor formal, Taiwan ditambah ABK, Malaysia ditambah konstruksi dan pekerjaan kebun sawit/karet. Status program tetap `Informasi lebih lanjut`; tidak ada lowongan baru yang dibuat.
+- Foto direktur baru dan bendera Brunei tersedia di bucket publik Neon serta aset lokal. Foto direktur didaftarkan ke koleksi media dan dipakai pada profil perusahaan.
+- `npm run build`, `npm run lint`, `npm run typecheck`, `npm run format:check`, dan 10 unit test lulus. Dua belas tes browser khusus negara lulus pada desktop, tablet, dan mobile.
+- Screenshot lima kartu negara dan foto direktur diperiksa pada desktop dan mobile. Tidak ada overflow horizontal; bendera Brunei dan subjek foto direktur tampak utuh di area penting.
+
 ## Pemeriksaan ulang — 10 November 2026
 
 - `npm run lint`, `npm run typecheck`, dan `npm run format:check` lulus.

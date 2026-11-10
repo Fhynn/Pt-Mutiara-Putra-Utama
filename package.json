@@ -24,6 +24,7 @@
     "assets:prepare": "node scripts/prepare-client-assets.mjs",
     "assets:import-all": "tsx scripts/import-all-client-media.ts",
     "assets:sync-private": "tsx scripts/sync-private-client-media.ts",
+    "content:apply-client-revision": "tsx scripts/apply-client-revision-2026-11-10.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

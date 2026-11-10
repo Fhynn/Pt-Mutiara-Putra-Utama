@@ -4,7 +4,8 @@ const localFlags: Record<string, string> = {
   TW: "/flags/tw.png",
   HK: "/flags/hk.png",
   SG: "/flags/sg.png",
-  MY: "/flags/my-card.png"
+  MY: "/flags/my-card.png",
+  BN: "/flags/bn.png"
 };
 
 export function CountryFlag({
@@ -21,7 +22,9 @@ export function CountryFlag({
 
   return (
     <Image
-      className="country-flag"
+      className={
+        isoCode?.toUpperCase() === "BN" ? "country-flag country-flag-brunei" : "country-flag"
+      }
       src={src}
       alt={`Bendera ${name}`}
       fill
