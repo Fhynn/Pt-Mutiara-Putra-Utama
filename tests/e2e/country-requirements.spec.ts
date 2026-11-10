@@ -28,14 +28,15 @@ test("halaman Hong Kong menampilkan kriteria, dokumen, gaji, dan sumber", async 
   }
 });
 
-test("halaman daftar menjelaskan kapan dokumen diserahkan", async ({ page }) => {
+test("halaman daftar meminta data diri dan menjelaskan penyimpanan foto privat", async ({
+  page
+}) => {
   await page.goto("/daftar?country=hong-kong");
 
-  await expect(
-    page.getByRole("heading", { name: "Pendaftaran awal sebelum verifikasi dokumen" })
-  ).toBeVisible();
-  await expect(page.getByText(/KTP, KK, akta kelahiran, ijazah/)).toBeVisible();
-  await expect(page.getByText(/petugas dan kanal resmi MPU/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Siapkan data diri dan foto" })).toBeVisible();
+  await expect(page.getByText(/NIK dan foto disimpan secara privat/)).toBeVisible();
+  await expect(page.getByLabel("Nomor NIK *")).toBeVisible();
+  await expect(page.getByLabel("Unggah foto diri *")).toBeVisible();
 });
 
 test("empat negara memiliki persyaratan spesifik dari sumber MPU", async ({ page }) => {

@@ -29,14 +29,14 @@ E2E memerlukan browser Playwright (`npx playwright install chromium`) dan databa
 
 ## Storage dan data formulir
 
-Upload memakai S3-compatible storage. MinIO disediakan untuk lokal; produksi menggunakan Neon Object Storage dengan bucket `mpu-public` dan `mpu-private`. Adapter menerima ENV `AWS_*` dari Neon Connect atau nama `S3_*` dalam `.env.example`. Pendaftaran dan pesan kontak langsung tersimpan di database dan dibaca melalui dashboard admin. Website tidak mengirim notifikasi email otomatis.
+Upload memakai S3-compatible storage. MinIO disediakan untuk lokal; produksi menggunakan Neon Object Storage dengan bucket `mpu-public` dan `mpu-private`. Adapter menerima ENV `AWS_*` dari Neon Connect atau nama `S3_*` dalam `.env.example`. Formulir CPMI menyimpan biodata di database, NIK terenkripsi, dan foto di bucket privat. Pendaftaran dan pesan kontak dibaca melalui dashboard admin. Website tidak mengirim notifikasi email otomatis.
 
 ## Deployment ringkas
 
 - App: Vercel/Node runtime dengan `npm run build` dan output standalone.
 - Database: PostgreSQL managed, jalankan `npm run db:migrate` pada proses release.
 - Media: Neon Object Storage dengan bucket publik dan privat pada branch production.
-- Environment: `DATABASE_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `RATE_LIMIT_SECRET`, konfigurasi S3, dan `NEXT_PUBLIC_SITE_URL` wajib diisi.
+- Environment: `DATABASE_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `RATE_LIMIT_SECRET`, `CRON_SECRET`, konfigurasi S3, dan `NEXT_PUBLIC_SITE_URL` wajib diisi. `CRON_SECRET` mengaktifkan penghapusan otomatis data pendaftar tidak aktif setelah 12 bulan.
 - TLS/HTTPS wajib; jangan menaruh kredensial bootstrap pada environment setelah penggunaan pertama.
 
 Dokumentasi keputusan dan verifikasi konten tersedia di folder `docs/`.

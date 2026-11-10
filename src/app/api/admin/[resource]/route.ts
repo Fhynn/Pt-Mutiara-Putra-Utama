@@ -48,6 +48,11 @@ export async function GET(
   const { resource } = await context.params;
   const access = await authorize(resource);
   if (!access) return NextResponse.json({ error: "Tidak diizinkan." }, { status: 403 });
+  if (resource === "pendaftar")
+    return NextResponse.json(
+      { error: "Buka daftar pendaftar melalui dashboard." },
+      { status: 405 }
+    );
   const items = await listAdminResource(resource, request.nextUrl.searchParams.get("q") ?? "");
   return NextResponse.json({ items });
 }

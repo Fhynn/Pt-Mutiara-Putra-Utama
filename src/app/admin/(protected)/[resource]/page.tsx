@@ -97,7 +97,24 @@ export default async function AdminResourcePage({
         domicile: row.domicile,
         country: row.country?.name,
         job: row.job?.title,
-        workExperience: row.workExperience ?? undefined
+        workExperience: row.workExperience ?? undefined,
+        sector: row.sector ?? undefined,
+        birthPlace: row.birthPlace ?? undefined,
+        birthDate: row.birthDate?.toISOString().slice(0, 10),
+        gender: row.gender ?? undefined,
+        maritalStatus: row.maritalStatus ?? undefined,
+        religion: row.religion ?? undefined,
+        heightCm: row.heightCm ?? undefined,
+        weightKg: row.weightKg ?? undefined,
+        address: row.address ?? undefined,
+        rt: row.rt ?? undefined,
+        rw: row.rw ?? undefined,
+        village: row.village ?? undefined,
+        district: row.district ?? undefined,
+        province: row.province ?? undefined,
+        hasNik: Boolean(row.nikEncrypted),
+        hasPhoto: Boolean(row.photoObjectKey),
+        anonymizedAt: row.anonymizedAt?.toISOString()
       }));
     } else {
       const status = Object.values(ContactStatus).includes(rawStatus as ContactStatus)

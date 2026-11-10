@@ -1,5 +1,14 @@
 # QA Report — 5 November 2026
 
+## Formulir CPMI lengkap — 11 November 2026
+
+- Migration `202611110001_application_full_form` berhasil diterapkan ke Neon. Kolom baru nullable agar pendaftar lama tetap terbaca.
+- Pendaftaran uji sementara berhasil lewat API nyata: biodata tersimpan di Neon, NIK terenkripsi, dan foto tersimpan di bucket privat serta dapat diakses dengan tautan singkat. Data uji dan foto telah dihapus setelah pemeriksaan.
+- Uji penghapusan data pribadi berhasil: NIK, biodata, catatan, dan foto hilang; referensi tanpa identitas tersisa. Data uji retensi juga telah dibersihkan.
+- Route NIK/foto tanpa login memberi 403; route retensi tanpa secret memberi 401.
+- Uji browser formulir desktop/tablet/mobile dengan API yang dimock lulus (3/3). Suite halaman publik dan persyaratan negara lulus (24/24). Screenshot formulir mobile diperiksa.
+- `CRON_SECRET` sudah dibuat di `.env.local` tetapi belum dapat diverifikasi di pengaturan Vercel dari repo lokal. Penghapusan otomatis production bergantung pada secret ini.
+
 ## Revisi negara dan foto direktur — 10 November 2026
 
 - Data Neon diperbarui: Brunei Darussalam ditambahkan sebagai informasi sektor formal, Taiwan ditambah ABK, Malaysia ditambah konstruksi dan pekerjaan kebun sawit/karet. Status program tetap `Informasi lebih lanjut`; tidak ada lowongan baru yang dibuat.

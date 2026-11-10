@@ -19,6 +19,23 @@ export type InboxItem = {
   country?: string;
   job?: string;
   workExperience?: string;
+  sector?: string;
+  birthPlace?: string;
+  birthDate?: string;
+  gender?: string;
+  maritalStatus?: string;
+  religion?: string;
+  heightCm?: number;
+  weightKg?: number;
+  address?: string;
+  rt?: string;
+  rw?: string;
+  village?: string;
+  district?: string;
+  province?: string;
+  hasNik?: boolean;
+  hasPhoto?: boolean;
+  anonymizedAt?: string;
 };
 
 function dateLabel(value: string) {
@@ -56,6 +73,7 @@ export function InboxManager({
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [revealedNik, setRevealedNik] = useState("");
   const labels = kind === "pendaftar" ? applicationStatusLabels : messageStatusLabels;
   const selected = items.find((item) => item.id === selectedId);
   const pendingStatus = status || selected?.status || "";
@@ -91,6 +109,85 @@ export function InboxManager({
       setMessage("Status berhasil disimpan.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Status tidak dapat disimpan.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function revealNik() {
+    if (!selected || !canEdit) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await fetch(`/api/admin/applications/${selected.id}/identity`, {
+        cache: "no-store"
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "NIK tidak dapat dibuka.");
+      setRevealedNik(body.nik);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "NIK tidak dapat dibuka.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function anonymizeApplication() {
+    if (
+      !selected ||
+      !canEdit ||
+      !window.confirm(
+        "Hapus seluruh data pribadi dan foto pendaftar ini? Tindakan ini tidak dapat dibatalkan."
+      )
+    )
+      return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await fetch(`/api/admin/applications/${selected.id}/anonymize`, {
+        method: "POST"
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Data belum dapat dihapus.");
+      setRevealedNik("");
+      setItems((current) =>
+        current.map((item) =>
+          item.id === selected.id
+            ? {
+                ...item,
+                name: "Data dihapus",
+                phone: null,
+                email: null,
+                message: null,
+                workExperience: undefined,
+                domicile: undefined,
+                country: undefined,
+                job: undefined,
+                sector: undefined,
+                birthPlace: undefined,
+                birthDate: undefined,
+                gender: undefined,
+                maritalStatus: undefined,
+                religion: undefined,
+                heightCm: undefined,
+                weightKg: undefined,
+                address: undefined,
+                rt: undefined,
+                rw: undefined,
+                village: undefined,
+                district: undefined,
+                province: undefined,
+                hasNik: false,
+                hasPhoto: false,
+                anonymizedAt: new Date().toISOString(),
+                status: "WITHDRAWN"
+              }
+            : item
+        )
+      );
+      setMessage("Data pribadi dan foto telah dihapus.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Data belum dapat dihapus.");
     } finally {
       setBusy(false);
     }
@@ -146,6 +243,7 @@ export function InboxManager({
                   setSelectedId(item.id);
                   setStatus("");
                   setMessage("");
+                  setRevealedNik("");
                 }}
                 type="button"
               >
@@ -209,6 +307,89 @@ export function InboxManager({
                     <strong>{selected.country}</strong>
                   </div>
                 )}
+                {isApplication && selected.sector && (
+                  <div>
+                    <span>Sektor</span>
+                    <strong>{selected.sector.replaceAll("_", " ")}</strong>
+                  </div>
+                )}
+                {isApplication && selected.hasNik && canEdit && (
+                  <div>
+                    <span>Nomor NIK</span>
+                    {revealedNik ? (
+                      <strong>{revealedNik}</strong>
+                    ) : (
+                      <button
+                        className="admin-button"
+                        type="button"
+                        disabled={busy}
+                        onClick={revealNik}
+                      >
+                        Lihat NIK
+                      </button>
+                    )}
+                  </div>
+                )}
+                {isApplication && selected.hasPhoto && canEdit && (
+                  <div>
+                    <span>Foto pendaftar</span>
+                    <a
+                      className="admin-button"
+                      href={`/api/admin/applications/${selected.id}/photo`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Lihat foto privat
+                    </a>
+                  </div>
+                )}
+                {isApplication && selected.birthPlace && (
+                  <div>
+                    <span>Tempat, tanggal lahir</span>
+                    <strong>
+                      {selected.birthPlace}, {selected.birthDate ?? "—"}
+                    </strong>
+                  </div>
+                )}
+                {isApplication && selected.gender && (
+                  <div>
+                    <span>Jenis kelamin</span>
+                    <strong>{selected.gender.replaceAll("_", " ")}</strong>
+                  </div>
+                )}
+                {isApplication && selected.maritalStatus && (
+                  <div>
+                    <span>Status pernikahan</span>
+                    <strong>{selected.maritalStatus.replaceAll("_", " ")}</strong>
+                  </div>
+                )}
+                {isApplication && selected.religion && (
+                  <div>
+                    <span>Agama</span>
+                    <strong>{selected.religion.replaceAll("_", " ")}</strong>
+                  </div>
+                )}
+                {isApplication && selected.heightCm && (
+                  <div>
+                    <span>Tinggi badan</span>
+                    <strong>{selected.heightCm} cm</strong>
+                  </div>
+                )}
+                {isApplication && selected.weightKg && (
+                  <div>
+                    <span>Berat badan</span>
+                    <strong>{selected.weightKg} kg</strong>
+                  </div>
+                )}
+                {isApplication && selected.address && (
+                  <div className="wide">
+                    <span>Alamat lengkap</span>
+                    <strong>
+                      {selected.address}, RT {selected.rt}/RW {selected.rw}, {selected.village},{" "}
+                      {selected.district}, {selected.domicile}, {selected.province}
+                    </strong>
+                  </div>
+                )}
                 {selected.job && (
                   <div>
                     <span>Lowongan diminati</span>
@@ -250,6 +431,21 @@ export function InboxManager({
                     type="button"
                   >
                     {busy ? "Menyimpan…" : "Simpan status"}
+                  </button>
+                </div>
+              )}
+              {isApplication && canEdit && !selected.anonymizedAt && (
+                <div className="admin-inbox-status-form">
+                  <p className="form-note">
+                    Gunakan saat ada permintaan penghapusan atau masa simpan berakhir.
+                  </p>
+                  <button
+                    className="admin-button"
+                    type="button"
+                    disabled={busy}
+                    onClick={anonymizeApplication}
+                  >
+                    Hapus data pribadi
                   </button>
                 </div>
               )}

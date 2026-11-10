@@ -11,6 +11,8 @@ Buka `/admin/login` menggunakan akun staf. Setelah masuk, halaman **Ringkasan** 
 3. Gunakan nomor telepon atau email yang tertera untuk menghubungi orang tersebut.
 4. Pilih **Status penanganan**, lalu klik **Simpan status**. Data tetap tersimpan di dashboard; website tidak mengirim email otomatis.
 
+NIK dan foto pendaftar hanya dapat dibuka oleh admin yang berwenang. Klik **Lihat NIK** atau **Lihat foto privat** di detail pendaftar bila diperlukan; akses ini tercatat di riwayat. Jika ada permintaan penghapusan data pribadi, buka pendaftar tersebut lalu klik **Hapus data pribadi** dan konfirmasi. Tindakan ini menghapus NIK, biodata, catatan, dan foto; nomor referensi tanpa identitas tetap ada untuk audit. Pendaftaran yang tidak dilanjutkan selama 12 bulan juga dibersihkan otomatis jika tugas harian Vercel telah dikonfigurasi.
+
 Kolom pencarian mencari semua data yang tersimpan, termasuk halaman lama. Gunakan **Berikutnya** untuk melihat data berikutnya. Tombol **Perbarui daftar** menampilkan data terbaru jika ada formulir yang baru dikirim.
 
 ## Mengubah isi website

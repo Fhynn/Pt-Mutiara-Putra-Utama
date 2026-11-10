@@ -101,9 +101,9 @@ export async function copyPrivateObjectToPublic(objectKey: string, contentType: 
   return `${config.publicBaseUrl.replace(/\/$/, "")}/${objectKey}`;
 }
 
-export async function createPrivateDownloadUrl(objectKey: string) {
+export async function createPrivateDownloadUrl(objectKey: string, expiresIn = 300) {
   const { config, s3 } = client();
   return getSignedUrl(s3, new GetObjectCommand({ Bucket: config.privateBucket, Key: objectKey }), {
-    expiresIn: 300
+    expiresIn
   });
 }

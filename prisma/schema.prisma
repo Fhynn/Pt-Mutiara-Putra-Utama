@@ -564,6 +564,22 @@ model Application {
   phone                String
   email                String?
   domicile             String
+  sector               String?
+  nikEncrypted         String?
+  birthPlace           String?
+  birthDate            DateTime?
+  gender               String?
+  maritalStatus        String?
+  religion             String?
+  heightCm             Int?
+  weightKg             Int?
+  address              String?
+  rt                   String?
+  rw                   String?
+  village              String?
+  district             String?
+  province             String?
+  photoObjectKey       String?           @unique
   countryId            String?
   jobId                String?
   workExperience       String?

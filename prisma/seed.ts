@@ -201,8 +201,8 @@ const countries = [
 const faqs = [
   [
     "Pendaftaran",
-    "Bagaimana cara melakukan pendaftaran awal?",
-    "Isi formulir pendaftaran awal di website dengan data yang benar. Tim MPU akan memeriksa data dan menghubungi Anda apabila ada program yang sesuai. Formulir ini bukan jaminan diterima atau diberangkatkan."
+    "Bagaimana cara melakukan pendaftaran online?",
+    "Isi formulir CPMI di website dengan data diri, pengalaman kerja, dan satu foto. Tim MPU akan memeriksa pendaftaran dan menghubungi Anda untuk informasi tahap berikutnya. Formulir ini bukan jaminan diterima atau diberangkatkan."
   ],
   [
     "Dokumen",
@@ -248,19 +248,22 @@ const mediaSeeds = [
 ] as const;
 
 const privacyPolicy = `Data yang dikumpulkan
-Formulir pendaftaran awal meminta nama, nomor telepon atau WhatsApp, domisili, negara yang diminati, serta informasi tambahan yang Anda pilih untuk diberikan.
+Formulir pendaftaran CPMI meminta negara tujuan, sektor, nama, NIK, tempat dan tanggal lahir, jenis kelamin, status pernikahan, agama, tinggi dan berat badan, alamat lengkap, kontak, pengalaman kerja, serta satu foto diri. Formulir kontak mengumpulkan data yang Anda isikan di sana.
 
 Tujuan penggunaan
-Data digunakan untuk menanggapi konsultasi, memeriksa minat awal, dan menghubungi Anda mengenai tahapan yang relevan.
+Data digunakan untuk memeriksa pendaftaran, menyesuaikan informasi program dan persyaratan, serta menghubungi Anda mengenai tahapan yang relevan. NIK disimpan terenkripsi dan foto berada di penyimpanan privat. Akses dibatasi kepada petugas berwenang.
 
 Dokumen pribadi
-Jangan mengirim KTP, KK, paspor, hasil medis, atau dokumen sensitif melalui kolom pesan. Penyerahan dokumen tahap lanjutan dilakukan melalui petugas dan saluran resmi MPU.
+Formulir hanya meminta nomor NIK dan foto diri, bukan unggahan foto KTP, KK, paspor, atau hasil medis. Jangan mengirim dokumen tersebut melalui kolom pesan. Penyerahan dokumen tahap lanjutan dilakukan melalui petugas dan saluran resmi MPU.
+
+Masa simpan
+Pendaftaran yang tidak dilanjutkan dan tidak mengalami aktivitas selama 12 bulan akan dihapus data pribadinya, termasuk NIK dan foto. Nomor referensi tanpa identitas dapat tetap disimpan sebagai catatan audit. Pendaftaran yang masih diproses disimpan selama diperlukan untuk tahapan tersebut.
 
 Akses dan permintaan data
 Akses data dibatasi kepada petugas berwenang. Permintaan koreksi atau penghapusan dapat diajukan melalui kontak resmi perusahaan.`;
 
-const terms = `Pendaftaran awal
-Pengisian formulir menyatakan minat awal dan bukan jaminan diterima, memperoleh visa, ditempatkan, atau diberangkatkan.
+const terms = `Pendaftaran melalui website
+Pengisian formulir CPMI tidak menjamin diterima, memperoleh visa, ditempatkan, atau diberangkatkan.
 
 Informasi program
 Persyaratan negara, gaji, biaya, jadwal, kuota, dan sektor pekerjaan dapat berubah. Kontrak kerja serta dokumen resmi menjadi acuan utama.

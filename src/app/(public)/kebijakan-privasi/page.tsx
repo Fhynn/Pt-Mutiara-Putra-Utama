@@ -2,19 +2,24 @@ import { LegalText } from "@/components/public/legal-text";
 import { PageHero } from "@/components/public/page-hero";
 import { getSettings } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Kebijakan Privasi",
   description: "Kebijakan pengelolaan data pribadi pada website PT. Mutiara Putra Utama."
 };
 
 const fallbackPolicy = `Data yang dikumpulkan
-Formulir pendaftaran awal meminta nama, nomor telepon atau WhatsApp, domisili, negara yang diminati, serta informasi tambahan yang Anda pilih untuk diberikan.
+Formulir pendaftaran CPMI meminta negara tujuan, sektor, nama, NIK, tempat dan tanggal lahir, jenis kelamin, status pernikahan, agama, tinggi dan berat badan, alamat lengkap, kontak, pengalaman kerja, serta satu foto diri. Formulir kontak mengumpulkan data yang Anda isikan di sana.
 
 Tujuan penggunaan
-Data digunakan untuk menanggapi konsultasi, memeriksa minat awal, dan menghubungi Anda mengenai tahapan yang relevan.
+Data digunakan untuk memeriksa pendaftaran, menyesuaikan informasi program dan persyaratan, serta menghubungi Anda mengenai tahapan yang relevan. NIK disimpan terenkripsi dan foto berada di penyimpanan privat. Akses dibatasi kepada petugas berwenang.
 
 Dokumen pribadi
-Jangan mengirim KTP, KK, paspor, hasil medis, atau dokumen sensitif melalui kolom pesan. Penyerahan dokumen tahap lanjutan dilakukan melalui petugas dan saluran resmi MPU.
+Formulir hanya meminta nomor NIK dan foto diri, bukan unggahan foto KTP, KK, paspor, atau hasil medis. Jangan mengirim dokumen tersebut melalui kolom pesan. Penyerahan dokumen tahap lanjutan dilakukan melalui petugas dan saluran resmi MPU.
+
+Masa simpan
+Pendaftaran yang tidak dilanjutkan dan tidak mengalami aktivitas selama 12 bulan akan dihapus data pribadinya, termasuk NIK dan foto. Nomor referensi tanpa identitas dapat tetap disimpan sebagai catatan audit. Pendaftaran yang masih diproses disimpan selama diperlukan untuk tahapan tersebut.
 
 Akses dan permintaan data
 Akses data dibatasi kepada petugas berwenang. Permintaan koreksi atau penghapusan dapat diajukan melalui kontak resmi perusahaan.`;

@@ -2,13 +2,15 @@ import { LegalText } from "@/components/public/legal-text";
 import { PageHero } from "@/components/public/page-hero";
 import { getSettings } from "@/lib/public-data";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Syarat dan Ketentuan",
-  description: "Ketentuan penggunaan website dan pendaftaran awal PT. Mutiara Putra Utama."
+  description: "Ketentuan penggunaan website dan pendaftaran CPMI PT. Mutiara Putra Utama."
 };
 
-const fallbackTerms = `Pendaftaran awal
-Pengisian formulir menyatakan minat awal dan bukan jaminan diterima, memperoleh visa, ditempatkan, atau diberangkatkan.
+const fallbackTerms = `Pendaftaran melalui website
+Pengisian formulir CPMI tidak menjamin diterima, memperoleh visa, ditempatkan, atau diberangkatkan.
 
 Informasi program
 Persyaratan negara, gaji, biaya, jadwal, kuota, dan sektor pekerjaan dapat berubah. Kontrak kerja serta dokumen resmi menjadi acuan utama.

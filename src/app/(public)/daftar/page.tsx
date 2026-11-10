@@ -4,8 +4,8 @@ import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "Pendaftaran Awal CPMI",
-  description: "Formulir minat awal calon Pekerja Migran Indonesia."
+  title: "Pendaftaran CPMI",
+  description: "Formulir pendaftaran calon Pekerja Migran Indonesia PT Mutiara Putra Utama."
 };
 
 export default async function ApplyPage({
@@ -39,33 +39,31 @@ export default async function ApplyPage({
     <>
       <PageHero
         breadcrumb="Daftar"
-        title="Pendaftaran Awal Calon Pekerja Migran Indonesia"
-        description="Formulir ini mencatat minat awal di website perusahaan. Formulir ini bukan pendaftaran pemerintah dan bukan jaminan diterima atau diberangkatkan."
+        title="Pendaftaran Calon Pekerja Migran Indonesia"
+        description="Isi formulir pendaftaran PT Mutiara Putra Utama. Data Anda diperiksa petugas sebelum tahapan berikutnya."
       />
       <section className="section section-muted">
         <div className="container form-shell">
           <aside>
             <span className="eyebrow">Sebelum Mengisi</span>
-            <h2 className="section-title">Pendaftaran awal sebelum verifikasi dokumen</h2>
+            <h2 className="section-title">Siapkan data diri dan foto</h2>
             <p className="lead">
-              Isi data kontak, domisili, dan negara yang diminati. Petugas MPU akan menjelaskan
-              tahapan berikutnya setelah memeriksa pendaftaran.
+              Siapkan NIK, alamat lengkap, riwayat pekerjaan, dan satu foto diri berukuran maksimal
+              2 MB. Periksa kembali semua data sebelum dikirim.
             </p>
             <ul className="check-list">
+              <li>Persyaratan setiap negara dapat dibaca di halaman negara tujuan.</li>
               <li>
-                Kriteria usia, pendidikan, tinggi badan, dan sektor tersedia di halaman negara.
+                NIK dan foto disimpan secara privat untuk pemeriksaan pendaftaran oleh petugas MPU.
               </li>
               <li>
-                KTP, KK, akta kelahiran, ijazah, surat izin keluarga, dan paspor lama disiapkan
-                untuk verifikasi tahap lanjutan sesuai negara tujuan.
-              </li>
-              <li>
-                Dokumen pribadi diserahkan melalui petugas dan kanal resmi MPU setelah ada arahan;
-                jangan menyalin nomor identitas ke kolom pesan.
+                Jangan mengirim foto KTP, paspor, atau dokumen lain melalui formulir ini. Dokumen
+                lanjutan diserahkan setelah ada arahan petugas melalui saluran resmi.
               </li>
               <li>
                 Simpan nomor referensi internal yang muncul setelah formulir berhasil dikirim.
               </li>
+              <li>Pengisian formulir tidak menjamin diterima atau diberangkatkan.</li>
             </ul>
           </aside>
           <ApplicationForm

@@ -129,7 +129,7 @@ const fallbackSteps = [
 const fallbackFaqs = [
   [
     "Cara mendaftar",
-    "Isi formulir pendaftaran awal dengan data yang benar. Tim akan meninjau data jika ada program yang sesuai."
+    "Isi formulir CPMI dengan data diri, pengalaman kerja, dan satu foto. Tim akan meninjau pendaftaran dan memberi informasi tahap berikutnya."
   ],
   [
     "Berkas umum",
