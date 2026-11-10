@@ -131,8 +131,6 @@ const advancedFieldKeys = new Set([
   "terms",
   "sourceReference",
   "sourceUrl",
-  "requirementsSourceUrl",
-  "requirementsReviewedAt",
   "needsReview"
 ]);
 

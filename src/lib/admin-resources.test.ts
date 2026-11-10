@@ -28,7 +28,6 @@ describe("form admin ramah pengguna", () => {
     expect(fieldTypes.salaryDetails).toBe("list");
     expect(fieldTypes.informalSectorInfo).toBe("textarea");
     expect(fieldTypes.formalSectorInfo).toBe("textarea");
-    expect(fieldTypes.requirementsReviewedAt).toBe("date");
   });
 
   it("menghapus tautan media sosial yang belum diisi", () => {

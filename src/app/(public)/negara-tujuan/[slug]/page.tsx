@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AlertTriangle, Banknote, BriefcaseBusiness, ExternalLink, FileText } from "lucide-react";
+import { Banknote, BriefcaseBusiness, FileText } from "lucide-react";
 import { Breadcrumb } from "@/components/public/breadcrumb";
 import { CompactList } from "@/components/public/compact-list";
 import { EmptyState } from "@/components/public/empty-state";
@@ -10,16 +10,6 @@ export const dynamic = "force-dynamic";
 
 function stringList(value: unknown) {
   return Array.isArray(value) ? value.map(String).filter(Boolean) : [];
-}
-
-function formatReviewedAt(value: Date | null) {
-  if (!value) return null;
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "Asia/Jakarta"
-  }).format(value);
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -55,7 +45,6 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
   const criteria = stringList(country.criteria);
   const documents = stringList(country.requirements);
   const salaryDetails = stringList(country.salaryDetails);
-  const reviewedAt = formatReviewedAt(country.requirementsReviewedAt);
   const statusLabel =
     country.programStatus === "AVAILABLE"
       ? "Program tersedia"
@@ -144,7 +133,6 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
             <article className="country-detail-card country-salary-card">
               <Banknote aria-hidden="true" />
               <div>
-                <span className="detail-kicker">Informasi yang pernah dipublikasikan MPU</span>
                 <h2>Gaji</h2>
                 {salaryDetails.length ? (
                   <ul>
@@ -175,28 +163,6 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
                 </dl>
               </div>
             </article>
-          </div>
-
-          <div className="country-source-notice">
-            <AlertTriangle aria-hidden="true" />
-            <div>
-              <strong>
-                {country.requirementsDisclaimer ??
-                  "Syarat dan ketentuan dapat berubah mengikuti aturan yang berlaku."}
-              </strong>
-              <p>
-                {salaryDetails.length
-                  ? "Nominal di atas berasal dari halaman persyaratan pada situs MPU sebelumnya dan bukan penawaran kerja atau jaminan penghasilan. Periksa lowongan, kontrak kerja, potongan, fasilitas, serta kurs yang berlaku sebelum menyetujui program."
-                  : "Rincian gaji, biaya, persyaratan, dan kontrak perlu dikonfirmasi kepada petugas MPU sesuai program yang berlaku."}
-              </p>
-              {country.requirementsSourceUrl ? (
-                <a href={country.requirementsSourceUrl} target="_blank" rel="noopener noreferrer">
-                  Buka sumber persyaratan
-                  <ExternalLink aria-hidden="true" />
-                </a>
-              ) : null}
-              {reviewedAt ? <small>Sumber terakhir diperiksa: {reviewedAt}</small> : null}
-            </div>
           </div>
 
           <div className="country-jobs-section">

@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-test("halaman Hong Kong menampilkan kriteria, dokumen, gaji, dan sumber", async ({ page }) => {
+test("halaman Hong Kong menampilkan kriteria, dokumen, dan gaji tanpa sumber situs lama", async ({
+  page
+}) => {
   await page.goto("/negara-tujuan/hong-kong");
 
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
@@ -12,10 +14,9 @@ test("halaman Hong Kong menampilkan kriteria, dokumen, gaji, dan sumber", async 
   await expect(
     page.getByText("Penjaga anak/bayi dan asisten rumah tangga.", { exact: true })
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /Buka sumber persyaratan/i })).toHaveAttribute(
-    "href",
-    "https://ptmutiaraputrautama.com/Syarat-Hongkong/"
-  );
+  await expect(page.getByRole("link", { name: /Buka sumber persyaratan/i })).toHaveCount(0);
+  await expect(page.getByText(/Sumber terakhir diperiksa/i)).toHaveCount(0);
+  await expect(page.getByText(/Nominal di atas berasal dari/i)).toHaveCount(0);
 
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth
@@ -39,7 +40,7 @@ test("halaman daftar meminta data diri dan menjelaskan penyimpanan foto privat",
   await expect(page.getByLabel("Unggah foto diri *")).toBeVisible();
 });
 
-test("empat negara memiliki persyaratan spesifik dari sumber MPU", async ({ page }) => {
+test("empat negara tetap memiliki persyaratan spesifik", async ({ page }) => {
   for (const [slug, name, salary] of [
     ["taiwan", "Taiwan", "NT$20.000"],
     ["hong-kong", "Hong Kong", "HK$5.100"],

@@ -1,5 +1,10 @@
 # QA Report — 5 November 2026
 
+## Penghapusan catatan sumber situs lama — 11 November 2026
+
+- Blok sumber, tautan ke halaman lama, dan tanggal pemeriksaan dihapus dari detail negara. Data lama pada lima negara dibersihkan di Neon; kriteria, dokumen, gaji, serta sektor tetap tersedia untuk diedit admin.
+- `npm run lint`, `npm run typecheck`, dan 12 unit test lulus. Dua belas uji browser detail negara lulus pada desktop, tablet, dan mobile.
+
 ## Formulir CPMI lengkap — 11 November 2026
 
 - Migration `202611110001_application_full_form` berhasil diterapkan ke Neon. Kolom baru nullable agar pendaftar lama tetap terbaca.

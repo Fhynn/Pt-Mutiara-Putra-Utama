@@ -253,20 +253,12 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       ),
       list(
         "salaryDetails",
-        "Rincian gaji dari sumber",
-        "Tulis nominal, mata uang, dan sektornya persis seperti sumber. Jangan menambahkan perkiraan sendiri."
+        "Rincian gaji",
+        "Tulis nominal dan mata uang yang sudah dipastikan untuk program ini."
       ),
       area("informalSectorInfo", "Keterangan sektor informal"),
       area("formalSectorInfo", "Keterangan sektor formal"),
       list("sectors", "Bidang pekerjaan singkat", "Dipakai sebagai label pada kartu negara."),
-      area("requirementsDisclaimer", "Catatan perubahan persyaratan", false),
-      text("requirementsSourceUrl", "Tautan sumber persyaratan"),
-      {
-        key: "requirementsReviewedAt",
-        label: "Tanggal sumber terakhir diperiksa",
-        type: "date",
-        help: "Tanggal petugas memeriksa kembali isi sumber. Ini bukan tanggal jaminan bahwa program sedang dibuka."
-      },
       select(
         "programStatus",
         "Ketersediaan program",

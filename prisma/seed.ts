@@ -100,8 +100,7 @@ const countries = [
       "Asisten rumah tangga",
       "Pabrik",
       "Nelayan"
-    ],
-    sourceUrl: "https://ptmutiaraputrautama.com/Syarat-Taiwan/"
+    ]
   },
   {
     name: "Hong Kong",
@@ -124,8 +123,7 @@ const countries = [
     salaryDetails: ["HK$5.100 (sekitar Rp11.000.000) — sektor informal"],
     informalSectorInfo: "Penjaga anak/bayi dan asisten rumah tangga.",
     formalSectorInfo: "Belum tersedia pada informasi MPU yang diperiksa.",
-    sectors: ["Penjaga anak/bayi", "Asisten rumah tangga"],
-    sourceUrl: "https://ptmutiaraputrautama.com/Syarat-Hongkong/"
+    sectors: ["Penjaga anak/bayi", "Asisten rumah tangga"]
   },
   {
     name: "Singapura",
@@ -147,8 +145,7 @@ const countries = [
     salaryDetails: ["SGD550 (sekitar Rp8.000.000) — sektor informal"],
     informalSectorInfo: "Penjaga anak/bayi dan asisten rumah tangga.",
     formalSectorInfo: "Belum tersedia pada informasi MPU yang diperiksa.",
-    sectors: ["Penjaga anak/bayi", "Asisten rumah tangga"],
-    sourceUrl: "https://ptmutiaraputrautama.com/Syarat-Singapura/"
+    sectors: ["Penjaga anak/bayi", "Asisten rumah tangga"]
   },
   {
     name: "Malaysia",
@@ -177,8 +174,7 @@ const countries = [
       "Penjaga anak/bayi",
       "Perawatan lansia",
       "Asisten rumah tangga"
-    ],
-    sourceUrl: "https://ptmutiaraputrautama.com/Syarat-Malaysia/"
+    ]
   },
   {
     name: "Brunei Darussalam",
@@ -193,8 +189,7 @@ const countries = [
     salaryDetails: [],
     informalSectorInfo: "Tidak disebutkan dalam informasi yang diberikan klien.",
     formalSectorInfo: "Konstruksi, pembuatan kue, dan bidang formal lain sesuai program.",
-    sectors: ["Konstruksi", "Pembuat kue"],
-    sourceUrl: null
+    sectors: ["Konstruksi", "Pembuat kue"]
   }
 ] as const;
 
@@ -445,11 +440,9 @@ async function main() {
       informalSectorInfo: country.informalSectorInfo,
       formalSectorInfo: country.formalSectorInfo,
       sectors: [...country.sectors],
-      requirementsDisclaimer:
-        "Syarat, nominal gaji, sektor, dan ketentuan dapat berubah sewaktu-waktu mengikuti program, kontrak kerja, dan peraturan yang berlaku.",
-      requirementsSourceUrl: country.sourceUrl,
-      requirementsReviewedAt:
-        country.slug === "brunei-darussalam" ? null : new Date("2026-11-07T00:00:00.000Z"),
+      requirementsDisclaimer: null,
+      requirementsSourceUrl: null,
+      requirementsReviewedAt: null,
       programStatus: "MORE_INFO" as const,
       status: "PUBLISHED" as const,
       isFeatured: true,

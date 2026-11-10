@@ -1164,49 +1164,6 @@ a {
   color: #46546b;
 }
 
-.country-source-notice {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: 24px minmax(0, 1fr);
-  margin-top: 24px;
-  border: 1px solid #f0d2aa;
-  border-radius: 12px;
-  padding: 22px 24px;
-  background: #fff9f0;
-  color: #5d4527;
-}
-
-.country-source-notice > svg {
-  color: #b56a00;
-}
-
-.country-source-notice strong {
-  color: #452f16;
-}
-
-.country-source-notice p {
-  margin: 7px 0 11px;
-  line-height: 1.55;
-}
-
-.country-source-notice a {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--navy);
-  font-weight: 800;
-}
-
-.country-source-notice a svg {
-  width: 15px;
-}
-
-.country-source-notice small {
-  display: block;
-  margin-top: 8px;
-  color: #72583a;
-}
-
 .country-jobs-section {
   margin-top: 58px;
   padding-top: 42px;
@@ -1241,8 +1198,7 @@ a {
   }
 
   .requirement-panel-heading,
-  .country-detail-card,
-  .country-source-notice {
+  .country-detail-card {
     padding-right: 18px;
     padding-left: 18px;
   }
@@ -4036,18 +3992,6 @@ body {
 
   .sector-definition-list div {
     gap: 1px;
-  }
-
-  .country-source-notice {
-    gap: 10px;
-    grid-template-columns: 20px minmax(0, 1fr);
-    margin-top: 12px;
-    padding: 14px;
-    font-size: 0.8rem;
-  }
-
-  .country-source-notice p {
-    margin: 6px 0 8px;
   }
 
   .country-jobs-section {
