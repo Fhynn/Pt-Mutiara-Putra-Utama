@@ -6,6 +6,7 @@
 - Pendaftaran uji sementara berhasil lewat API nyata: biodata tersimpan di Neon, NIK terenkripsi, dan foto tersimpan di bucket privat serta dapat diakses dengan tautan singkat. Data uji dan foto telah dihapus setelah pemeriksaan.
 - Uji penghapusan data pribadi berhasil: NIK, biodata, catatan, dan foto hilang; referensi tanpa identitas tersisa. Data uji retensi juga telah dibersihkan.
 - Route NIK/foto tanpa login memberi 403; route retensi tanpa secret memberi 401.
+- Setelah deploy `b7bf8ea`, halaman daftar live menampilkan form baru, kebijakan privasi live menampilkan retensi 12 bulan, dan pendaftaran uji melalui API Vercel berhasil tersimpan di Neon dengan NIK terenkripsi serta foto bucket privat. Data dan foto uji live telah dihapus. Endpoint NIK, foto, dan penghapusan menolak akses anonim (403).
 - Uji browser formulir desktop/tablet/mobile dengan API yang dimock lulus (3/3). Suite halaman publik dan persyaratan negara lulus (24/24). Screenshot formulir mobile diperiksa.
 - `CRON_SECRET` sudah dibuat di `.env.local` tetapi belum dapat diverifikasi di pengaturan Vercel dari repo lokal. Penghapusan otomatis production bergantung pada secret ini.
 
