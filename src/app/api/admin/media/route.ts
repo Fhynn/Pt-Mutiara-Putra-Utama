@@ -7,7 +7,12 @@ import { writeAudit } from "@/lib/audit";
 import { prisma } from "@/lib/db";
 import { validateAndProcessUpload } from "@/lib/media-validation";
 import { hasPermission } from "@/lib/permissions";
-import { deleteObject, isStorageConfigured, putObject } from "@/lib/storage";
+import {
+  copyPrivateObjectToPublic,
+  deleteObject,
+  isStorageConfigured,
+  putObject
+} from "@/lib/storage";
 import { serializeBigInt } from "@/lib/utils";
 
 async function authorized() {
@@ -26,8 +31,7 @@ export async function GET() {
   const items = await prisma.mediaAsset.findMany({
     where: { isDeleted: false },
     include: { _count: { select: { usages: true, galleryItems: true } } },
-    orderBy: { createdAt: "desc" },
-    take: 200
+    orderBy: { createdAt: "desc" }
   });
   return NextResponse.json({
     items: serializeBigInt(items),
@@ -153,6 +157,40 @@ export async function PATCH(request: NextRequest) {
   const session = await authorized();
   if (!session) return NextResponse.json({ error: "Tidak diizinkan." }, { status: 403 });
   try {
+    const body = await request.json();
+    if (body?.action === "makePublic") {
+      const input = z
+        .object({ action: z.literal("makePublic"), id: z.string(), confirmed: z.literal(true) })
+        .parse(body);
+      const current = await prisma.mediaAsset.findUnique({ where: { id: input.id } });
+      if (!current || current.isDeleted)
+        return NextResponse.json({ error: "File tidak ditemukan." }, { status: 404 });
+      if (current.visibility === "PUBLIC")
+        return NextResponse.json({ item: serializeBigInt(current) });
+      if (current.kind === "EMBED")
+        return NextResponse.json({ error: "Tautan video sudah bersifat publik." }, { status: 400 });
+
+      const publicUrl = await copyPrivateObjectToPublic(current.objectKey, current.mimeType);
+      let item;
+      try {
+        item = await prisma.mediaAsset.update({
+          where: { id: current.id },
+          data: { visibility: "PUBLIC", publicUrl, permissionStatus: "CLIENT_PROVIDED" }
+        });
+      } catch (error) {
+        await deleteObject(current.objectKey, "PUBLIC").catch(() => undefined);
+        throw error;
+      }
+      await deleteObject(current.objectKey, "PRIVATE").catch(() => undefined);
+      await writeAudit({
+        actorId: session.user.id,
+        action: "UPDATE",
+        entityType: "MediaAsset",
+        entityId: item.id,
+        summary: `Membuka akses publik untuk ${item.originalName}`
+      });
+      return NextResponse.json({ item: serializeBigInt(item) });
+    }
     const input = z
       .object({
         id: z.string(),
@@ -167,7 +205,7 @@ export async function PATCH(request: NextRequest) {
         focalX: z.number().min(0).max(1),
         focalY: z.number().min(0).max(1)
       })
-      .parse(await request.json());
+      .parse(body);
     const item = await prisma.mediaAsset.update({
       where: { id: input.id, isDeleted: false },
       data: input
@@ -177,12 +215,12 @@ export async function PATCH(request: NextRequest) {
       action: "UPDATE",
       entityType: "MediaAsset",
       entityId: item.id,
-      summary: `Memperbarui metadata ${item.originalName}`
+      summary: `Memperbarui keterangan ${item.originalName}`
     });
     return NextResponse.json({ item: serializeBigInt(item) });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Metadata tidak dapat disimpan." },
+      { error: error instanceof Error ? error.message : "Perubahan file tidak dapat disimpan." },
       { status: 400 }
     );
   }

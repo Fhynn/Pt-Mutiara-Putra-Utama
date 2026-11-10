@@ -28,6 +28,15 @@ export async function POST(request: Request) {
         isCover: z.boolean().default(false)
       })
       .parse(await request.json());
+    const media = await prisma.mediaAsset.findFirst({
+      where: { id: input.mediaId, isDeleted: false, visibility: "PUBLIC" },
+      select: { id: true }
+    });
+    if (!media)
+      return NextResponse.json(
+        { error: "File hanya untuk admin. Jadikan publik dahulu di Foto & Video." },
+        { status: 400 }
+      );
     const count = await prisma.galleryItem.count({ where: { albumId: input.albumId } });
     const item = await prisma.$transaction(async (tx) => {
       if (input.isCover)

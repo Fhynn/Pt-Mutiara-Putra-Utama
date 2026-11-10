@@ -23,6 +23,7 @@
     "db:studio": "prisma studio",
     "assets:prepare": "node scripts/prepare-client-assets.mjs",
     "assets:import-all": "tsx scripts/import-all-client-media.ts",
+    "assets:sync-private": "tsx scripts/sync-private-client-media.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

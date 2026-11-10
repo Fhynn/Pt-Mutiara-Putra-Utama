@@ -27,9 +27,9 @@ npm run test:e2e
 
 E2E memerlukan browser Playwright (`npx playwright install chromium`) dan database lokal yang sudah dimigrasikan/di-seed.
 
-## Storage dan email
+## Storage dan data formulir
 
-Upload memakai S3-compatible storage. MinIO disediakan untuk lokal; produksi menggunakan Neon Object Storage dengan bucket `mpu-public` dan `mpu-private`. Adapter menerima ENV `AWS_*` dari Neon Connect atau nama `S3_*` dalam `.env.example`. Email notifikasi memakai Resend bila `RESEND_API_KEY`, `EMAIL_FROM`, dan `ADMIN_NOTIFICATION_EMAIL` tersedia; kegagalan email tidak membatalkan penyimpanan formulir.
+Upload memakai S3-compatible storage. MinIO disediakan untuk lokal; produksi menggunakan Neon Object Storage dengan bucket `mpu-public` dan `mpu-private`. Adapter menerima ENV `AWS_*` dari Neon Connect atau nama `S3_*` dalam `.env.example`. Pendaftaran dan pesan kontak langsung tersimpan di database dan dibaca melalui dashboard admin. Website tidak mengirim notifikasi email otomatis.
 
 ## Deployment ringkas
 

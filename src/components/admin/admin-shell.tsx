@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
-  Activity,
   BriefcaseBusiness,
-  Building2,
   CircleHelp,
   FileBadge2,
   FileText,
@@ -18,7 +17,6 @@ import {
   Inbox,
   LayoutDashboard,
   LogOut,
-  MessageSquare,
   Newspaper,
   Route,
   Settings,
@@ -27,44 +25,42 @@ import {
   UsersRound
 } from "lucide-react";
 
-const groups = [
-  { label: "Ringkasan", items: [["Dashboard", "/admin", LayoutDashboard]] },
-  {
-    label: "Konten Website",
-    items: [
-      ["Halaman", "/admin/halaman", FileText],
-      ["Media", "/admin/media", ImageIcon],
-      ["Galeri", "/admin/galeri", GalleryHorizontal],
-      ["Negara", "/admin/negara", Globe2],
-      ["Berita", "/admin/berita", Newspaper],
-      ["Testimoni", "/admin/testimoni", MessageSquare],
-      ["Pelatihan", "/admin/pelatihan", Building2],
-      ["Layanan", "/admin/layanan", ShieldCheck],
-      ["Tim", "/admin/tim", UsersRound],
-      ["Profil", "/admin/profil", UserRound],
-      ["Alur", "/admin/alur", Route],
-      ["FAQ", "/admin/faq", CircleHelp],
-      ["Legalitas", "/admin/legalitas", FileBadge2]
-    ]
-  },
-  {
-    label: "Rekrutmen",
-    items: [
-      ["Lowongan", "/admin/lowongan", BriefcaseBusiness],
-      ["Pendaftar", "/admin/pendaftar", Inbox]
-    ]
-  },
-  { label: "Komunikasi", items: [["Pesan", "/admin/pesan", MessageSquare]] },
-  {
-    label: "Sistem",
-    items: [
-      ["Pengaturan", "/admin/pengaturan", Settings],
-      ["Pengguna", "/admin/pengguna", UsersRound],
-      ["Aktivitas", "/admin/aktivitas", Activity],
-      ["Profil Akun", "/admin/profil-akun", UserRound]
-    ]
-  }
+const primaryItems = [
+  ["Ringkasan", "/admin", LayoutDashboard],
+  ["Pendaftar", "/admin/pendaftar", Inbox],
+  ["Pesan Masuk", "/admin/pesan", FileText],
+  ["Negara Tujuan", "/admin/negara", Globe2],
+  ["Lowongan", "/admin/lowongan", BriefcaseBusiness],
+  ["Galeri", "/admin/galeri", GalleryHorizontal],
+  ["Foto & Video", "/admin/media", ImageIcon]
 ] as const;
+
+const contentItems = [
+  ["Isi Beranda", "/admin/halaman", FileText],
+  ["Profil Perusahaan", "/admin/profil", UserRound],
+  ["Layanan", "/admin/layanan", ShieldCheck],
+  ["Pelatihan", "/admin/pelatihan", FileText],
+  ["Berita", "/admin/berita", Newspaper],
+  ["FAQ", "/admin/faq", CircleHelp],
+  ["Legalitas", "/admin/legalitas", FileBadge2],
+  ["Tim", "/admin/tim", UsersRound],
+  ["Testimoni", "/admin/testimoni", UserRound],
+  ["Alur Penempatan", "/admin/alur", Route]
+] as const;
+
+const systemItems = [
+  ["Pengaturan Website", "/admin/pengaturan", Settings],
+  ["Profil Akun", "/admin/profil-akun", UserRound],
+  ["Pengguna", "/admin/pengguna", UsersRound],
+  ["Riwayat Aktivitas", "/admin/aktivitas", FileText]
+] as const;
+
+const roleLabels: Record<string, string> = {
+  SUPER_ADMIN: "Administrator utama",
+  ADMIN: "Administrator",
+  EDITOR: "Editor konten",
+  VIEWER: "Pembaca"
+};
 
 export function AdminShell({
   children,
@@ -74,6 +70,29 @@ export function AdminShell({
   user: { name?: string | null; email?: string | null; role: string };
 }) {
   const pathname = usePathname();
+  const [contentOpen, setContentOpen] = useState(
+    contentItems.some(([, href]) => pathname.startsWith(href))
+  );
+  const [systemOpen, setSystemOpen] = useState(
+    systemItems.some(([, href]) => pathname.startsWith(href))
+  );
+  function navLink([label, href, Icon]:
+    | (typeof primaryItems)[number]
+    | (typeof contentItems)[number]
+    | (typeof systemItems)[number]) {
+    const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
+    return (
+      <Link
+        className={active ? "active" : ""}
+        href={href}
+        key={href}
+        aria-current={active ? "page" : undefined}
+      >
+        <Icon size={18} aria-hidden="true" />
+        <span>{label}</span>
+      </Link>
+    );
+  }
   return (
     <div className="admin-body">
       <div className="admin-shell">
@@ -87,38 +106,48 @@ export function AdminShell({
               height={50}
             />
             <span className="brand-copy">
-              <strong style={{ color: "white" }}>CMS MPU</strong>
-              <span>Panel Administrasi</span>
+              <strong style={{ color: "white" }}>MPU</strong>
+              <span>Kelola Website</span>
             </span>
           </Link>
-          {groups.map((group) => (
-            <div className="admin-nav-group" key={group.label}>
-              <span>{group.label}</span>
-              <nav className="admin-nav">
-                {group.items.map(([label, href, Icon]) => (
-                  <Link
-                    className={
-                      pathname === href || (href !== "/admin" && pathname.startsWith(href))
-                        ? "active"
-                        : ""
-                    }
-                    href={href}
-                    key={href}
-                  >
-                    <Icon size={18} />
-                    <span>{label}</span>
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          ))}
+          <nav className="admin-nav admin-nav-primary" aria-label="Menu utama admin">
+            {primaryItems.map(navLink)}
+          </nav>
+          <details
+            className="admin-nav-more"
+            open={contentOpen}
+            onToggle={(event) => setContentOpen(event.currentTarget.open)}
+          >
+            <summary>Konten lainnya</summary>
+            <nav className="admin-nav" aria-label="Konten lainnya">
+              {contentItems.map(navLink)}
+            </nav>
+          </details>
+          <details
+            className="admin-nav-more"
+            open={systemOpen}
+            onToggle={(event) => setSystemOpen(event.currentTarget.open)}
+          >
+            <summary>Akun & pengaturan</summary>
+            <nav className="admin-nav" aria-label="Akun dan pengaturan">
+              {systemItems
+                .filter(([, href]) =>
+                  href === "/admin/pengguna"
+                    ? user.role === "SUPER_ADMIN"
+                    : href === "/admin/aktivitas" || href === "/admin/pengaturan"
+                      ? user.role === "SUPER_ADMIN" || user.role === "ADMIN"
+                      : true
+                )
+                .map(navLink)}
+            </nav>
+          </details>
         </aside>
         <div className="admin-main">
           <header className="admin-topbar">
             <div>
               <strong>{user.name}</strong>
               <span>
-                {user.role} · {user.email}
+                {roleLabels[user.role] ?? "Staf"} · {user.email}
               </span>
             </div>
             <div className="admin-actions">

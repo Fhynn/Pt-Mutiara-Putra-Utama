@@ -55,7 +55,7 @@ export async function getAdminRelationOptions(config: AdminResourceConfig) {
         }));
       } else if (relation === "media") {
         const rows = await prisma.mediaAsset.findMany({
-          where: { isDeleted: false },
+          where: { isDeleted: false, visibility: "PUBLIC" },
           orderBy: { createdAt: "desc" },
           take: 250
         });

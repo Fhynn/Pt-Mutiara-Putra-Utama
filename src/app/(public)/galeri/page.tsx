@@ -71,7 +71,7 @@ export default async function GalleryPage() {
           ) : (
             <EmptyState
               title="Galeri belum dipublikasikan"
-              description="Dokumentasi kegiatan akan ditampilkan setelah memperoleh izin publikasi."
+              description="Dokumentasi kegiatan sedang disiapkan untuk ditampilkan di halaman ini."
             />
           )}
         </div>

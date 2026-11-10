@@ -175,8 +175,8 @@ export const adminResources: Record<string, AdminResourceConfig> = {
     ]
   },
   halaman: {
-    title: "Section Halaman",
-    singular: "section",
+    title: "Isi Beranda",
+    singular: "bagian beranda",
     model: "pageSection",
     permission: "content",
     listFields: ["key", "title", "status", "displayOrder"],

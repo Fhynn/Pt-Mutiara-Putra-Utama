@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
@@ -82,6 +83,22 @@ export async function deleteObject(objectKey: string, visibility: "PUBLIC" | "PR
       Key: objectKey
     })
   );
+}
+
+export async function copyPrivateObjectToPublic(objectKey: string, contentType: string) {
+  const { config, s3 } = client();
+  if (!config.publicBaseUrl) throw new Error("Alamat bucket publik belum dikonfigurasi.");
+  await s3.send(
+    new CopyObjectCommand({
+      Bucket: config.publicBucket,
+      Key: objectKey,
+      CopySource: `${config.privateBucket}/${objectKey.split("/").map(encodeURIComponent).join("/")}`,
+      ContentType: contentType,
+      MetadataDirective: "REPLACE",
+      CacheControl: "public, max-age=31536000, immutable"
+    })
+  );
+  return `${config.publicBaseUrl.replace(/\/$/, "")}/${objectKey}`;
 }
 
 export async function createPrivateDownloadUrl(objectKey: string) {

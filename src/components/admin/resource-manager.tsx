@@ -95,12 +95,57 @@ function emptyValue(field: AdminField): FormValue {
   if (field.type === "boolean") return false;
   if (field.type === "list") return [];
   if (field.type === "socialLinks" || field.type === "sectionContent") return {};
+  if (field.type === "select") {
+    if (field.key === "programStatus") return "MORE_INFO";
+    if (field.key === "status" && field.options?.some((option) => option.value === "DRAFT"))
+      return "DRAFT";
+    if (field.key === "approval") return "PENDING";
+  }
   return "";
 }
 
 function initialForm(config: AdminResourceConfig): FormState {
   return Object.fromEntries(config.fields.map((field) => [field.key, emptyValue(field)]));
 }
+
+function formFromItem(config: AdminResourceConfig, item: Record<string, unknown>): FormState {
+  const next = initialForm(config);
+  for (const field of config.fields) {
+    const value = item[field.key];
+    next[field.key] =
+      field.type === "date" && value
+        ? String(value).slice(0, 10)
+        : ((value ?? emptyValue(field)) as FormValue);
+  }
+  return next;
+}
+
+const advancedFieldKeys = new Set([
+  "isoCode",
+  "displayOrder",
+  "isFeatured",
+  "faviconUrl",
+  "logoUrl",
+  "maintenanceMode",
+  "privacyPolicy",
+  "terms",
+  "sourceReference",
+  "sourceUrl",
+  "requirementsSourceUrl",
+  "requirementsReviewedAt",
+  "needsReview"
+]);
+
+// These values are generated or retained by the system. They do not need an editor in the CMS.
+const internalFieldKeys = new Set([
+  "slug",
+  "metaTitle",
+  "metaDescription",
+  "defaultMetaTitle",
+  "defaultMetaDescription",
+  "defaultOgImage",
+  "analyticsId"
+]);
 
 function optionLabel(field: AdminField | undefined, value: unknown, relations: RelationOptions) {
   const options = field?.type === "relation" ? relations[field.relation ?? ""] : field?.options;
@@ -236,7 +281,7 @@ function SectionContentEditor({
               value={String(value[item.key] ?? "")}
               onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
             >
-              <option value="">Pilih foto dari Media Library</option>
+              <option value="">Pilih foto dari koleksi</option>
               {mediaOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -282,12 +327,26 @@ export function ResourceManager({
   initialItems: Record<string, unknown>[];
   relationOptions: RelationOptions;
 }) {
+  const singleton = resource === "pengaturan" || resource === "profil";
   const [items, setItems] = useState(initialItems);
-  const [form, setForm] = useState<FormState>(() => initialForm(config));
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<FormState>(() =>
+    singleton && initialItems[0] ? formFromItem(config, initialItems[0]) : initialForm(config)
+  );
+  const [editingId, setEditingId] = useState<string | null>(
+    singleton && initialItems[0] ? String(initialItems[0].id) : null
+  );
+  const [formOpen, setFormOpen] = useState(singleton && Boolean(initialItems[0]));
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const standardFields = config.fields.filter(
+    (field) =>
+      !field.hidden && !internalFieldKeys.has(field.key) && !advancedFieldKeys.has(field.key)
+  );
+  const advancedFields = config.fields.filter(
+    (field) =>
+      !field.hidden && !internalFieldKeys.has(field.key) && advancedFieldKeys.has(field.key)
+  );
   const filtered = useMemo(
     () =>
       query
@@ -310,16 +369,9 @@ export function ResourceManager({
   }
 
   function edit(item: Record<string, unknown>) {
-    const next: FormState = initialForm(config);
-    for (const field of config.fields) {
-      const value = item[field.key];
-      next[field.key] =
-        field.type === "date" && value
-          ? String(value).slice(0, 10)
-          : ((value ?? emptyValue(field)) as FormValue);
-    }
     setEditingId(String(item.id));
-    setForm(next);
+    setForm(formFromItem(config, item));
+    setFormOpen(true);
     setMessage("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -343,8 +395,11 @@ export function ResourceManager({
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "Gagal menyimpan data.");
       await reload();
-      setEditingId(null);
-      setForm(initialForm(config));
+      if (!singleton) {
+        setEditingId(null);
+        setForm(initialForm(config));
+        setFormOpen(false);
+      }
       setMessage("Perubahan berhasil disimpan.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Gagal menyimpan data.");
@@ -449,6 +504,26 @@ export function ResourceManager({
     );
   }
 
+  function renderFormField(field: AdminField) {
+    return (
+      <label
+        className={
+          ["textarea", "list", "socialLinks", "sectionContent"].includes(field.type ?? "")
+            ? "wide"
+            : ""
+        }
+        key={field.key}
+      >
+        <span>
+          {field.label}
+          {field.required ? " *" : ""}
+        </span>
+        {renderField(field)}
+        {field.help && <small>{field.help}</small>}
+      </label>
+    );
+  }
+
   return (
     <>
       <div className="admin-heading">
@@ -459,18 +534,33 @@ export function ResourceManager({
               `Tambah, perbarui, dan periksa ${config.title.toLowerCase()} yang tampil di website.`}
           </p>
         </div>
+        {!config.readonly && !config.noCreate && (
+          <button
+            className="admin-button primary"
+            type="button"
+            onClick={() => {
+              setEditingId(null);
+              setForm(initialForm(config));
+              setFormOpen(true);
+              setMessage("");
+            }}
+          >
+            <Plus size={16} aria-hidden="true" /> Tambah {config.singular}
+          </button>
+        )}
       </div>
-      {!config.readonly && (
+      {!config.readonly && formOpen && (
         <section className="admin-panel" style={{ marginBottom: 20 }}>
           <div className="admin-panel-header">
-            <h2>{editingId ? `Edit ${config.singular}` : `Tambah ${config.singular}`}</h2>
-            {editingId && (
+            <h2>{editingId ? `Ubah ${config.singular}` : `Tambah ${config.singular}`}</h2>
+            {!singleton && (
               <button
                 className="admin-button"
                 type="button"
                 onClick={() => {
                   setEditingId(null);
                   setForm(initialForm(config));
+                  setFormOpen(false);
                 }}
               >
                 Batal
@@ -483,29 +573,14 @@ export function ResourceManager({
             </p>
           ) : (
             <form onSubmit={save}>
-              <div className="admin-form-grid">
-                {config.fields
-                  .filter((field) => !field.hidden)
-                  .map((field) => (
-                    <label
-                      className={
-                        ["textarea", "list", "socialLinks", "sectionContent"].includes(
-                          field.type ?? ""
-                        )
-                          ? "wide"
-                          : ""
-                      }
-                      key={field.key}
-                    >
-                      <span>
-                        {field.label}
-                        {field.required ? " *" : ""}
-                      </span>
-                      {renderField(field)}
-                      {field.help && <small>{field.help}</small>}
-                    </label>
-                  ))}
-              </div>
+              <div className="admin-form-grid">{standardFields.map(renderFormField)}</div>
+              {advancedFields.length > 0 && (
+                <details className="admin-advanced">
+                  <summary>Pengaturan lanjutan</summary>
+                  <p>Bagian ini biasanya tidak perlu diubah.</p>
+                  <div className="admin-form-grid">{advancedFields.map(renderFormField)}</div>
+                </details>
+              )}
               <div className="admin-actions" style={{ marginTop: 18 }}>
                 <button className="admin-button primary" disabled={busy} type="submit">
                   {busy ? "Menyimpan…" : "Simpan perubahan"}
@@ -513,78 +588,92 @@ export function ResourceManager({
               </div>
             </form>
           )}
-          {message && <p className="admin-message">{message}</p>}
         </section>
       )}
-      <section className="admin-panel">
-        <div className="admin-panel-header">
-          <h2>Daftar data ({filtered.length})</h2>
-          <input
-            aria-label="Cari data"
-            placeholder="Cari…"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </div>
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                {config.listFields.map((fieldKey) => {
-                  const field = config.fields.find((candidate) => candidate.key === fieldKey);
-                  return (
-                    <th key={fieldKey}>{field?.label ?? fieldNameLabels[fieldKey] ?? fieldKey}</th>
-                  );
-                })}
-                {!config.readonly && <th>Aksi</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length ? (
-                filtered.map((item) => (
-                  <tr key={String(item.id)}>
-                    {config.listFields.map((fieldKey) => {
-                      const field = config.fields.find((candidate) => candidate.key === fieldKey);
-                      return (
-                        <td key={fieldKey}>
-                          {displayValue(item[fieldKey], field, relationOptions)}
-                        </td>
-                      );
-                    })}
-                    {!config.readonly && (
-                      <td>
-                        <div className="admin-actions">
-                          <button className="admin-button" type="button" onClick={() => edit(item)}>
-                            Edit
-                          </button>
-                          {resource === "galeri" && (
-                            <a className="admin-button" href={`/admin/galeri/${String(item.id)}`}>
-                              Kelola foto
-                            </a>
-                          )}
-                          {!config.noDelete && (
-                            <button
-                              className="admin-button danger"
-                              type="button"
-                              onClick={() => remove(String(item.id))}
-                            >
-                              Hapus
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))
-              ) : (
+      {message && (
+        <p className="admin-message" role="status">
+          {message}
+        </p>
+      )}
+      {!singleton && (
+        <section className="admin-panel">
+          <div className="admin-panel-header">
+            <h2>
+              Daftar {config.title.toLowerCase()} ({filtered.length})
+            </h2>
+            <input
+              aria-label="Cari data"
+              placeholder="Cari…"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
                 <tr>
-                  <td colSpan={config.listFields.length + 1}>Belum ada data.</td>
+                  {config.listFields.map((fieldKey) => {
+                    const field = config.fields.find((candidate) => candidate.key === fieldKey);
+                    return (
+                      <th key={fieldKey}>
+                        {field?.label ?? fieldNameLabels[fieldKey] ?? fieldKey}
+                      </th>
+                    );
+                  })}
+                  {!config.readonly && <th>Aksi</th>}
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+              </thead>
+              <tbody>
+                {filtered.length ? (
+                  filtered.map((item) => (
+                    <tr key={String(item.id)}>
+                      {config.listFields.map((fieldKey) => {
+                        const field = config.fields.find((candidate) => candidate.key === fieldKey);
+                        return (
+                          <td key={fieldKey}>
+                            {displayValue(item[fieldKey], field, relationOptions)}
+                          </td>
+                        );
+                      })}
+                      {!config.readonly && (
+                        <td>
+                          <div className="admin-actions">
+                            <button
+                              className="admin-button"
+                              type="button"
+                              onClick={() => edit(item)}
+                            >
+                              Ubah
+                            </button>
+                            {resource === "galeri" && (
+                              <a className="admin-button" href={`/admin/galeri/${String(item.id)}`}>
+                                Kelola foto
+                              </a>
+                            )}
+                            {!config.noDelete && (
+                              <button
+                                className="admin-button danger"
+                                type="button"
+                                onClick={() => remove(String(item.id))}
+                              >
+                                Hapus
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={config.listFields.length + 1}>Belum ada data.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </>
   );
 }

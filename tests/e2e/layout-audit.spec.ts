@@ -20,6 +20,7 @@ const publicRoutes = [
 ];
 
 test("seluruh halaman publik rapi dan bebas teks internal", async ({ page }) => {
+  test.setTimeout(90_000); // This audit visits every public route in one test.
   for (const route of publicRoutes) {
     await page.goto(route);
     await expect(page.locator("main")).toBeVisible();

@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { notifyAdmin } from "@/lib/email";
 import { prisma } from "@/lib/db";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { applicationSchema } from "@/lib/validation";
@@ -76,13 +75,5 @@ export async function POST(request: Request) {
     });
   });
 
-  const notification = await notifyAdmin({
-    subject: `Pendaftaran awal baru ${application.referenceNumber}`,
-    text: "Pendaftaran baru tersimpan di dashboard admin. Masuk ke CMS untuk melihat detail."
-  });
-  await prisma.application.update({
-    where: { id: application.id },
-    data: { notificationStatus: notification.status }
-  });
   return NextResponse.json({ referenceNumber: application.referenceNumber }, { status: 201 });
 }

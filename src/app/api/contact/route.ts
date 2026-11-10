@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { notifyAdmin } from "@/lib/email";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { contactSchema } from "@/lib/validation";
 
@@ -26,7 +25,7 @@ export async function POST(request: Request) {
       { status: 429 }
     );
 
-  const message = await prisma.contactMessage.create({
+  await prisma.contactMessage.create({
     data: {
       name: parsed.data.name,
       email: parsed.data.email || null,
@@ -37,14 +36,6 @@ export async function POST(request: Request) {
       consentAt: new Date(),
       privacyPolicyVersion: "2026-11-05"
     }
-  });
-  const notification = await notifyAdmin({
-    subject: `Pesan kontak baru: ${message.subject}`,
-    text: "Pesan baru tersimpan di dashboard admin. Masuk ke CMS untuk melihat detail."
-  });
-  await prisma.contactMessage.update({
-    where: { id: message.id },
-    data: { notificationStatus: notification.status }
   });
   return NextResponse.json({ message: "Pesan tersimpan." }, { status: 201 });
 }

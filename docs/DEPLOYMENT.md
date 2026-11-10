@@ -8,6 +8,10 @@
 4. Isi `NEXTAUTH_URL` dan `NEXT_PUBLIC_SITE_URL` dengan origin HTTPS domain final, tanpa path atau trailing slash. Isi `NEXTAUTH_SECRET` dan `RATE_LIMIT_SECRET` dengan dua secret acak berbeda, masing-masing minimal 32 byte. Jika `S3_ENDPOINT` atau credential `S3_*` lama juga terisi, hapus karena nilainya diprioritaskan atas `AWS_*`.
 5. Akun SUPER_ADMIN yang sudah ada tidak perlu dibootstrap ulang. Pada database baru, jalankan `npm run db:bootstrap-admin` dari lingkungan aman memakai `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_NAME`, dan `BOOTSTRAP_ADMIN_PASSWORD` sementara; hapus ketiga nilai setelah berhasil.
 6. Hubungkan domain HTTPS. Periksa `/api/health`, sitemap, robots, login/logout, ganti password, CRUD negara, upload media publik dan privat, serta formulir kontak dan pendaftaran pada deployment nyata. Pastikan file privat tidak dapat diakses dari URL publik.
-7. Periksa UI pada 390/768/1440 px. Atur backup dan uji pemulihan PostgreSQL serta object storage, monitoring, dan catat versi Vercel terakhir untuk rollback. Selesaikan keputusan fakta dan izin media pada `docs/CONTENT_VERIFICATION.md` sebelum publikasi.
+7. Periksa UI pada 390/768/1440 px. Atur backup dan uji pemulihan PostgreSQL serta object storage, monitoring, dan catat versi Vercel terakhir untuk rollback. Periksa ulang data operasional pada `docs/CONTENT_VERIFICATION.md` sebelum publikasi; izin penggunaan materi klien telah dikonfirmasi oleh pemilik proyek.
 
-Email bersifat opsional. Bila provider belum dikonfigurasi, database tetap menyimpan pendaftaran/pesan dan kolom status notifikasi menunjukkan kondisi tersebut.
+## Pendaftaran dan pesan
+
+Pendaftaran dari `/daftar` dan pesan dari `/kontak` tersimpan langsung ke database. Staf membaca dan mengubah statusnya melalui menu **Pendaftar** dan **Pesan Masuk** di dashboard admin. Tidak ada konfigurasi layanan email yang diperlukan. Setelah deploy, kirim satu pendaftaran dan satu pesan uji lalu pastikan keduanya muncul di dashboard.
+
+Kredensial database, Auth.js, dan Neon Object Storage tetap harus diset pada deployment Vercel; nilai yang tersedia di terminal lokal tidak otomatis ikut ke Vercel.
