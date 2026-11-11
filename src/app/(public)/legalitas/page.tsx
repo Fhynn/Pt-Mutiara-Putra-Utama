@@ -33,8 +33,8 @@ export default async function LegalityPage() {
     <>
       <PageHero
         breadcrumb="Legalitas"
-        title="Legalitas dan sumber verifikasi"
-        description="Kategori dokumen, nomor, dan sumber ditampilkan terpisah untuk mencegah penyebutan izin yang keliru."
+        title="Legalitas PT Mutiara Putra Utama"
+        description="Lihat akta dan informasi izin perusahaan beserta tautan verifikasinya."
       />
       <section className="section">
         <div className="container">
@@ -68,15 +68,6 @@ export default async function LegalityPage() {
                 ) : null}
               </article>
             ))}
-          </div>
-          <div className="content-card" style={{ marginTop: 34 }}>
-            <h2>Catatan penting</h2>
-            <p>
-              Company profile 2022 menyebut nomor <strong>02201003618290002</strong> dengan label
-              SIUP 2021, sedangkan profil SISKOP2MI menampilkan nomor izin{" "}
-              <strong>0220100361829</strong>. Keduanya tidak digabungkan menjadi satu jenis dokumen.
-              Gunakan tautan sumber pada setiap kartu untuk memeriksa kategori dan status dokumen.
-            </p>
           </div>
         </div>
       </section>
