@@ -5,6 +5,7 @@ import { enforceRateLimit } from "@/lib/rate-limit";
 import { applicationSchema } from "@/lib/validation";
 import { encryptNik, processApplicantPhoto } from "@/lib/application-private";
 import { deleteObject, isStorageConfigured, putObject } from "@/lib/storage";
+import { getCountryOccupationOptions } from "@/lib/country-occupations";
 
 export const runtime = "nodejs";
 
@@ -65,10 +66,19 @@ export async function POST(request: Request) {
   }
   const country = await prisma.country.findFirst({
     where: { id: parsed.data.countryId, status: "PUBLISHED" },
-    select: { id: true }
+    select: { id: true, sectors: true, genderCriteria: true }
   });
   if (!country)
     return NextResponse.json({ message: "Negara tujuan tidak tersedia." }, { status: 400 });
+  if (
+    !getCountryOccupationOptions(country, parsed.data.gender).includes(
+      parsed.data.preferredOccupation
+    )
+  )
+    return NextResponse.json(
+      { message: "Pekerjaan yang dipilih tidak sesuai dengan negara atau jenis kelamin." },
+      { status: 400 }
+    );
   if (parsed.data.jobId) {
     const job = await prisma.job.findFirst({
       where: {
@@ -123,6 +133,7 @@ export async function POST(request: Request) {
           domicile: parsed.data.domicile,
           province: parsed.data.province,
           sector: parsed.data.sector,
+          preferredOccupation: parsed.data.preferredOccupation,
           nikEncrypted,
           birthPlace: parsed.data.birthPlace,
           birthDate: new Date(`${parsed.data.birthDate}T00:00:00.000Z`),

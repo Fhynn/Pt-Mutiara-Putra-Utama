@@ -20,6 +20,7 @@ export type InboxItem = {
   job?: string;
   workExperience?: string;
   sector?: string;
+  preferredOccupation?: string;
   birthPlace?: string;
   birthDate?: string;
   gender?: string;
@@ -164,6 +165,7 @@ export function InboxManager({
                 country: undefined,
                 job: undefined,
                 sector: undefined,
+                preferredOccupation: undefined,
                 birthPlace: undefined,
                 birthDate: undefined,
                 gender: undefined,
@@ -311,6 +313,12 @@ export function InboxManager({
                   <div>
                     <span>Sektor</span>
                     <strong>{selected.sector.replaceAll("_", " ")}</strong>
+                  </div>
+                )}
+                {isApplication && selected.preferredOccupation && (
+                  <div>
+                    <span>Pekerjaan diminati</span>
+                    <strong>{selected.preferredOccupation}</strong>
                   </div>
                 )}
                 {isApplication && selected.hasNik && canEdit && (

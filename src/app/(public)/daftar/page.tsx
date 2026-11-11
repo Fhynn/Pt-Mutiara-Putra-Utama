@@ -45,7 +45,9 @@ export default async function ApplyPage() {
             countries={countries.map((country) => ({
               id: country.id,
               name: country.name,
-              slug: country.slug
+              slug: country.slug,
+              sectors: country.sectors,
+              genderCriteria: country.genderCriteria
             }))}
             jobs={jobs.map((job) => ({
               id: job.id,

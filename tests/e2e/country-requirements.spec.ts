@@ -76,6 +76,30 @@ test("revisi klien menampilkan Brunei, ABK Taiwan, dan pekerjaan Malaysia", asyn
   );
 });
 
+test("Malaysia dan Taiwan membedakan kriteria perempuan serta laki-laki", async ({ page }) => {
+  await page.goto("/negara-tujuan/malaysia");
+  await expect(page.getByRole("heading", { name: "Kriteria perempuan" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kriteria laki-laki" })).toBeVisible();
+  await expect(page.getByText("Asisten rumah tangga (ART)")).toBeVisible();
+  await expect(page.getByText("Konstruksi", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Perkebunan sawit dan karet")).toBeVisible();
+  await expect(
+    page.getByText("Rincian kriteria untuk laki-laki belum diberikan MPU.")
+  ).toBeVisible();
+
+  await page.goto("/negara-tujuan/taiwan");
+  if ((page.viewportSize()?.width ?? 1000) <= 520) {
+    await page.getByRole("button", { name: "Lihat 2 kriteria perempuan lainnya" }).click();
+    await page.getByRole("button", { name: "Lihat 2 kriteria laki-laki lainnya" }).click();
+  }
+  await expect(page.getByText("Tinggi badan minimal 155 cm")).toBeVisible();
+  await expect(page.getByText("Tinggi badan minimal 165 cm")).toBeVisible();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
 test("halaman Singapura membedakan persyaratan, pendaftaran CPMI, dan lowongan", async ({
   page
 }) => {

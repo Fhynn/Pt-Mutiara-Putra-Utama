@@ -13,6 +13,7 @@ export const applicationSchema = z.object({
   email: z.email("Email tidak valid."),
   countryId: z.string().cuid("Pilih negara tujuan."),
   sector: z.enum(["FORMAL", "SEMI_FORMAL", "INFORMAL"], "Pilih sektor pekerjaan."),
+  preferredOccupation: z.string().trim().min(2, "Pilih pekerjaan yang diminati.").max(180),
   nik: z.string().regex(/^\d{16}$/, "NIK harus 16 angka."),
   birthPlace: z.string().trim().min(2).max(120),
   birthDate: z.iso

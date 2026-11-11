@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { applicationSchema } from "@/lib/validation";
+import { getCountryOccupationOptions } from "@/lib/country-occupations";
 
 type Values = z.input<typeof applicationSchema>;
 
@@ -40,7 +41,13 @@ export function ApplicationForm({
   defaultCountryId = "",
   defaultJobId = ""
 }: {
-  countries: Array<{ id: string; name: string; slug?: string }>;
+  countries: Array<{
+    id: string;
+    name: string;
+    slug?: string;
+    sectors: string[];
+    genderCriteria: unknown;
+  }>;
   jobs: Array<{ id: string; title: string; countryId: string; slug?: string }>;
   defaultCountryId?: string;
   defaultJobId?: string;
@@ -65,6 +72,7 @@ export function ApplicationForm({
       email: "",
       countryId: defaultCountryId,
       sector: undefined,
+      preferredOccupation: "",
       nik: "",
       birthPlace: "",
       birthDate: "",
@@ -97,7 +105,12 @@ export function ApplicationForm({
     }
   }, [countries, jobs, setValue]);
   const countryId = useWatch({ control, name: "countryId" });
+  const gender = useWatch({ control, name: "gender" });
   const availableJobs = jobs.filter((job) => job.countryId === countryId);
+  const selectedCountry = countries.find((country) => country.id === countryId);
+  const occupationOptions = selectedCountry
+    ? getCountryOccupationOptions(selectedCountry, gender)
+    : [];
   const error = (key: keyof Values) =>
     errors[key]?.message ? (
       <span className="field-error" role="alert">
@@ -137,6 +150,7 @@ export function ApplicationForm({
         email: "",
         countryId: defaultCountryId,
         sector: undefined,
+        preferredOccupation: "",
         nik: "",
         birthPlace: "",
         birthDate: "",
@@ -178,7 +192,15 @@ export function ApplicationForm({
         <h3 className="application-form-section">Program yang diminati</h3>
         <div className="field">
           <label htmlFor="countryId">Negara tujuan *</label>
-          <select id="countryId" {...register("countryId")}>
+          <select
+            id="countryId"
+            {...register("countryId", {
+              onChange: () => {
+                setValue("preferredOccupation", "");
+                setValue("jobId", "");
+              }
+            })}
+          >
             <option value="">Pilih negara</option>
             {countries.map((country) => (
               <option value={country.id} key={country.id}>
@@ -187,6 +209,45 @@ export function ApplicationForm({
             ))}
           </select>
           {error("countryId")}
+        </div>
+        <div className="field">
+          <label htmlFor="gender">Jenis kelamin *</label>
+          <select
+            id="gender"
+            {...register("gender", { onChange: () => setValue("preferredOccupation", "") })}
+          >
+            <option value="">Pilih jenis kelamin</option>
+            {genderOptions.map(([value, label]) => (
+              <option value={value} key={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          {error("gender")}
+        </div>
+        <div className="field">
+          <label htmlFor="preferredOccupation">Pekerjaan yang diminati *</label>
+          <select
+            id="preferredOccupation"
+            {...register("preferredOccupation")}
+            disabled={!occupationOptions.length}
+          >
+            <option value="">
+              {!countryId
+                ? "Pilih negara dahulu"
+                : !gender && !occupationOptions.length
+                  ? "Pilih jenis kelamin dahulu"
+                  : occupationOptions.length
+                    ? "Pilih pekerjaan"
+                    : "Pilihan pekerjaan belum tersedia"}
+            </option>
+            {occupationOptions.map((occupation) => (
+              <option value={occupation} key={occupation}>
+                {occupation}
+              </option>
+            ))}
+          </select>
+          {error("preferredOccupation")}
         </div>
         <div className="field">
           <label htmlFor="sector">Sektor *</label>
@@ -245,18 +306,6 @@ export function ApplicationForm({
             {...register("birthDate")}
           />
           {error("birthDate")}
-        </div>
-        <div className="field">
-          <label htmlFor="gender">Jenis kelamin *</label>
-          <select id="gender" {...register("gender")}>
-            <option value="">Pilih jenis kelamin</option>
-            {genderOptions.map(([value, label]) => (
-              <option value={value} key={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-          {error("gender")}
         </div>
         <div className="field">
           <label htmlFor="maritalStatus">Status pernikahan *</label>

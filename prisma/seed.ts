@@ -3,6 +3,7 @@ import { stat } from "node:fs/promises";
 import path from "node:path";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { initialCountryGenderCriteria } from "../src/lib/country-gender-defaults";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL wajib diisi sebelum menjalankan seed.");
@@ -429,6 +430,10 @@ async function main() {
   }
 
   for (const [index, country] of countries.entries()) {
+    const genderCriteria =
+      country.slug === "malaysia" || country.slug === "taiwan"
+        ? initialCountryGenderCriteria[country.slug]
+        : null;
     const countryData = {
       name: country.name,
       isoCode: country.isoCode,
@@ -453,6 +458,7 @@ async function main() {
       update: countryData,
       create: {
         ...countryData,
+        ...(genderCriteria ? { genderCriteria } : {}),
         slug: country.slug,
         publishedAt: new Date()
       }

@@ -24,10 +24,25 @@ describe("form admin ramah pengguna", () => {
     const fieldTypes = Object.fromEntries(fields.map((field) => [field.key, field.type]));
 
     expect(fieldTypes.criteria).toBe("list");
+    expect(fieldTypes.genderCriteria).toBe("genderCriteria");
     expect(fieldTypes.requirements).toBe("list");
     expect(fieldTypes.salaryDetails).toBe("list");
     expect(fieldTypes.informalSectorInfo).toBe("textarea");
     expect(fieldTypes.formalSectorInfo).toBe("textarea");
+  });
+
+  it("menyimpan kriteria perempuan dan laki-laki secara terpisah", () => {
+    const result = normalizeAdminPayload(adminResources.negara, {
+      genderCriteria: {
+        women: { jobs: ["ART", ""], criteria: ["Tinggi minimal 145 cm"] },
+        men: { jobs: ["Konstruksi"], criteria: ["  Usia 21–40 tahun  "] }
+      }
+    });
+
+    expect(result.genderCriteria).toEqual({
+      women: { jobs: ["ART"], criteria: ["Tinggi minimal 145 cm"] },
+      men: { jobs: ["Konstruksi"], criteria: ["Usia 21–40 tahun"] }
+    });
   });
 
   it("menghapus tautan media sosial yang belum diisi", () => {

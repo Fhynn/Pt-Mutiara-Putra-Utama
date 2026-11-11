@@ -15,6 +15,8 @@ NIK dan foto pendaftar hanya dapat dibuka oleh admin yang berwenang. Klik **Liha
 
 Kolom pencarian mencari semua data yang tersimpan, termasuk halaman lama. Gunakan **Berikutnya** untuk melihat data berikutnya. Tombol **Perbarui daftar** menampilkan data terbaru jika ada formulir yang baru dikirim.
 
+Formulir meminta **Pekerjaan yang diminati** setelah negara dan jenis kelamin dipilih. Pada Malaysia, pilihan perempuan dan laki-laki berbeda. Pilihan ini muncul di detail **Pendaftar**, terpisah dari lowongan aktif. Jika daftar pekerjaan negara diubah di **Negara Tujuan**, pilihan formulir ikut berubah setelah halaman publik diperbarui.
+
 ## Mengubah isi website
 
 - **Negara Tujuan**: ubah informasi negara, kriteria, dan persyaratan. Buka negara dari daftar, ubah kolom yang diperlukan, lalu simpan.
@@ -22,6 +24,8 @@ Kolom pencarian mencari semua data yang tersimpan, termasuk halaman lama. Gunaka
 - **Galeri** dan **Foto & Video**: unggah media, lalu kelola album yang tampil di website. Tombol **Ubah** digunakan untuk judul, deskripsi, dan keterangan foto.
 - **Konten lainnya**: buka menu ini jika ingin mengubah isi beranda, profil perusahaan, layanan, berita, FAQ, legalitas, dan bagian lain yang jarang diperbarui.
 - **Akun & pengaturan**: ubah kontak website atau password akun. Menu pengguna dan riwayat aktivitas hanya terlihat untuk staf yang berwenang.
+
+Untuk negara dengan syarat berbeda bagi perempuan dan laki-laki, buka **Negara Tujuan → Ubah**, aktifkan **Pisahkan persyaratan perempuan dan laki-laki**, lalu isi pekerjaan dan kriteria pada masing-masing bagian. Kosongkan syarat yang belum dipastikan; website tidak akan membuat angkanya sendiri. Daftar dokumen di bawahnya berlaku untuk kedua bagian. Klik **Simpan perubahan** agar halaman negara diperbarui.
 
 Kolom **Pengaturan lanjutan** biasanya tidak perlu diubah. Alamat halaman dan beberapa pengaturan teknis dibuat otomatis atau sudah diisi dari data website.
 

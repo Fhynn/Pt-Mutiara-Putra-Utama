@@ -298,6 +298,7 @@ model Country {
   summary                String?
   programDescription     String?
   criteria               Json?
+  genderCriteria         Json?
   requirements           Json?
   salaryDetails          Json?
   informalSectorInfo     String?
@@ -565,6 +566,7 @@ model Application {
   email                String?
   domicile             String
   sector               String?
+  preferredOccupation  String?
   nikEncrypted         String?
   birthPlace           String?
   birthDate            DateTime?

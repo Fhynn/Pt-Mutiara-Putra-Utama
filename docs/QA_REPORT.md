@@ -1,5 +1,17 @@
 # QA Report — 5 November 2026
 
+## Pilihan pekerjaan formulir CPMI — 11 November 2026
+
+- Formulir pendaftaran kini meminta pekerjaan yang diminati sesuai negara dan jenis kelamin. Malaysia memisahkan ART dari konstruksi/perkebunan; Taiwan menggunakan daftar pekerjaan negara untuk kedua jenis kelamin sampai ada rincian pemisahan pekerjaan yang dikonfirmasi.
+- API memeriksa kembali pilihan terhadap data negara sebelum menyimpan. Dashboard Pendaftar menampilkan pilihan ini dan proses penghapusan data pribadi ikut membersihkannya.
+- Migration `202611110003_application_preferred_occupation` berhasil diterapkan di Neon. Typecheck, lint, 27 unit test, dan 24 browser test pada desktop/tablet/mobile lulus.
+
+## Persyaratan Malaysia dan Taiwan — 11 November 2026
+
+- Kolom `genderCriteria` ditambahkan melalui migration Neon dan diisi hanya untuk Malaysia serta Taiwan. Data kriteria negara lain tetap memakai format semula.
+- Admin dapat mengubah pekerjaan dan kriteria perempuan/laki-laki tanpa mengisi JSON. Kriteria laki-laki Malaysia yang belum diberikan klien dibiarkan kosong dan diberi keterangan jelas di halaman publik.
+- Build production, validasi Prisma, typecheck, lint, 25 unit test, dan 18 uji browser halaman negara lulus. Uji browser mencakup desktop, tablet, mobile, serta pemeriksaan overflow. Komposisi kartu Malaysia diperiksa melalui tangkapan layar lokal.
+
 ## Navigasi dashboard admin — 11 November 2026
 
 - Pemeriksaan sesi dan akun aktif di layout serta halaman admin menggunakan hasil yang sama dalam satu permintaan. Daftar Pendaftar hanya mengambil kolom yang dipakai antarmuka.

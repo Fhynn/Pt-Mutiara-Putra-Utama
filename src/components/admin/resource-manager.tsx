@@ -107,7 +107,12 @@ function slugify(value: string) {
 function emptyValue(field: AdminField): FormValue {
   if (field.type === "boolean") return false;
   if (field.type === "list") return [];
-  if (field.type === "socialLinks" || field.type === "sectionContent") return {};
+  if (
+    field.type === "socialLinks" ||
+    field.type === "sectionContent" ||
+    field.type === "genderCriteria"
+  )
+    return {};
   if (field.type === "select") {
     if (field.key === "programStatus") return "MORE_INFO";
     if (field.key === "status" && field.options?.some((option) => option.value === "DRAFT"))
@@ -244,7 +249,7 @@ function StringListEditor({
             }}
           />
           <button
-            aria-label={`Hapus item ${index + 1}`}
+            aria-label={`Hapus ${label.toLowerCase()} ${index + 1}`}
             className="admin-icon-button danger"
             type="button"
             onClick={() => onChange(items.filter((_, itemIndex) => itemIndex !== index))}
@@ -254,8 +259,86 @@ function StringListEditor({
         </div>
       ))}
       <button className="admin-button" type="button" onClick={() => onChange([...items, ""])}>
-        <Plus size={16} /> Tambah item
+        <Plus size={16} /> Tambah {label.toLowerCase()}
       </button>
+    </div>
+  );
+}
+
+function GenderCriteriaEditor({
+  value,
+  onChange
+}: {
+  value: Record<string, unknown>;
+  onChange: (value: Record<string, unknown>) => void;
+}) {
+  const enabled = "women" in value || "men" in value;
+  function group(gender: "women" | "men") {
+    const current = value[gender];
+    const data = current && typeof current === "object" && !Array.isArray(current) ? current : {};
+    return {
+      jobs: "jobs" in data && Array.isArray(data.jobs) ? data.jobs.map(String) : [],
+      criteria: "criteria" in data && Array.isArray(data.criteria) ? data.criteria.map(String) : []
+    };
+  }
+  function update(gender: "women" | "men", key: "jobs" | "criteria", entries: string[]) {
+    onChange({ ...value, [gender]: { ...group(gender), [key]: entries } });
+  }
+  return (
+    <div className="wide admin-gender-criteria">
+      <div className="admin-gender-criteria-head">
+        <div>
+          <strong>Pisahkan persyaratan perempuan dan laki-laki</strong>
+          <p>Aktifkan bila pilihan pekerjaan atau kriterianya berbeda.</p>
+        </div>
+        <button
+          className={`admin-switch ${enabled ? "active" : ""}`}
+          aria-pressed={enabled}
+          type="button"
+          onClick={() =>
+            onChange(
+              enabled
+                ? {}
+                : {
+                    women: { jobs: [], criteria: [] },
+                    men: { jobs: [], criteria: [] }
+                  }
+            )
+          }
+        >
+          <span aria-hidden="true" />
+          {enabled ? "Aktif" : "Tidak aktif"}
+        </button>
+      </div>
+      {enabled ? (
+        <div className="admin-gender-criteria-grid">
+          {(["women", "men"] as const).map((gender) => {
+            const label = gender === "women" ? "perempuan" : "laki-laki";
+            const current = group(gender);
+            return (
+              <section className="admin-gender-criteria-group" key={gender}>
+                <h3>Untuk {label}</h3>
+                <div>
+                  <strong>Pekerjaan {label}</strong>
+                  <StringListEditor
+                    label={`Pekerjaan ${label}`}
+                    value={current.jobs}
+                    onChange={(entries) => update(gender, "jobs", entries)}
+                  />
+                </div>
+                <div>
+                  <strong>Kriteria {label}</strong>
+                  <StringListEditor
+                    label={`Kriteria ${label}`}
+                    value={current.criteria}
+                    onChange={(entries) => update(gender, "criteria", entries)}
+                  />
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -454,8 +537,17 @@ export function ResourceManager({
       !advancedFieldKeys.has(field.key) &&
       !detailGroup?.keys.includes(field.key)
   );
+  const genderSplitEnabled =
+    resource === "negara" &&
+    form.genderCriteria &&
+    typeof form.genderCriteria === "object" &&
+    !Array.isArray(form.genderCriteria) &&
+    ("women" in form.genderCriteria || "men" in form.genderCriteria);
   const detailFields = config.fields.filter(
-    (field) => !field.hidden && detailGroup?.keys.includes(field.key)
+    (field) =>
+      !field.hidden &&
+      detailGroup?.keys.includes(field.key) &&
+      !(genderSplitEnabled && field.key === "criteria")
   );
   const advancedFields = config.fields.filter(
     (field) =>
@@ -652,6 +744,13 @@ export function ResourceManager({
           onChange={(entries) => updateField(field, entries)}
         />
       );
+    if (field.type === "genderCriteria")
+      return (
+        <GenderCriteriaEditor
+          value={value && typeof value === "object" && !Array.isArray(value) ? value : {}}
+          onChange={(next) => updateField(field, next)}
+        />
+      );
     if (field.type === "socialLinks")
       return (
         <SocialLinksEditor
@@ -717,6 +816,13 @@ export function ResourceManager({
   }
 
   function renderFormField(field: AdminField) {
+    if (field.type === "genderCriteria")
+      return (
+        <div className="wide" key={field.key}>
+          {renderField(field)}
+          {field.help ? <small>{field.help}</small> : null}
+        </div>
+      );
     if (
       field.type === "relation" &&
       ["media", "mediaImages", "mediaUrls"].includes(field.relation ?? "")

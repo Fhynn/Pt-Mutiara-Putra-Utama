@@ -8,6 +8,7 @@ describe("validasi formulir publik", () => {
     const form = {
       countryId: "clx1234567890123456789012",
       sector: "FORMAL",
+      preferredOccupation: "Konstruksi",
       fullName: "Budi Santoso",
       nik: "3201010101010001",
       birthPlace: "Bogor",

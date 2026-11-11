@@ -27,6 +27,7 @@ export async function anonymizeApplication(id: string, actorId?: string) {
         domicile: "-",
         province: null,
         sector: null,
+        preferredOccupation: null,
         nikEncrypted: null,
         birthPlace: null,
         birthDate: null,

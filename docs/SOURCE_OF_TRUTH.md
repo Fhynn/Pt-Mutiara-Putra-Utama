@@ -38,6 +38,15 @@ Tanggal inventarisasi: 5 November 2026. Status `confirmed` berarti tercantum jel
 | Foto direktur diganti dengan foto pria bertopi di jembatan                                                        | Foto `revisi/image copy 9.png` dan instruksi klien yang diteruskan pemilik proyek pada 10 November 2026 | confirmed untuk penggunaan sebagai foto direktur                                                        |
 | Bendera Brunei                                                                                                    | [Wikimedia Commons: Flag of Brunei.svg](https://commons.wikimedia.org/wiki/File:Flag_of_Brunei.svg)     | confirmed sebagai bendera; gambar domain publik                                                         |
 
+## Pembagian kriteria menurut jenis kelamin — 11 November 2026
+
+| Informasi                                                                                                    | Sumber                                                           | Status                                                                              |
+| ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Malaysia: pekerjaan perempuan ART; pekerjaan laki-laki konstruksi dan perkebunan sawit/karet                 | Pesan klien yang diteruskan pemilik proyek pada 11 November 2026 | confirmed untuk jenis pekerjaan; kriteria rinci laki-laki needs-client-confirmation |
+| Malaysia: usia 21–40 tahun, tinggi minimal 145 cm, berat proporsional, pendidikan minimal SD untuk perempuan | Kriteria Malaysia yang telah tersimpan dari situs MPU sebelumnya | confirmed sebagai isi lama; needs-current-confirmation                              |
+| Taiwan: usia 20–40 tahun untuk kedua kelompok; tinggi minimal 155 cm perempuan dan 165 cm laki-laki          | Kriteria Taiwan yang telah tersimpan dari situs MPU sebelumnya   | confirmed sebagai isi lama; needs-current-confirmation                              |
+| Pembagian pekerjaan Taiwan menurut jenis kelamin                                                             | Belum ada rincian dari klien                                     | needs-client-confirmation                                                           |
+
 ## Formulir CPMI — 11 November 2026
 
 Pemilik proyek meminta formulir pendaftaran penuh: negara, sektor, NIK, data lahir, jenis kelamin, status pernikahan, agama, tinggi dan berat badan, alamat lengkap, kontak, pengalaman kerja, foto diri maksimal 2 MB, dan persetujuan. Pemilik proyek memilih penghapusan data pribadi setelah 12 bulan tanpa aktivitas untuk pendaftaran yang tidak dilanjutkan. Sumber: pesan pemilik proyek 11 November 2026; status `confirmed` sebagai keputusan produk. Ini tidak menyatakan setiap field diwajibkan oleh peraturan pemerintah.

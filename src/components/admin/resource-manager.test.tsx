@@ -17,6 +17,42 @@ afterEach(() => {
 });
 
 describe("foto negara di admin", () => {
+  it("mengedit pekerjaan dan kriteria laki-laki tanpa JSON", async () => {
+    const fetchMock = vi.fn(async (_url: string, options?: RequestInit) =>
+      options?.method === "POST"
+        ? { ok: true, json: async () => ({ item: { id: "malaysia" } }) }
+        : { ok: true, json: async () => ({ items: [] }) }
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <ResourceManager
+        resource="negara"
+        config={adminResources.negara}
+        initialItems={[
+          { id: "malaysia", name: "Malaysia", slug: "malaysia", genderCriteria: null }
+        ]}
+        relationOptions={{ mediaImages: [] }}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Ubah" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tidak aktif" }));
+    fireEvent.change(screen.getByLabelText("Pekerjaan laki-laki 1"), {
+      target: { value: "Konstruksi" }
+    });
+    fireEvent.change(screen.getByLabelText("Kriteria perempuan 1"), {
+      target: { value: "Tinggi badan minimal 145 cm" }
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Simpan perubahan" }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    const saveCall = fetchMock.mock.calls.find(([, options]) => options?.method === "POST");
+    expect(JSON.parse(String(saveCall?.[1]?.body)).data.genderCriteria).toMatchObject({
+      women: { criteria: ["Tinggi badan minimal 145 cm"] },
+      men: { jobs: ["Konstruksi"] }
+    });
+  });
+
   it("mengisi kode bendera otomatis dari nama negara saat disimpan", async () => {
     const fetchMock = vi.fn(async (_url: string, options?: RequestInit) =>
       options?.method === "POST"

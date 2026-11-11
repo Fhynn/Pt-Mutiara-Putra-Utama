@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeCountryGenderCriteria } from "@/lib/country-gender-criteria";
 import { slugify as createSlug } from "@/lib/utils";
 
 export type AdminField = {
@@ -14,6 +15,7 @@ export type AdminField = {
     | "list"
     | "socialLinks"
     | "sectionContent"
+    | "genderCriteria"
     | "relation"
     | "slug";
   required?: boolean;
@@ -278,6 +280,12 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       {
         ...relation("coverMediaId", "Foto negara", "mediaImages"),
         help: "Foto ini muncul di halaman detail negara setelah diterbitkan. Bendera dibuat otomatis dari nama negara."
+      },
+      {
+        key: "genderCriteria",
+        label: "Kriteria perempuan dan laki-laki",
+        type: "genderCriteria",
+        help: "Aktifkan jika pekerjaan atau syarat untuk perempuan dan laki-laki berbeda. Bagian yang belum pasti boleh dikosongkan."
       },
       list(
         "criteria",
@@ -605,6 +613,8 @@ export function normalizeAdminPayload(config: AdminResourceConfig, raw: Record<s
       result[field.key] = Array.isArray(value)
         ? value.map((item) => String(item).trim()).filter(Boolean)
         : [];
+    else if (field.type === "genderCriteria")
+      result[field.key] = normalizeCountryGenderCriteria(value);
     else if (field.type === "socialLinks" && value && typeof value === "object")
       result[field.key] = Object.fromEntries(
         Object.entries(value).filter(([, entry]) => String(entry ?? "").trim())

@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Banknote, BriefcaseBusiness, FileText } from "lucide-react";
+import { Banknote, BriefcaseBusiness, FileText, UsersRound } from "lucide-react";
 import { Breadcrumb } from "@/components/public/breadcrumb";
 import { CompactList } from "@/components/public/compact-list";
 import { EmptyState } from "@/components/public/empty-state";
 import { prisma } from "@/lib/db";
+import { readCountryGenderCriteria } from "@/lib/country-gender-criteria";
 
 export const revalidate = 60;
 
@@ -69,6 +70,7 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
     : null;
 
   const criteria = stringList(country.criteria);
+  const genderCriteria = readCountryGenderCriteria(country.genderCriteria);
   const documents = stringList(country.requirements);
   const salaryDetails = stringList(country.salaryDetails);
   const hasOpenJobs = country.jobs.length > 0;
@@ -126,33 +128,70 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
             </div>
           </div>
 
-          <div className="country-requirements-grid">
-            <article className="requirement-panel">
-              <div className="requirement-panel-heading">
-                <span className="requirement-icon">
-                  <span aria-hidden="true">✓</span>
-                </span>
-                <div>
-                  <span>Calon pekerja</span>
-                  <h2>Kriteria</h2>
+          <div className={`country-requirements-grid${genderCriteria ? " has-gender-split" : ""}`}>
+            {genderCriteria ? (
+              (["women", "men"] as const).map((gender) => {
+                const label = gender === "women" ? "perempuan" : "laki-laki";
+                const group = genderCriteria[gender];
+                return (
+                  <article className="requirement-panel gender-requirement-panel" key={gender}>
+                    <div className="requirement-panel-heading">
+                      <span className="requirement-icon">
+                        <UsersRound aria-hidden="true" />
+                      </span>
+                      <div>
+                        <span>Calon pekerja {label}</span>
+                        <h2>Kriteria {label}</h2>
+                      </div>
+                    </div>
+                    {group.jobs.length ? (
+                      <div className="gender-job-block">
+                        <strong>Bidang pekerjaan</strong>
+                        <ul>
+                          {group.jobs.map((job) => (
+                            <li key={job}>{job}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                    {group.criteria.length ? (
+                      <CompactList items={group.criteria} label={`kriteria ${label}`} />
+                    ) : (
+                      <p className="country-empty-copy">
+                        Rincian kriteria untuk {label} belum diberikan MPU.
+                      </p>
+                    )}
+                  </article>
+                );
+              })
+            ) : (
+              <article className="requirement-panel">
+                <div className="requirement-panel-heading">
+                  <span className="requirement-icon">
+                    <span aria-hidden="true">✓</span>
+                  </span>
+                  <div>
+                    <span>Calon pekerja</span>
+                    <h2>Kriteria</h2>
+                  </div>
                 </div>
-              </div>
-              {criteria.length ? (
-                <CompactList items={criteria} label="kriteria" />
-              ) : (
-                <p className="country-empty-copy">
-                  Kriteria belum dipublikasikan. Hubungi petugas MPU sebelum mendaftar.
-                </p>
-              )}
-            </article>
+                {criteria.length ? (
+                  <CompactList items={criteria} label="kriteria" />
+                ) : (
+                  <p className="country-empty-copy">
+                    Kriteria belum dipublikasikan. Hubungi petugas MPU sebelum mendaftar.
+                  </p>
+                )}
+              </article>
+            )}
 
-            <article className="requirement-panel">
+            <article className="requirement-panel document-requirement-panel">
               <div className="requirement-panel-heading">
                 <span className="requirement-icon">
                   <FileText aria-hidden="true" />
                 </span>
                 <div>
-                  <span>Tahap lanjutan</span>
+                  <span>{genderCriteria ? "Untuk kedua jalur" : "Tahap lanjutan"}</span>
                   <h2>Dokumen yang perlu disiapkan</h2>
                 </div>
               </div>
