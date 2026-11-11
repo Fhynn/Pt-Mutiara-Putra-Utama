@@ -339,7 +339,7 @@ export function InboxManager({
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Lihat foto privat
+                      Lihat foto pendaftar
                     </a>
                   </div>
                 )}

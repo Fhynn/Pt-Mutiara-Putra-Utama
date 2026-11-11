@@ -11,6 +11,28 @@ type UserRow = {
   lastLoginAt: string | null;
 };
 const empty = { name: "", email: "", role: "VIEWER", password: "", isActive: true };
+const roles = [
+  {
+    value: "VIEWER",
+    label: "Pembaca",
+    description: "Hanya melihat data, tidak dapat mengubahnya."
+  },
+  {
+    value: "EDITOR",
+    label: "Editor konten",
+    description: "Dapat menulis dan mengubah konten website."
+  },
+  {
+    value: "ADMIN",
+    label: "Administrator",
+    description: "Dapat mengelola konten, pendaftar, dan pesan."
+  },
+  {
+    value: "SUPER_ADMIN",
+    label: "Administrator utama",
+    description: "Dapat mengelola seluruh website dan akun staf."
+  }
+] as const;
 
 export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
   const [items, setItems] = useState(initialItems);
@@ -52,7 +74,7 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
       <div className="admin-heading">
         <div>
           <h1>Pengguna Internal</h1>
-          <p>Hanya super admin yang dapat mengelola akun dan role.</p>
+          <p>Tambahkan staf yang boleh masuk dan tentukan tugasnya.</p>
         </div>
       </div>
       <section className="admin-panel" style={{ marginBottom: 20 }}>
@@ -76,15 +98,18 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
               />
             </label>
             <label>
-              <span>Role</span>
+              <span>Hak akses</span>
               <select
                 value={String(form.role)}
                 onChange={(e) => setForm({ ...form, role: e.target.value })}
               >
-                {["SUPER_ADMIN", "ADMIN", "EDITOR", "VIEWER"].map((v) => (
-                  <option key={v}>{v}</option>
+                {roles.map((role) => (
+                  <option key={role.value} value={role.value}>
+                    {role.label}
+                  </option>
                 ))}
               </select>
+              <small>{roles.find((role) => role.value === form.role)?.description}</small>
             </label>
             <label>
               <span>{id ? "Password baru (opsional)" : "Password awal *"}</span>
@@ -96,13 +121,13 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
               />
             </label>
-            <label>
-              <span>Akun aktif</span>
+            <label className="admin-user-active">
               <input
                 type="checkbox"
                 checked={Boolean(form.isActive)}
                 onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
               />
+              <span>Izinkan akun ini masuk ke dashboard</span>
             </label>
           </div>
           <div className="admin-actions" style={{ marginTop: 18 }}>
@@ -130,7 +155,7 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
               <tr>
                 <th>Nama</th>
                 <th>Email</th>
-                <th>Role</th>
+                <th>Hak akses</th>
                 <th>Status</th>
                 <th>Aksi</th>
               </tr>
@@ -140,14 +165,14 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
                 <tr key={user.id}>
                   <td>{user.name}</td>
                   <td>{user.email}</td>
-                  <td>{user.role}</td>
+                  <td>{roles.find((role) => role.value === user.role)?.label ?? user.role}</td>
                   <td>
                     {user.isActive ? "Aktif" : "Nonaktif"}
                     {user.mustChangePassword ? " · wajib ganti password" : ""}
                   </td>
                   <td>
                     <button className="admin-button" onClick={() => edit(user)}>
-                      Edit
+                      Ubah akun
                     </button>
                   </td>
                 </tr>

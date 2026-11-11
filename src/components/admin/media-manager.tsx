@@ -289,21 +289,10 @@ export function MediaManager({
                   onChange={(e) => setEditing({ ...editing, title: e.target.value || null })}
                 />
               </label>
-              <label className="wide">
-                <span>Keterangan file (opsional)</span>
-                <textarea
-                  value={editing.caption ?? ""}
-                  onChange={(e) => setEditing({ ...editing, caption: e.target.value || null })}
-                />
-                <small>
-                  Keterangan yang tampil di album diatur melalui{" "}
-                  <Link href="/admin/galeri">Galeri</Link>.
-                </small>
-              </label>
             </div>
             <details className="admin-advanced">
-              <summary>Informasi tambahan</summary>
-              <p>Isi jika Anda perlu mencatat sumber atau mengatur posisi foto.</p>
+              <summary>Asal foto dan izin penggunaan</summary>
+              <p>Isi jika foto berasal dari pihak lain atau masih perlu diperiksa izinnya.</p>
               <div className="admin-form-grid">
                 <label>
                   <span>Fotografer</span>
@@ -340,35 +329,6 @@ export function MediaManager({
                       Jangan ditampilkan sebelum diperiksa
                     </option>
                   </select>
-                </label>
-                <label>
-                  <span>Folder</span>
-                  <input
-                    value={editing.folder ?? ""}
-                    onChange={(e) => setEditing({ ...editing, folder: e.target.value || null })}
-                  />
-                </label>
-                <label>
-                  <span>Posisi fokus horizontal</span>
-                  <input
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    type="range"
-                    value={editing.focalX}
-                    onChange={(e) => setEditing({ ...editing, focalX: Number(e.target.value) })}
-                  />
-                </label>
-                <label>
-                  <span>Posisi fokus vertikal</span>
-                  <input
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    type="range"
-                    value={editing.focalY}
-                    onChange={(e) => setEditing({ ...editing, focalY: Number(e.target.value) })}
-                  />
                 </label>
               </div>
             </details>

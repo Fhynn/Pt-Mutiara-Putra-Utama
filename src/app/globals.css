@@ -2031,6 +2031,20 @@ a {
   font-weight: 400;
 }
 
+.admin-panel .admin-user-active {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: end;
+  min-height: 42px;
+}
+
+.admin-user-active input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+}
+
 .admin-list-editor {
   display: grid;
   gap: 10px;
@@ -4470,14 +4484,37 @@ body {
   margin-bottom: 18px;
 }
 
-.admin-album-add > form {
-  display: grid;
-  justify-items: start;
-  gap: 16px;
+.admin-album-upload-direct {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
   padding: 20px;
 }
 
-.admin-album-add > form > label {
+.admin-album-upload-direct small {
+  color: var(--muted);
+}
+
+.admin-album-existing-files {
+  border-top: 1px solid var(--border);
+  padding: 14px 20px 20px;
+}
+
+.admin-album-existing-files > summary {
+  color: var(--navy);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-album-existing-files > form {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  padding-top: 16px;
+}
+
+.admin-album-existing-files > form > label {
   display: grid;
   width: min(100%, 560px);
   gap: 7px;

@@ -1,14 +1,17 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { GalleryItemManager } from "@/components/admin/gallery-item-manager";
 
 vi.mock("next/image", () => ({
   default: ({ src }: { src: string }) => <span data-testid="foto-preview" data-src={src} />
 }));
 
-afterEach(() => cleanup());
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 const photo = {
   id: "foto-1",
@@ -52,5 +55,52 @@ describe("editor foto album", () => {
       target: { value: photo.id }
     });
     expect(screen.getAllByTestId("foto-preview")).toHaveLength(2);
+  });
+
+  it("mengunggah foto langsung ke album dan membuat sampul otomatis", async () => {
+    const fetchMock = vi.fn(async (url: string) =>
+      url === "/api/admin/media"
+        ? { ok: true, json: async () => ({ items: [photo] }) }
+        : {
+            ok: true,
+            json: async () => ({
+              item: {
+                id: "item-1",
+                mediaId: photo.id,
+                caption: null,
+                displayOrder: 0,
+                isCover: true,
+                media: photo
+              }
+            })
+          }
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <GalleryItemManager
+        albumId="album-1"
+        albumSlug="dokumentasi-pt-pusat"
+        albumStatus="DRAFT"
+        albumFeatured={false}
+        initialItems={[]}
+        media={[]}
+      />
+    );
+
+    fireEvent.change(screen.getByLabelText("Unggah foto atau video ke album"), {
+      target: { files: [new File(["foto"], "kegiatan.jpg", { type: "image/jpeg" })] }
+    });
+
+    await waitFor(() => expect(screen.getByText("Sampul album")).toBeTruthy());
+    expect(fetchMock).toHaveBeenCalledWith("/api/admin/media", {
+      method: "POST",
+      body: expect.any(FormData)
+    });
+    expect(fetchMock).toHaveBeenCalledWith("/api/admin/gallery-items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ albumId: "album-1", mediaId: photo.id, caption: null, isCover: true })
+    });
   });
 });

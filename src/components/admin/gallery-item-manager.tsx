@@ -64,11 +64,57 @@ export function GalleryItemManager({
   media: Media[];
 }) {
   const [items, setItems] = useState(initialItems);
+  const [mediaOptions, setMediaOptions] = useState(media);
   const [mediaId, setMediaId] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const selectedMedia = media.find((asset) => asset.id === mediaId);
+  const selectedMedia = mediaOptions.find((asset) => asset.id === mediaId);
   const isPublished = albumStatus === "PUBLISHED";
+
+  async function uploadDirectly(files: FileList | null) {
+    if (!files?.length || busy) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const data = new FormData();
+      Array.from(files).forEach((file) => data.append("files", file));
+      data.append("visibility", "PUBLIC");
+      const uploadResponse = await fetch("/api/admin/media", { method: "POST", body: data });
+      const uploadBody = await uploadResponse.json();
+      if (!uploadResponse.ok) throw new Error(uploadBody.error ?? "Foto gagal diunggah.");
+      const uploaded = (uploadBody.items ?? []) as Media[];
+      setMediaOptions((current) => [...uploaded, ...current]);
+      let added = 0;
+      let hasCover = items.some((item) => item.isCover);
+      for (const asset of uploaded) {
+        if (!["IMAGE", "VIDEO"].includes(asset.kind)) continue;
+        const isCover = !hasCover && asset.kind === "IMAGE";
+        const addResponse = await fetch("/api/admin/gallery-items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            albumId,
+            mediaId: asset.id,
+            caption: null,
+            isCover
+          })
+        });
+        const addBody = await addResponse.json();
+        if (!addResponse.ok)
+          throw new Error(
+            `${addBody.error ?? "File belum dapat dimasukkan ke album."} File tetap tersimpan di Foto & Video dan bisa dipilih di bawah.`
+          );
+        setItems((current) => [...current, addBody.item]);
+        if (isCover) hasCover = true;
+        added += 1;
+      }
+      setMessage(`${added} file berhasil ditambahkan ke album.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "File belum dapat ditambahkan.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function add(event: React.FormEvent) {
     event.preventDefault();
@@ -175,40 +221,57 @@ export function GalleryItemManager({
       <section className="admin-panel admin-album-add">
         <div className="admin-panel-header">
           <h2>Tambahkan foto atau video</h2>
-          <Link className="admin-button" href="/admin/media">
-            Unggah file baru
-          </Link>
         </div>
-        <form onSubmit={add}>
-          <label>
-            <span>Pilih file yang sudah diunggah</span>
-            <select required value={mediaId} onChange={(event) => setMediaId(event.target.value)}>
-              <option value="">Pilih foto atau video…</option>
-              {media.map((asset) => (
-                <option value={asset.id} key={asset.id}>
-                  {asset.title || asset.altText || asset.originalName} ({asset.originalName})
-                </option>
-              ))}
-            </select>
+        <div className="admin-album-upload-direct">
+          <label className="admin-button primary admin-simple-media-upload">
+            <span>{busy ? "Menambahkan…" : "Unggah langsung ke album"}</span>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif,video/mp4,video/webm"
+              multiple
+              disabled={busy}
+              aria-label="Unggah foto atau video ke album"
+              onChange={(event) => {
+                void uploadDirectly(event.target.files);
+                event.target.value = "";
+              }}
+            />
           </label>
-          {selectedMedia ? (
-            <div className="admin-album-selected">
-              <MediaPreview media={selectedMedia} />
-              <div>
-                <strong>
-                  {selectedMedia.title || selectedMedia.altText || selectedMedia.originalName}
-                </strong>
-                <small>{selectedMedia.originalName}</small>
+          <small>
+            Foto pertama otomatis menjadi sampul album. Anda dapat menggantinya di bawah.
+          </small>
+        </div>
+        <details className="admin-album-existing-files">
+          <summary>Pilih foto yang sudah diunggah sebelumnya</summary>
+          <form onSubmit={add}>
+            <label>
+              <span>Pilih file yang sudah diunggah</span>
+              <select required value={mediaId} onChange={(event) => setMediaId(event.target.value)}>
+                <option value="">Pilih foto atau video…</option>
+                {mediaOptions.map((asset) => (
+                  <option value={asset.id} key={asset.id}>
+                    {asset.title || asset.altText || asset.originalName} ({asset.originalName})
+                  </option>
+                ))}
+              </select>
+            </label>
+            {selectedMedia ? (
+              <div className="admin-album-selected">
+                <MediaPreview media={selectedMedia} />
+                <div>
+                  <strong>
+                    {selectedMedia.title || selectedMedia.altText || selectedMedia.originalName}
+                  </strong>
+                  <small>{selectedMedia.originalName}</small>
+                </div>
               </div>
-            </div>
-          ) : null}
-          <button className="admin-button primary" disabled={!mediaId || busy}>
-            {busy ? "Menambahkan…" : "Tambahkan ke album"}
-          </button>
-          {!media.length ? (
-            <p>Belum ada foto atau video yang dapat dipilih. Unggah file melalui Foto & Video.</p>
-          ) : null}
-        </form>
+            ) : null}
+            <button className="admin-button primary" disabled={!mediaId || busy}>
+              {busy ? "Menambahkan…" : "Tambahkan ke album"}
+            </button>
+            {!mediaOptions.length ? <p>Belum ada foto atau video yang tersimpan.</p> : null}
+          </form>
+        </details>
       </section>
 
       <section className="admin-panel admin-album-items">

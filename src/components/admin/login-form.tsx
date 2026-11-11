@@ -31,7 +31,7 @@ export function LoginForm() {
   return (
     <div className="login-card">
       <Image src="/brand/mpu-logo.png" alt="Logo MPU" width={80} height={69} />
-      <h1>Masuk ke CMS MPU</h1>
+      <h1>Masuk ke Dashboard MPU</h1>
       <p className="form-note">
         Area internal untuk staf berwenang. Tidak tersedia pendaftaran akun publik.
       </p>
