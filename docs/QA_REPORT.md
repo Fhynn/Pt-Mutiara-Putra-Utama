@@ -7,7 +7,7 @@
 - Halaman publik yang tidak bergantung pada permintaan pengunjung memakai cache 60 detik; perubahan konten admin memicu invalidasi cache. Efek masuk konten dipersingkat agar navigasi tidak terasa tertahan.
 - Build production, lint, format, dan 23 unit test lulus. Uji browser penuh: 36 lulus dan 3 tes admin dilewati karena kredensial QA tidak disetel.
 - Pada server production lokal setelah build, respons hangat: Beranda 41 ms, Tentang 28 ms, Negara Tujuan 31 ms, Galeri 11 ms, Lowongan 7 ms. Akses pertama Lowongan sekitar 591 ms untuk mengisi cache data; angka ini pengukuran lokal, bukan jaminan latency Vercel.
-- Setelah deploy awal, akses pertama Lowongan di Vercel sempat sekitar 10 detik. Lowongan dan Daftar kemudian diubah menjadi halaman statis dengan filter dan pilihan awal yang diproses di browser. Build menunjukkan kedua route sebagai static; 18 tes browser khusus navigasi, filter, dan pendaftaran lulus pada desktop, tablet, serta mobile. Kecepatan versi ini perlu dicek setelah deploy berikutnya.
+- Setelah deploy awal, akses pertama Lowongan di Vercel sempat sekitar 10 detik. Lowongan dan Daftar kemudian diubah menjadi halaman statis dengan filter dan pilihan awal yang diproses di browser. Build menunjukkan kedua route sebagai static; 18 tes browser khusus navigasi, filter, dan pendaftaran lulus pada desktop, tablet, serta mobile. Setelah deploy `b6ca75f`, respons Lowongan live 0,36–0,66 detik dan Daftar 0,34–0,86 detik pada pengukuran ini; Vercel melaporkan cache `PRERENDER`/`HIT`. Waktu pengunjung lain dapat berbeda menurut jaringan dan lokasi.
 
 ## Penghapusan catatan sumber situs lama — 11 November 2026
 
