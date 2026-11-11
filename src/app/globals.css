@@ -4268,6 +4268,12 @@ body {
   background: #f7e110;
 }
 
+.country-grid .country-flag-auto,
+.mpu-home .country-flag-auto {
+  object-fit: contain;
+  background: #f6f8fc;
+}
+
 @media (max-width: 520px) {
   .country-grid > .country-card,
   .mpu-home .country-card {
@@ -4653,70 +4659,96 @@ body {
   padding: 0 20px 18px;
 }
 
-.admin-country-photo-field {
+.admin-simple-media-field {
   display: grid;
-  gap: 10px;
+  gap: 9px;
   border: 1px solid var(--border);
   border-radius: 9px;
-  padding: 16px;
+  padding: 14px 16px;
   background: #f8fafd;
 }
 
-.admin-country-photo-picker {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px;
-  align-items: start;
-  gap: 16px;
+.admin-simple-media-field > strong {
+  color: var(--navy);
+  font-size: 0.88rem;
 }
 
-.admin-country-photo-preview {
+.admin-simple-media-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-simple-media-preview {
   position: relative;
   display: grid;
-  aspect-ratio: 16 / 9;
+  width: 132px;
+  height: 86px;
   overflow: hidden;
   place-items: center;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: #e9eef6;
+  background: white;
   color: var(--muted);
   text-align: center;
 }
 
-.admin-country-photo-preview.flag {
-  background: white;
-}
-
-.admin-country-photo-preview img {
+.admin-simple-media-preview img {
   object-fit: cover;
 }
 
-.admin-country-photo-preview.flag img {
-  object-fit: contain;
+.admin-simple-media-preview span {
+  padding: 9px;
+  font-size: 0.75rem;
 }
 
-.admin-country-photo-preview span {
-  padding: 12px;
-  font-size: 0.8rem;
+.admin-simple-media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.admin-country-photo-field > p {
+.admin-simple-media-upload {
+  position: relative;
+  cursor: pointer;
+}
+
+.admin-simple-media-upload:focus-within {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.admin-panel .admin-simple-media-upload input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+}
+
+.admin-simple-media-field > p {
   margin: 0;
   color: var(--muted);
   font-size: 0.82rem;
 }
 
-.admin-country-photo-upload {
-  width: min(100%, 560px);
+.admin-simple-media-field details {
+  width: min(100%, 420px);
 }
 
-@media (max-width: 620px) {
-  .admin-country-photo-picker {
-    grid-template-columns: 1fr;
-  }
+.admin-simple-media-field summary {
+  width: fit-content;
+  color: var(--blue);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
 
-  .admin-country-photo-preview {
-    width: min(100%, 260px);
-  }
+.admin-simple-media-field details select {
+  margin-top: 8px;
 }
 
 @media (max-width: 1100px) {

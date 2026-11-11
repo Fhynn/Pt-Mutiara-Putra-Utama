@@ -17,6 +17,34 @@ afterEach(() => {
 });
 
 describe("foto negara di admin", () => {
+  it("mengisi kode bendera otomatis dari nama negara saat disimpan", async () => {
+    const fetchMock = vi.fn(async (_url: string, options?: RequestInit) =>
+      options?.method === "POST"
+        ? { ok: true, json: async () => ({}) }
+        : { ok: true, json: async () => ({ items: [] }) }
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <ResourceManager
+        resource="negara"
+        config={adminResources.negara}
+        initialItems={[]}
+        relationOptions={{ mediaImages: [] }}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Tambah negara" }));
+    fireEvent.change(screen.getByLabelText("Nama *"), { target: { value: "Jepang" } });
+    expect(screen.queryByLabelText("Kode negara")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Simpan perubahan" }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    const saveCall = fetchMock.mock.calls.find(([, options]) => options?.method === "POST");
+    expect(saveCall).toBeTruthy();
+    expect(JSON.parse(String(saveCall?.[1]?.body)).data.isoCode).toBe("JP");
+  });
+
   it("dapat memilih foto yang ada dan langsung melihat pratinjaunya", () => {
     render(
       <ResourceManager
@@ -28,7 +56,8 @@ describe("foto negara di admin", () => {
             {
               value: "media-1",
               label: "Pemandangan Singapura",
-              previewUrl: "https://example.com/singapura.jpg"
+              previewUrl: "https://example.com/singapura.jpg",
+              kind: "IMAGE"
             }
           ],
           mediaUrls: []
@@ -37,14 +66,16 @@ describe("foto negara di admin", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Tambah negara" }));
-    fireEvent.change(screen.getByLabelText("Foto negara untuk halaman detail"), {
+    expect(screen.queryByText("Bendera untuk kartu negara")).toBeNull();
+    fireEvent.click(screen.getByText("Pilih foto yang sudah ada"));
+    fireEvent.change(screen.getByLabelText("Pilih foto negara yang sudah ada"), {
       target: { value: "media-1" }
     });
 
     expect(screen.getByTestId("pratinjau-foto").getAttribute("data-src")).toBe(
       "https://example.com/singapura.jpg"
     );
-    expect(screen.getByText(/Kartu daftar tetap memakai bendera/)).toBeTruthy();
+    expect(screen.getByText(/Bendera dibuat otomatis dari nama negara/)).toBeTruthy();
   });
 
   it("dapat mengunggah foto langsung saat menambah negara", async () => {
@@ -72,7 +103,7 @@ describe("foto negara di admin", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Tambah negara" }));
-    fireEvent.change(screen.getByLabelText("Atau unggah foto negara baru"), {
+    fireEvent.change(screen.getByLabelText("Unggah foto"), {
       target: { files: [new File(["foto"], "negara.jpg", { type: "image/jpeg" })] }
     });
 

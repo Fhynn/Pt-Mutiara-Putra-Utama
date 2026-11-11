@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Plus, Trash2 } from "lucide-react";
+import { FileText, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { AdminField, AdminOption, AdminResourceConfig } from "@/lib/admin-resources";
+import { inferCountryIso } from "@/lib/country-flags";
 
 type FormValue = string | number | boolean | string[] | Record<string, unknown> | null;
 type FormState = Record<string, FormValue>;
@@ -75,7 +76,7 @@ const fieldNameLabels: Record<string, string> = {
 };
 
 const resourceDescriptions: Record<string, string> = {
-  negara: "Atur bendera, foto negara, kriteria, dokumen, pekerjaan, dan status program.",
+  negara: "Isi informasi negara. Bendera dibuat otomatis; foto dapat diunggah jika ada.",
   lowongan: "Kelola lowongan terverifikasi, negara tujuan, persyaratan, dan batas pendaftaran.",
   galeri: "Susun album kegiatan, tanggal, lokasi, dan status publikasinya.",
   berita: "Tulis dan terbitkan berita atau kegiatan resmi MPU."
@@ -121,7 +122,6 @@ function formFromItem(config: AdminResourceConfig, item: Record<string, unknown>
 }
 
 const advancedFieldKeys = new Set([
-  "isoCode",
   "displayOrder",
   "isFeatured",
   "faviconUrl",
@@ -137,6 +137,7 @@ const advancedFieldKeys = new Set([
 // These values are generated or retained by the system. They do not need an editor in the CMS.
 const internalFieldKeys = new Set([
   "slug",
+  "isoCode",
   "metaTitle",
   "metaDescription",
   "defaultMetaTitle",
@@ -358,6 +359,11 @@ export function ResourceManager({
   function updateField(field: AdminField, value: FormValue) {
     setForm((current) => {
       const next = { ...current, [field.key]: value };
+      if (resource === "negara" && field.key === "name") {
+        const code = inferCountryIso(String(value ?? ""));
+        if (code) next.isoCode = code;
+        else if (!editingId) next.isoCode = "";
+      }
       for (const slugField of config.fields.filter(
         (candidate) => candidate.type === "slug" && candidate.autoFrom === field.key
       )) {
@@ -368,29 +374,30 @@ export function ResourceManager({
     });
   }
 
-  async function uploadCountryImage(field: AdminField, file: File) {
+  async function uploadMediaForField(field: AdminField, file: File) {
     setPhotoUploading(field.key);
     setMessage("");
     try {
       const data = new FormData();
       data.append("files", file);
       data.append("visibility", "PUBLIC");
-      data.append(
-        "altText",
-        field.key === "flagUrl"
-          ? `Bendera ${String(form.name || "negara tujuan")}`
-          : `Foto negara ${String(form.name || "tujuan")}`
-      );
+      data.append("altText", file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " "));
       const response = await fetch("/api/admin/media", { method: "POST", body: data });
       const body = await response.json();
-      if (!response.ok) throw new Error(body.error ?? "Foto gagal diunggah.");
+      if (!response.ok) throw new Error(body.error ?? "File gagal diunggah.");
       const uploaded = body.items?.[0];
-      if (!uploaded?.id || uploaded.kind !== "IMAGE" || !uploaded.publicUrl)
-        throw new Error("Foto belum siap digunakan. Coba unggah ulang.");
+      const isDocument = field.key === "documentMediaId";
+      if (
+        !uploaded?.id ||
+        !uploaded.publicUrl ||
+        (isDocument ? !["PDF", "IMAGE"].includes(uploaded.kind) : uploaded.kind !== "IMAGE")
+      )
+        throw new Error("File belum siap digunakan. Coba unggah ulang.");
       const option: AdminOption = {
-        value: field.key === "flagUrl" ? uploaded.publicUrl : uploaded.id,
+        value: field.relation === "mediaUrls" ? uploaded.publicUrl : uploaded.id,
         label: file.name,
-        previewUrl: uploaded.publicUrl
+        previewUrl: uploaded.kind === "IMAGE" ? uploaded.publicUrl : undefined,
+        kind: uploaded.kind
       };
       const relation = field.relation ?? "mediaImages";
       setAvailableRelationOptions((current) => ({
@@ -398,11 +405,9 @@ export function ResourceManager({
         [relation]: [option, ...(current[relation] ?? [])]
       }));
       updateField(field, option.value);
-      setMessage(
-        "Foto berhasil diunggah dan dipilih. Simpan negara; foto tampil setelah negara diterbitkan."
-      );
+      setMessage("File berhasil diunggah. Klik Simpan perubahan untuk memasangnya.");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Foto gagal diunggah.");
+      setMessage(error instanceof Error ? error.message : "File gagal diunggah.");
     } finally {
       setPhotoUploading(null);
     }
@@ -545,50 +550,93 @@ export function ResourceManager({
   }
 
   function renderFormField(field: AdminField) {
-    if (resource === "negara" && (field.key === "coverMediaId" || field.key === "flagUrl")) {
-      const selected = availableRelationOptions[field.relation ?? ""]?.find(
-        (option) => option.value === form[field.key]
+    if (
+      field.type === "relation" &&
+      ["media", "mediaImages", "mediaUrls"].includes(field.relation ?? "")
+    ) {
+      const isDocument = field.key === "documentMediaId";
+      const available = (availableRelationOptions[field.relation ?? ""] ?? []).filter((option) =>
+        isDocument ? ["PDF", "IMAGE"].includes(option.kind ?? "") : option.kind === "IMAGE"
       );
-      const isFlag = field.key === "flagUrl";
+      const currentValue = String(form[field.key] ?? "");
+      const selected = available.find((option) => option.value === currentValue);
+      const imageUrl =
+        selected?.previewUrl ||
+        (field.relation === "mediaUrls" && /^(https:\/\/|\/)/.test(currentValue)
+          ? currentValue
+          : null);
       return (
-        <div className="wide admin-country-photo-field" key={field.key}>
-          <div className="admin-country-photo-picker">
-            <label>
-              <span>{field.label}</span>
-              {renderField(field)}
-            </label>
-            <div className={`admin-country-photo-preview ${isFlag ? "flag" : ""}`}>
-              {selected?.previewUrl ? (
+        <div className="wide admin-simple-media-field" key={field.key}>
+          <strong>{field.label}</strong>
+          <div className="admin-simple-media-content">
+            <div className="admin-simple-media-preview">
+              {imageUrl ? (
                 <Image
-                  src={selected.previewUrl}
-                  alt={selected.label}
+                  src={imageUrl}
+                  alt={selected?.label || field.label}
                   fill
                   sizes="(max-width: 700px) 100vw, 220px"
                 />
+              ) : selected?.kind === "PDF" ? (
+                <FileText aria-label="Dokumen PDF" />
               ) : (
-                <span>
-                  {isFlag
-                    ? "Bendera bawaan dipakai jika kode negara tersedia."
-                    : "Foto negara belum dipilih."}
-                </span>
+                <span>{currentValue ? "File terpasang" : "Belum ada file"}</span>
               )}
+            </div>
+            <div className="admin-simple-media-actions">
+              <label className="admin-button primary admin-simple-media-upload">
+                <span>
+                  {photoUploading === field.key
+                    ? "Mengunggah…"
+                    : `${currentValue ? "Ganti" : "Unggah"} ${isDocument ? "dokumen" : "foto"}`}
+                </span>
+                <input
+                  type="file"
+                  accept={
+                    isDocument
+                      ? "application/pdf,image/jpeg,image/png,image/webp"
+                      : "image/jpeg,image/png,image/webp,image/avif"
+                  }
+                  disabled={photoUploading !== null}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    event.target.value = "";
+                    if (file) void uploadMediaForField(field, file);
+                  }}
+                />
+              </label>
+              {currentValue ? (
+                <button
+                  className="admin-button"
+                  type="button"
+                  onClick={() => updateField(field, "")}
+                >
+                  Lepas file
+                </button>
+              ) : null}
             </div>
           </div>
           {field.help ? <p>{field.help}</p> : null}
-          <label className="admin-country-photo-upload">
-            <span>Atau unggah {isFlag ? "gambar bendera" : "foto negara"} baru</span>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/avif"
-              disabled={photoUploading !== null}
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                event.target.value = "";
-                if (file) void uploadCountryImage(field, file);
-              }}
-            />
-          </label>
-          {photoUploading === field.key ? <small>Mengunggah foto…</small> : null}
+          {available.length ? (
+            <details>
+              <summary>Pilih {isDocument ? "dokumen" : "foto"} yang sudah ada</summary>
+              <select
+                aria-label={`Pilih ${field.label.toLowerCase()} yang sudah ada`}
+                value={currentValue}
+                onChange={(event) => updateField(field, event.target.value)}
+              >
+                <option value="">Belum dipilih</option>
+                {available.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+                {currentValue && !selected ? (
+                  <option value={currentValue}>File saat ini</option>
+                ) : null}
+              </select>
+            </details>
+          ) : null}
         </div>
       );
     }

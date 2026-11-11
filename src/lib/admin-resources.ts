@@ -33,7 +33,7 @@ export type AdminField = {
   help?: string;
 };
 
-export type AdminOption = { value: string; label: string; previewUrl?: string };
+export type AdminOption = { value: string; label: string; previewUrl?: string; kind?: string };
 
 export type AdminResourceConfig = {
   title: string;
@@ -248,12 +248,8 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       area("summary", "Ringkasan"),
       area("programDescription", "Penjelasan program", false),
       {
-        ...relation("flagUrl", "Bendera untuk kartu negara", "mediaUrls"),
-        help: "Bendera Taiwan, Hong Kong, Singapura, Malaysia, dan Brunei sudah tersedia. Untuk negara lain, unggah benderanya di sini."
-      },
-      {
-        ...relation("coverMediaId", "Foto negara untuk halaman detail", "mediaImages"),
-        help: "Foto tampil di bagian atas halaman detail setelah negara diterbitkan. Kartu daftar tetap memakai bendera."
+        ...relation("coverMediaId", "Foto negara", "mediaImages"),
+        help: "Foto ini muncul di halaman detail negara setelah diterbitkan. Bendera dibuat otomatis dari nama negara."
       },
       list(
         "criteria",

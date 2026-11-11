@@ -1,12 +1,5 @@
 import Image from "next/image";
-
-const localFlags: Record<string, string> = {
-  TW: "/flags/tw.png",
-  HK: "/flags/hk.png",
-  SG: "/flags/sg.png",
-  MY: "/flags/my-card.png",
-  BN: "/flags/bn.png"
-};
+import { countryFlagUrl } from "@/lib/country-flags";
 
 export function CountryFlag({
   isoCode,
@@ -17,14 +10,13 @@ export function CountryFlag({
   name: string;
   flagUrl?: string | null;
 }) {
-  const src = flagUrl || localFlags[isoCode?.toUpperCase() ?? ""];
+  const src = countryFlagUrl(isoCode, flagUrl);
   if (!src) return null;
+  const isAutomaticFlag = src.startsWith("https://flagcdn.com/");
 
   return (
     <Image
-      className={
-        isoCode?.toUpperCase() === "BN" ? "country-flag country-flag-brunei" : "country-flag"
-      }
+      className={`country-flag${isoCode?.toUpperCase() === "BN" ? " country-flag-brunei" : ""}${isAutomaticFlag ? " country-flag-auto" : ""}`}
       src={src}
       alt={`Bendera ${name}`}
       fill

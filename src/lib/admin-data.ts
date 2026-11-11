@@ -61,7 +61,9 @@ export async function getAdminRelationOptions(config: AdminResourceConfig) {
         });
         result[relation] = rows.map((row) => ({
           value: row.id,
-          label: row.title || row.altText || row.originalName
+          label: row.title || row.altText || row.originalName,
+          kind: row.kind,
+          previewUrl: row.kind === "IMAGE" ? (row.publicUrl ?? undefined) : undefined
         }));
       } else if (relation === "mediaImages") {
         const rows = await prisma.mediaAsset.findMany({
@@ -77,7 +79,8 @@ export async function getAdminRelationOptions(config: AdminResourceConfig) {
         result[relation] = rows.map((row) => ({
           value: row.id,
           label: row.title || row.altText || row.originalName,
-          previewUrl: row.publicUrl!
+          previewUrl: row.publicUrl!,
+          kind: row.kind
         }));
       } else if (relation === "mediaUrls") {
         const rows = await prisma.mediaAsset.findMany({
@@ -93,7 +96,8 @@ export async function getAdminRelationOptions(config: AdminResourceConfig) {
         result[relation] = rows.map((row) => ({
           value: row.publicUrl!,
           label: row.title || row.altText || row.originalName,
-          previewUrl: row.publicUrl!
+          previewUrl: row.publicUrl!,
+          kind: row.kind
         }));
       } else if (relation === "articleCategories") {
         const rows = await prisma.articleCategory.findMany({ orderBy: { name: "asc" } });
