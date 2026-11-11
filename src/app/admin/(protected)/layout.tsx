@@ -1,20 +1,12 @@
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/admin/admin-shell";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/db";
+import { getActiveAdmin } from "@/lib/admin-session";
 
 export default async function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/admin/login?callbackUrl=/admin");
-  const active = await prisma.user
-    .findFirst({ where: { id: session.user.id, isActive: true }, select: { id: true } })
-    .catch(() => null);
-  if (!active) redirect("/admin/login");
+  const admin = await getActiveAdmin();
+  if (!admin) redirect("/admin/login?callbackUrl=/admin");
   return (
-    <AdminShell
-      user={{ name: session.user.name, email: session.user.email, role: session.user.role }}
-    >
+    <AdminShell user={{ name: admin.user.name, email: admin.user.email, role: admin.user.role }}>
       {children}
     </AdminShell>
   );

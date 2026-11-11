@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
@@ -62,6 +62,11 @@ const roleLabels: Record<string, string> = {
   VIEWER: "Pembaca"
 };
 
+function NavPendingHint() {
+  const { pending } = useLinkStatus();
+  return <span className={`admin-nav-pending${pending ? " is-pending" : ""}`} aria-hidden="true" />;
+}
+
 export function AdminShell({
   children,
   user
@@ -90,6 +95,7 @@ export function AdminShell({
       >
         <Icon size={18} aria-hidden="true" />
         <span>{label}</span>
+        <NavPendingHint />
       </Link>
     );
   }

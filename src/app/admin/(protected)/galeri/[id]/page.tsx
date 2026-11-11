@@ -1,8 +1,12 @@
 import { notFound } from "next/navigation";
 import { GalleryItemManager } from "@/components/admin/gallery-item-manager";
+import { getActiveAdmin } from "@/lib/admin-session";
 import { prisma } from "@/lib/db";
+import { hasPermission } from "@/lib/permissions";
 export const dynamic = "force-dynamic";
 export default async function GalleryItemsPage({ params }: { params: Promise<{ id: string }> }) {
+  const user = (await getActiveAdmin())?.user;
+  if (!user || !hasPermission(user.role, "content:read", user.permissions)) notFound();
   const { id } = await params;
   const [album, media] = await Promise.all([
     prisma.galleryAlbum.findUnique({

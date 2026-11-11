@@ -1,5 +1,11 @@
 # QA Report — 5 November 2026
 
+## Navigasi dashboard admin — 11 November 2026
+
+- Pemeriksaan sesi dan akun aktif di layout serta halaman admin menggunakan hasil yang sama dalam satu permintaan. Daftar Pendaftar hanya mengambil kolom yang dipakai antarmuka.
+- Perpindahan route menampilkan kerangka konten dan tanda proses pada menu. Tombol `Perbarui daftar` memakai pembaruan data tanpa reload browser penuh.
+- Build production, lint, format, dan 23 unit test lulus. Uji browser dengan sesi admin lokal: Ringkasan ke Pendaftar sekitar 350 ms saat koneksi hangat; indikator tampil sebelum respons ketika permintaan sengaja ditahan 700 ms. Ini pengukuran lokal, bukan jaminan waktu di Vercel.
+
 ## Migrasi media dan kecepatan navigasi — 11 November 2026
 
 - Audit Neon menemukan 38 foto klien publik tercatat; 37 masih memakai URL file website. Seluruh 37 file telah diunggah ke bucket publik Neon dan URL pada Media Library diperbarui. Audit ulang menunjukkan 0 foto klien publik yang masih memakai URL lokal.

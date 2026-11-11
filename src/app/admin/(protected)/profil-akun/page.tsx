@@ -1,19 +1,18 @@
-import { getServerSession } from "next-auth";
 import { PasswordForm } from "@/components/admin/password-form";
-import { authOptions } from "@/lib/auth";
+import { getActiveAdmin } from "@/lib/admin-session";
 export default async function ProfileAccountPage() {
-  const session = await getServerSession(authOptions);
+  const admin = await getActiveAdmin();
   return (
     <>
       <div className="admin-heading">
         <div>
           <h1>Profil Akun</h1>
           <p>
-            {session?.user.name} · {session?.user.email} · {session?.user.role}
+            {admin?.user.name} · {admin?.user.email} · {admin?.user.role}
           </p>
         </div>
       </div>
-      {session?.user.mustChangePassword && (
+      {admin?.session.user.mustChangePassword && (
         <div className="admin-alert">
           Akun ini wajib mengganti password awal sebelum dipakai rutin.
         </div>

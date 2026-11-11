@@ -1,16 +1,14 @@
 import Link from "next/link";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { formatDateTime } from "@/lib/utils";
-import { authOptions } from "@/lib/auth";
+import { getActiveAdmin } from "@/lib/admin-session";
 import { applicationStatusLabels, messageStatusLabels } from "@/lib/admin-labels";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) redirect("/admin/login");
+  if (!(await getActiveAdmin())) redirect("/admin/login");
   const [newApplications, unreadMessages, openJobs, recentApplications, recentMessages] =
     await Promise.all([
       prisma.application.count({ where: { status: "NEW" } }),

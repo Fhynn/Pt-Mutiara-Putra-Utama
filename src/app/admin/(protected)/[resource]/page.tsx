@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
 import { InboxManager, type InboxItem } from "@/components/admin/inbox-manager";
 import { ResourceManager } from "@/components/admin/resource-manager";
 import { adminResources } from "@/lib/admin-resources";
 import { getAdminRelationOptions, listAdminResource } from "@/lib/admin-data";
-import { authOptions } from "@/lib/auth";
+import { getActiveAdmin } from "@/lib/admin-session";
 import { hasPermission, type Permission } from "@/lib/permissions";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@/generated/prisma/client";
@@ -31,13 +30,7 @@ export default async function AdminResourcePage({
   const { resource } = await params;
   const config = adminResources[resource];
   if (!config) notFound();
-  const session = await getServerSession(authOptions);
-  const user = session?.user
-    ? await prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { role: true, permissions: true, isActive: true }
-      })
-    : null;
+  const user = (await getActiveAdmin())?.user;
   if (
     !user?.isActive ||
     !hasPermission(user.role, readPermissions[config.permission], user.permissions)
@@ -81,7 +74,37 @@ export default async function AdminResourcePage({
           orderBy: { createdAt: "desc" },
           skip: (page - 1) * pageSize,
           take: pageSize,
-          include: { country: { select: { name: true } }, job: { select: { title: true } } }
+          select: {
+            id: true,
+            referenceNumber: true,
+            fullName: true,
+            status: true,
+            createdAt: true,
+            phone: true,
+            email: true,
+            message: true,
+            domicile: true,
+            workExperience: true,
+            sector: true,
+            birthPlace: true,
+            birthDate: true,
+            gender: true,
+            maritalStatus: true,
+            religion: true,
+            heightCm: true,
+            weightKg: true,
+            address: true,
+            rt: true,
+            rw: true,
+            village: true,
+            district: true,
+            province: true,
+            nikEncrypted: true,
+            photoObjectKey: true,
+            anonymizedAt: true,
+            country: { select: { name: true } },
+            job: { select: { title: true } }
+          }
         })
       ]);
       total = count;
@@ -140,7 +163,17 @@ export default async function AdminResourcePage({
           where,
           orderBy: { createdAt: "desc" },
           skip: (page - 1) * pageSize,
-          take: pageSize
+          take: pageSize,
+          select: {
+            id: true,
+            name: true,
+            createdAt: true,
+            status: true,
+            phone: true,
+            email: true,
+            message: true,
+            subject: true
+          }
         })
       ]);
       total = count;

@@ -1,14 +1,12 @@
 import { UserManager } from "@/components/admin/user-manager";
-import { getServerSession } from "next-auth";
 import { notFound } from "next/navigation";
-import { authOptions } from "@/lib/auth";
+import { getActiveAdmin } from "@/lib/admin-session";
 import { prisma } from "@/lib/db";
 import { hasPermission } from "@/lib/permissions";
 export const dynamic = "force-dynamic";
 export default async function UsersPage() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user || !hasPermission(session.user.role, "users:manage", session.user.permissions))
-    notFound();
+  const user = (await getActiveAdmin())?.user;
+  if (!user || !hasPermission(user.role, "users:manage", user.permissions)) notFound();
   const items = await prisma.user.findMany({
     select: {
       id: true,

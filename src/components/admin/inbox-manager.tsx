@@ -205,7 +205,7 @@ export function InboxManager({
               : "Baca pesan dari pengunjung dan tandai tindak lanjutnya."}
           </p>
         </div>
-        <button className="admin-button" type="button" onClick={() => window.location.reload()}>
+        <button className="admin-button" type="button" onClick={() => router.refresh()}>
           Perbarui daftar
         </button>
       </div>
