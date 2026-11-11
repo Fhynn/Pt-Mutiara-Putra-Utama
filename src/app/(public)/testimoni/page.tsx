@@ -2,7 +2,7 @@ import { EmptyState } from "@/components/public/empty-state";
 import { PageHero } from "@/components/public/page-hero";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Testimoni",
   description: "Testimoni yang telah disetujui untuk publikasi."

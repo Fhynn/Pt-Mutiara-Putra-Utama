@@ -2,7 +2,7 @@ import { ContactForm } from "@/components/forms/contact-form";
 import { PageHero } from "@/components/public/page-hero";
 import { getSettings } from "@/lib/public-data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Kontak",
   description: "Kontak resmi dan formulir pesan PT Mutiara Putra Utama."

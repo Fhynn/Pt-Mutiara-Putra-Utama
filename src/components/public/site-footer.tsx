@@ -12,7 +12,7 @@ export function SiteFooter({ settings }: { settings: Settings }) {
           <div className="brand">
             <Image
               className="brand-logo"
-              src="/brand/mpu-logo.png"
+              src={settings.logoUrl || "/brand/mpu-logo.png"}
               alt="Logo MPU"
               width={67}
               height={58}

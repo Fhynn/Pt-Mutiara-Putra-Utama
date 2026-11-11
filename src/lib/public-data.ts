@@ -1,5 +1,17 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/db";
 import { serializeBigInt } from "@/lib/utils";
+
+const homeClientFiles = [
+  "hero-training.webp",
+  "about-office.webp",
+  "training-class.webp",
+  "gallery-team.webp",
+  "gallery-office-sragen.webp",
+  "gallery-training-sragen.webp",
+  "gallery-briefing.webp",
+  "gallery-training-legok.webp"
+];
 
 export const defaultSettings = {
   legalName: "PT. MUTIARA PUTRA UTAMA",
@@ -18,13 +30,17 @@ export const defaultSettings = {
   terms: null
 };
 
-export async function getSettings() {
-  try {
-    return (await prisma.siteSetting.findUnique({ where: { id: "default" } })) ?? defaultSettings;
-  } catch {
-    return defaultSettings;
-  }
-}
+export const getSettings = unstable_cache(
+  async () => {
+    try {
+      return (await prisma.siteSetting.findUnique({ where: { id: "default" } })) ?? defaultSettings;
+    } catch {
+      return defaultSettings;
+    }
+  },
+  ["site-settings"],
+  { tags: ["site-settings"], revalidate: 60 }
+);
 
 export async function getHomeData() {
   try {
@@ -38,7 +54,8 @@ export async function getHomeData() {
       legal,
       testimonials,
       galleries,
-      faqs
+      faqs,
+      clientAssets
     ] = await Promise.all([
       prisma.page.findUnique({
         where: { slug: "home" },
@@ -83,8 +100,21 @@ export async function getHomeData() {
         where: { status: "PUBLISHED" },
         orderBy: { displayOrder: "asc" },
         take: 6
+      }),
+      prisma.mediaAsset.findMany({
+        where: {
+          objectKey: { in: homeClientFiles.map((file) => `seed/client/${file}`) },
+          isDeleted: false,
+          visibility: "PUBLIC"
+        },
+        select: { objectKey: true, publicUrl: true }
       })
     ]);
+    const clientMedia = Object.fromEntries(
+      clientAssets
+        .filter((asset) => asset.publicUrl)
+        .map((asset) => [asset.objectKey.replace("seed/client/", "/client/"), asset.publicUrl!])
+    );
     return serializeBigInt({
       page,
       services,
@@ -95,7 +125,8 @@ export async function getHomeData() {
       legal,
       testimonials,
       galleries,
-      faqs
+      faqs,
+      clientMedia
     });
   } catch {
     return {
@@ -108,50 +139,59 @@ export async function getHomeData() {
       legal: [],
       testimonials: [],
       galleries: [],
-      faqs: []
+      faqs: [],
+      clientMedia: {} as Record<string, string>
     };
   }
 }
 
-export async function getPublishedCountries() {
-  try {
-    return await prisma.country.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: { displayOrder: "asc" }
-    });
-  } catch {
-    return [];
-  }
-}
+export const getPublishedCountries = unstable_cache(
+  async () => {
+    try {
+      return await prisma.country.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: { displayOrder: "asc" }
+      });
+    } catch {
+      return [];
+    }
+  },
+  ["published-countries"],
+  { tags: ["public-content"], revalidate: 60 }
+);
 
-export async function getOpenJobs(params?: { country?: string; query?: string }) {
-  const now = new Date();
-  try {
-    return await prisma.job.findMany({
-      where: {
-        status: "OPEN",
-        AND: [
-          { OR: [{ deadline: null }, { deadline: { gte: now } }] },
-          ...(params?.country ? [{ country: { slug: params.country } }] : []),
-          ...(params?.query
-            ? [
-                {
-                  OR: [
-                    { title: { contains: params.query, mode: "insensitive" as const } },
-                    { summary: { contains: params.query, mode: "insensitive" as const } }
-                  ]
-                }
-              ]
-            : [])
-        ]
-      },
-      include: { country: true, sector: true },
-      orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }]
-    });
-  } catch {
-    return [];
-  }
-}
+export const getOpenJobs = unstable_cache(
+  async (params?: { country?: string; query?: string }) => {
+    const now = new Date();
+    try {
+      return await prisma.job.findMany({
+        where: {
+          status: "OPEN",
+          AND: [
+            { OR: [{ deadline: null }, { deadline: { gte: now } }] },
+            ...(params?.country ? [{ country: { slug: params.country } }] : []),
+            ...(params?.query
+              ? [
+                  {
+                    OR: [
+                      { title: { contains: params.query, mode: "insensitive" as const } },
+                      { summary: { contains: params.query, mode: "insensitive" as const } }
+                    ]
+                  }
+                ]
+              : [])
+          ]
+        },
+        include: { country: true, sector: true },
+        orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }]
+      });
+    } catch {
+      return [];
+    }
+  },
+  ["open-jobs"],
+  { tags: ["public-content"], revalidate: 60 }
+);
 
 export async function getPublishedArticles() {
   try {

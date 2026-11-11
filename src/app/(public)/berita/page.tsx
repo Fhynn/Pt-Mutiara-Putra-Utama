@@ -4,7 +4,7 @@ import { PageHero } from "@/components/public/page-hero";
 import { getPublishedArticles } from "@/lib/public-data";
 import { formatDate } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Berita",
   description: "Berita dan kegiatan PT Mutiara Putra Utama."

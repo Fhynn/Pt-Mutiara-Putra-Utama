@@ -2,7 +2,7 @@ import { ApplicationForm } from "@/components/forms/application-form";
 import { PageHero } from "@/components/public/page-hero";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Pendaftaran CPMI",
   description: "Formulir pendaftaran calon Pekerja Migran Indonesia PT Mutiara Putra Utama."

@@ -3,7 +3,7 @@ import { CheckCircle2 } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Program Pelatihan",
   description: "Informasi persiapan dan program pelatihan calon pekerja migran Indonesia."
@@ -11,11 +11,20 @@ export const metadata = {
 
 export default async function TrainingPage() {
   let programs: Array<{ id: string; title: string; description: string; materials: unknown }> = [];
+  let trainingPhoto = "/client/training-class.webp";
   try {
-    programs = await prisma.trainingProgram.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: { displayOrder: "asc" }
-    });
+    const [rows, photo] = await Promise.all([
+      prisma.trainingProgram.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: { displayOrder: "asc" }
+      }),
+      prisma.mediaAsset.findUnique({
+        where: { objectKey: "seed/client/training-class.webp" },
+        select: { publicUrl: true }
+      })
+    ]);
+    programs = rows;
+    trainingPhoto = photo?.publicUrl || trainingPhoto;
   } catch {}
   return (
     <>
@@ -27,12 +36,7 @@ export default async function TrainingPage() {
       <section className="section">
         <div className="container split-grid">
           <div className="media-frame">
-            <Image
-              src="/client/training-class.webp"
-              alt="Kegiatan kelas persiapan"
-              width={1000}
-              height={760}
-            />
+            <Image src={trainingPhoto} alt="Kegiatan kelas persiapan" width={1000} height={760} />
           </div>
           <div>
             {programs.length ? (

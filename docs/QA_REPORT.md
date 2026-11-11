@@ -1,5 +1,13 @@
 # QA Report — 5 November 2026
 
+## Migrasi media dan kecepatan navigasi — 11 November 2026
+
+- Audit Neon menemukan 38 foto klien publik tercatat; 37 masih memakai URL file website. Seluruh 37 file telah diunggah ke bucket publik Neon dan URL pada Media Library diperbarui. Audit ulang menunjukkan 0 foto klien publik yang masih memakai URL lokal.
+- Dua bagian halaman yang menyimpan URL lokal diperbarui ke URL Neon. Logo MPU juga diunggah ke bucket publik dan dicatat sebagai media.
+- Halaman publik yang tidak bergantung pada permintaan pengunjung memakai cache 60 detik; perubahan konten admin memicu invalidasi cache. Efek masuk konten dipersingkat agar navigasi tidak terasa tertahan.
+- Build production, lint, format, dan 23 unit test lulus. Uji browser penuh: 36 lulus dan 3 tes admin dilewati karena kredensial QA tidak disetel.
+- Pada server production lokal setelah build, respons hangat: Beranda 41 ms, Tentang 28 ms, Negara Tujuan 31 ms, Galeri 11 ms, Lowongan 7 ms. Akses pertama Lowongan sekitar 591 ms untuk mengisi cache data; angka ini pengukuran lokal, bukan jaminan latency Vercel.
+
 ## Penghapusan catatan sumber situs lama — 11 November 2026
 
 - Blok sumber, tautan ke halaman lama, dan tanggal pemeriksaan dihapus dari detail negara. Data lama pada lima negara dibersihkan di Neon; kriteria, dokumen, gaji, serta sektor tetap tersedia untuk diedit admin.

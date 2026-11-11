@@ -5,7 +5,17 @@ import { Breadcrumb } from "@/components/public/breadcrumb";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const jobs = await prisma.job
+    .findMany({
+      where: { status: "OPEN", OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
+      select: { slug: true }
+    })
+    .catch(() => []);
+  return jobs.map(({ slug }) => ({ slug }));
+}
 
 export async function generateMetadata({
   params

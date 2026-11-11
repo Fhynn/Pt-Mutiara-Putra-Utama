@@ -4,7 +4,7 @@ import { PageHero } from "@/components/public/page-hero";
 import { EmptyState } from "@/components/public/empty-state";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Galeri",
   description: "Album dokumentasi kegiatan PT Mutiara Putra Utama."
@@ -54,7 +54,6 @@ export default async function GalleryPage() {
                         src={album.items[0].media.publicUrl}
                         alt={album.items[0].media.altText}
                         fill
-                        loading="eager"
                         sizes="(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 33vw"
                       />
                     </div>

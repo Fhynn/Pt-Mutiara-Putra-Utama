@@ -191,6 +191,7 @@ type HeroSection = {
 };
 
 export function HomePage({ data }: { data: HomeData }) {
+  const clientPhoto = (url: string) => data.clientMedia[url] ?? url;
   const heroSection = data.page?.sections?.find((section) => section.key === "hero");
   const hero = (heroSection?.content ?? {}) as HeroSection;
   const services = data.services.length ? data.services : fallbackServices;
@@ -242,7 +243,7 @@ export function HomePage({ data }: { data: HomeData }) {
             <div className="hero-collage-main">
               <Image
                 className="hero-image"
-                src={hero.image ?? "/client/hero-training.webp"}
+                src={clientPhoto(hero.image ?? "/client/hero-training.webp")}
                 alt="Kegiatan kelas persiapan calon pekerja migran Indonesia"
                 width={1000}
                 height={1100}
@@ -251,20 +252,18 @@ export function HomePage({ data }: { data: HomeData }) {
             </div>
             <div className="hero-collage-small hero-collage-team">
               <Image
-                src="/client/gallery-team.webp"
+                src={clientPhoto("/client/gallery-team.webp")}
                 alt="Tim PT Mutiara Putra Utama dalam kegiatan kantor"
                 width={560}
                 height={420}
-                priority
               />
             </div>
             <div className="hero-collage-small hero-collage-training">
               <Image
-                src="/client/training-class.webp"
+                src={clientPhoto("/client/training-class.webp")}
                 alt="Peserta mengikuti kegiatan persiapan"
                 width={560}
                 height={420}
-                priority
               />
             </div>
             <div className="hero-badge">
@@ -320,7 +319,7 @@ export function HomePage({ data }: { data: HomeData }) {
         <div className="container split-grid">
           <div className="media-frame">
             <Image
-              src="/client/about-office.webp"
+              src={clientPhoto("/client/about-office.webp")}
               alt="Kantor cabang PT Mutiara Putra Utama"
               width={1000}
               height={760}
@@ -519,7 +518,7 @@ export function HomePage({ data }: { data: HomeData }) {
         <div className="container split-grid">
           <div className="media-frame">
             <Image
-              src="/client/training-class.webp"
+              src={clientPhoto("/client/training-class.webp")}
               alt="Kegiatan kelas persiapan calon pekerja"
               width={1000}
               height={760}
@@ -577,11 +576,11 @@ export function HomePage({ data }: { data: HomeData }) {
               ? dbGallery
                   .slice(0, 5)
                   .map((item) => [item.media.publicUrl ?? "", item.media.altText] as const)
-              : galleryFallback
+              : galleryFallback.map(([src, alt]) => [clientPhoto(src), alt] as const)
             ).map(([src, alt], index) =>
               src ? (
                 <div className="gallery-item" key={`${src}-${index}`}>
-                  <Image src={src} alt={alt} width={900} height={700} loading="eager" />
+                  <Image src={src} alt={alt} width={900} height={700} />
                   <span>{alt}</span>
                 </div>
               ) : null

@@ -17,7 +17,7 @@ const nav = [
   ["Kontak", "/kontak"]
 ] as const;
 
-export function SiteHeader() {
+export function SiteHeader({ logoUrl }: { logoUrl?: string | null }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -29,7 +29,7 @@ export function SiteHeader() {
         <Link className="brand" href="/" aria-label="PT Mutiara Putra Utama - Beranda">
           <Image
             className="brand-logo"
-            src="/brand/mpu-logo.png"
+            src={logoUrl || "/brand/mpu-logo.png"}
             alt="Logo MPU"
             width={67}
             height={58}

@@ -23,6 +23,7 @@
     "db:studio": "prisma studio",
     "assets:prepare": "node scripts/prepare-client-assets.mjs",
     "assets:import-all": "tsx scripts/import-all-client-media.ts",
+    "assets:migrate-public": "tsx scripts/migrate-client-media-to-neon.ts --apply",
     "assets:sync-private": "tsx scripts/sync-private-client-media.ts",
     "content:apply-client-revision": "tsx scripts/apply-client-revision-2026-11-10.ts",
     "content:apply-application-policy": "tsx scripts/apply-application-policy-2026-11-11.ts",

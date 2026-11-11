@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
       entityId: input.albumId,
       summary: "Menambahkan media ke album"
     });
+    revalidatePath("/", "layout");
     return NextResponse.json({ item });
   } catch (error) {
     return NextResponse.json(
@@ -130,6 +132,7 @@ export async function PATCH(request: Request) {
     entityId: input.albumId,
     summary: "Mengurutkan media album"
   });
+  revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }
 
@@ -146,5 +149,6 @@ export async function DELETE(request: NextRequest) {
     entityId: item.albumId,
     summary: "Menghapus media dari album"
   });
+  revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }

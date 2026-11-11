@@ -3,7 +3,7 @@ import { PageHero } from "@/components/public/page-hero";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Legalitas",
   description: "Informasi legalitas dan sumber verifikasi PT Mutiara Putra Utama."

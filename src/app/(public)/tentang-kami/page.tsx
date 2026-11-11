@@ -4,7 +4,7 @@ import { Award, CheckCircle2, ShieldCheck, Zap } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Tentang Kami",
   description:
@@ -43,9 +43,23 @@ const fallback = {
 
 export default async function AboutPage() {
   let profile = fallback;
+  let officePhoto = "/client/about-office.webp";
+  let directorPhoto = fallback.directorPhoto;
   try {
-    const record = await prisma.companyProfile.findUnique({ where: { id: "default" } });
+    const [record, office, portrait] = await Promise.all([
+      prisma.companyProfile.findUnique({ where: { id: "default" } }),
+      prisma.mediaAsset.findUnique({
+        where: { objectKey: "seed/client/about-office.webp" },
+        select: { publicUrl: true }
+      }),
+      prisma.mediaAsset.findUnique({
+        where: { objectKey: "client/director-martua-2026.png" },
+        select: { publicUrl: true }
+      })
+    ]);
     if (record) profile = record as unknown as typeof fallback;
+    officePhoto = office?.publicUrl || officePhoto;
+    directorPhoto = portrait?.publicUrl || directorPhoto;
   } catch {}
 
   return (
@@ -69,7 +83,7 @@ export default async function AboutPage() {
           </div>
           <div className="media-frame">
             <Image
-              src="/client/about-office.webp"
+              src={officePhoto}
               alt="Kantor cabang PT Mutiara Putra Utama"
               width={1000}
               height={760}
@@ -83,7 +97,7 @@ export default async function AboutPage() {
           <div className="media-frame">
             <Image
               className="director-photo"
-              src={profile.directorPhoto ?? "/client/director-martua-2026.png"}
+              src={profile.directorPhoto ?? directorPhoto}
               alt="Foto Direktur Utama PT Mutiara Putra Utama"
               width={700}
               height={950}

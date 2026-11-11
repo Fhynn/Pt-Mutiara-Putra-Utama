@@ -3,7 +3,7 @@ import { BookOpenCheck, MessageCircle, PlaneTakeoff, SearchCheck } from "lucide-
 import { PageHero } from "@/components/public/page-hero";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Layanan",
   description: "Layanan sosialisasi, rekrutmen, pelatihan, dan penempatan PT Mutiara Putra Utama."

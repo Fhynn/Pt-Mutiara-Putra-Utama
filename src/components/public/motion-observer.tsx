@@ -29,18 +29,16 @@ export function MotionObserver() {
     const root = document.documentElement;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const elements = Array.from(document.querySelectorAll<HTMLElement>(animatedSelectors));
+    if (reduceMotion || !("IntersectionObserver" in window)) return;
 
-    root.classList.add("motion-enabled");
-
-    elements.forEach((element, index) => {
+    const belowFold = elements.filter(
+      (element) => element.getBoundingClientRect().top > window.innerHeight * 1.05
+    );
+    belowFold.forEach((element, index) => {
       element.classList.add("reveal-node");
-      element.style.setProperty("--reveal-delay", `${(index % 6) * 55}ms`);
+      element.style.setProperty("--reveal-delay", `${(index % 3) * 35}ms`);
     });
-
-    if (reduceMotion) {
-      elements.forEach((element) => element.classList.add("reveal-visible"));
-      return;
-    }
+    root.classList.add("motion-enabled");
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -50,10 +48,10 @@ export function MotionObserver() {
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: "0px 0px -7% 0px", threshold: 0.12 }
+      { rootMargin: "0px 0px 4% 0px", threshold: 0.08 }
     );
 
-    elements.forEach((element) => observer.observe(element));
+    belowFold.forEach((element) => observer.observe(element));
     return () => observer.disconnect();
   }, [pathname]);
 

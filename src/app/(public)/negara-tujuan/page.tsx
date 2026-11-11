@@ -4,7 +4,7 @@ import { PageHero } from "@/components/public/page-hero";
 import { CountryFlag } from "@/components/public/country-flag";
 import { getPublishedCountries } from "@/lib/public-data";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Negara Tujuan",
   description: "Kriteria kerja dan pilihan negara tujuan PT Mutiara Putra Utama."

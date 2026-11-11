@@ -7,7 +7,17 @@ import { CompactList } from "@/components/public/compact-list";
 import { EmptyState } from "@/components/public/empty-state";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const countries = await prisma.country
+    .findMany({
+      where: { status: "PUBLISHED" },
+      select: { slug: true }
+    })
+    .catch(() => []);
+  return countries.map(({ slug }) => ({ slug }));
+}
 
 function stringList(value: unknown) {
   return Array.isArray(value) ? value.map(String).filter(Boolean) : [];

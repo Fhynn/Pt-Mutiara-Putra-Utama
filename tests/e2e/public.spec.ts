@@ -18,7 +18,10 @@ test("elemen homepage muncul saat masuk viewport", async ({ page }) => {
   await page.goto("/");
   const trustItem = page.locator(".trust-item").first();
   await trustItem.scrollIntoViewIfNeeded();
-  await expect(trustItem).toHaveClass(/reveal-visible/);
+  await expect(trustItem).toBeVisible();
+  const lowerSection = page.locator(".timeline-card").first();
+  await lowerSection.scrollIntoViewIfNeeded();
+  await expect(lowerSection).toHaveClass(/reveal-visible/);
 });
 
 test("formulir publik dapat dibuka", async ({ page }) => {

@@ -4,7 +4,17 @@ import { Breadcrumb } from "@/components/public/breadcrumb";
 import { GalleryLightbox } from "@/components/public/gallery-lightbox";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const albums = await prisma.galleryAlbum
+    .findMany({
+      where: { status: "PUBLISHED" },
+      select: { slug: true }
+    })
+    .catch(() => []);
+  return albums.map(({ slug }) => ({ slug }));
+}
 
 export async function generateMetadata({
   params

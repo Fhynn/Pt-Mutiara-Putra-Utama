@@ -5,7 +5,7 @@ import { PageHero } from "@/components/public/page-hero";
 import { getOpenJobs, getPublishedCountries } from "@/lib/public-data";
 import { formatDate } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "Lowongan",
   description:

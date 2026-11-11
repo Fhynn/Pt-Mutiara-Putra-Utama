@@ -8,7 +8,7 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <>
       <MotionObserver />
-      <SiteHeader />
+      <SiteHeader logoUrl={settings.logoUrl} />
       <main>{children}</main>
       <SiteFooter settings={settings} />
     </>

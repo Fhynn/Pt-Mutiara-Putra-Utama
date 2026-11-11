@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { adminResources, mutationEnvelope, normalizeAdminPayload } from "@/lib/admin-resources";
 import {
@@ -99,7 +100,10 @@ export async function POST(
         : 0;
       if (photoCount === 0)
         return NextResponse.json(
-          { error: "Simpan album dulu, tambahkan setidaknya satu foto, lalu pilih Tampilkan di website." },
+          {
+            error:
+              "Simpan album dulu, tambahkan setidaknya satu foto, lalu pilih Tampilkan di website."
+          },
           { status: 400 }
         );
     }
@@ -177,6 +181,11 @@ export async function POST(
       entityId: String(item.id),
       summary: `${parsed.id ? "Memperbarui" : "Membuat"} ${access.config.singular}`
     });
+    if (access.config.permission === "content" || access.config.permission === "settings") {
+      revalidatePath("/", "layout");
+      revalidateTag("public-content", { expire: 0 });
+      if (resource === "pengaturan") revalidateTag("site-settings", { expire: 0 });
+    }
     return NextResponse.json({ item });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Data tidak dapat disimpan.";
@@ -203,6 +212,11 @@ export async function DELETE(
       entityId: id,
       summary: `Menghapus ${access.config.singular}`
     });
+    if (access.config.permission === "content" || access.config.permission === "settings") {
+      revalidatePath("/", "layout");
+      revalidateTag("public-content", { expire: 0 });
+      if (resource === "pengaturan") revalidateTag("site-settings", { expire: 0 });
+    }
     return NextResponse.json({ ok: true });
   } catch (error) {
     return NextResponse.json(

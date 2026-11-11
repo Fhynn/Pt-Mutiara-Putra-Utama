@@ -4,7 +4,17 @@ import { Breadcrumb } from "@/components/public/breadcrumb";
 import { prisma } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const articles = await prisma.article
+    .findMany({
+      where: { status: "PUBLISHED" },
+      select: { slug: true }
+    })
+    .catch(() => []);
+  return articles.map(({ slug }) => ({ slug }));
+}
 
 export async function generateMetadata({
   params

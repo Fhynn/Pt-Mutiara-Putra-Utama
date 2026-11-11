@@ -2,7 +2,7 @@ import { FaqAccordion } from "@/components/public/faq-accordion";
 import { PageHero } from "@/components/public/page-hero";
 import { prisma } from "@/lib/db";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 export const metadata = {
   title: "FAQ",
   description: "Pertanyaan umum mengenai pendaftaran dan proses penempatan."
