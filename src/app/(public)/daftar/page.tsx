@@ -1,6 +1,6 @@
 import { ApplicationForm } from "@/components/forms/application-form";
 import { PageHero } from "@/components/public/page-hero";
-import { prisma } from "@/lib/db";
+import { getOpenJobs, getPublishedCountries } from "@/lib/public-data";
 
 export const revalidate = 60;
 export const metadata = {
@@ -8,33 +8,8 @@ export const metadata = {
   description: "Formulir pendaftaran calon Pekerja Migran Indonesia PT Mutiara Putra Utama."
 };
 
-export default async function ApplyPage({
-  searchParams
-}: {
-  searchParams: Promise<{ country?: string; job?: string }>;
-}) {
-  const query = await searchParams;
-  let countries: Array<{ id: string; name: string; slug: string }> = [];
-  let jobs: Array<{ id: string; title: string; slug: string; countryId: string }> = [];
-  try {
-    [countries, jobs] = await Promise.all([
-      prisma.country.findMany({
-        where: { status: "PUBLISHED" },
-        select: { id: true, name: true, slug: true },
-        orderBy: { displayOrder: "asc" }
-      }),
-      prisma.job.findMany({
-        where: { status: "OPEN", OR: [{ deadline: null }, { deadline: { gte: new Date() } }] },
-        select: { id: true, title: true, slug: true, countryId: true },
-        orderBy: { publishedAt: "desc" }
-      })
-    ]);
-  } catch {}
-  const defaultCountryId =
-    countries.find((country) => country.slug === query.country)?.id ??
-    jobs.find((job) => job.slug === query.job)?.countryId ??
-    "";
-  const defaultJobId = jobs.find((job) => job.slug === query.job)?.id ?? "";
+export default async function ApplyPage() {
+  const [countries, jobs] = await Promise.all([getPublishedCountries(), getOpenJobs()]);
   return (
     <>
       <PageHero
@@ -67,10 +42,17 @@ export default async function ApplyPage({
             </ul>
           </aside>
           <ApplicationForm
-            countries={countries}
-            jobs={jobs}
-            defaultCountryId={defaultCountryId}
-            defaultJobId={defaultJobId}
+            countries={countries.map((country) => ({
+              id: country.id,
+              name: country.name,
+              slug: country.slug
+            }))}
+            jobs={jobs.map((job) => ({
+              id: job.id,
+              title: job.title,
+              slug: job.slug,
+              countryId: job.countryId
+            }))}
           />
         </div>
       </section>

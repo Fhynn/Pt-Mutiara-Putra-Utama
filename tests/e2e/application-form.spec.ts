@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("formulir CPMI mengirim biodata dan satu foto setelah persetujuan", async ({ page }) => {
   await page.goto("/daftar?country=hong-kong");
+  await expect(page.locator("#countryId option:checked")).toHaveText("Hong Kong");
   await page.getByLabel("Sektor *").selectOption("INFORMAL");
   await page.getByLabel("Nama lengkap sesuai KTP *").fill("Pendaftar Uji");
   await page.getByLabel("Nomor NIK *").fill("0000000000000000");

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { applicationSchema } from "@/lib/validation";
@@ -40,8 +40,8 @@ export function ApplicationForm({
   defaultCountryId = "",
   defaultJobId = ""
 }: {
-  countries: Array<{ id: string; name: string }>;
-  jobs: Array<{ id: string; title: string; countryId: string }>;
+  countries: Array<{ id: string; name: string; slug?: string }>;
+  jobs: Array<{ id: string; title: string; countryId: string; slug?: string }>;
   defaultCountryId?: string;
   defaultJobId?: string;
 }) {
@@ -55,7 +55,8 @@ export function ApplicationForm({
     handleSubmit,
     control,
     formState: { errors, isSubmitting },
-    reset
+    reset,
+    setValue
   } = useForm<Values>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
@@ -86,6 +87,15 @@ export function ApplicationForm({
       idempotencyKey
     }
   });
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const selectedJob = jobs.find((job) => job.slug === params.get("job"));
+    const selectedCountry = countries.find((country) => country.slug === params.get("country"));
+    if (selectedCountry || selectedJob) {
+      setValue("countryId", selectedCountry?.id ?? selectedJob?.countryId ?? "");
+      setValue("jobId", selectedJob?.id ?? "");
+    }
+  }, [countries, jobs, setValue]);
   const countryId = useWatch({ control, name: "countryId" });
   const availableJobs = jobs.filter((job) => job.countryId === countryId);
   const error = (key: keyof Values) =>

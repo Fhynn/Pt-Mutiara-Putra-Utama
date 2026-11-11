@@ -29,6 +29,18 @@ test("formulir publik dapat dibuka", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Pendaftaran");
   await expect(page.getByLabel(/Nama lengkap/i)).toBeVisible();
 });
+
+test("filter lowongan mengikuti URL tanpa memuat ulang halaman", async ({ page }) => {
+  await page.goto("/lowongan?country=hong-kong");
+  await expect(page.getByLabel("Negara")).toHaveValue("hong-kong");
+  await page.getByLabel("Negara").selectOption("taiwan");
+  await page.getByRole("button", { name: "Terapkan Filter" }).click();
+  await expect(page).toHaveURL(/country=taiwan/);
+  await expect(page.getByLabel("Negara")).toHaveValue("taiwan");
+  await page.goBack();
+  await expect(page.getByLabel("Negara")).toHaveValue("hong-kong");
+});
+
 test("admin dialihkan ke login", async ({ page }) => {
   await page.goto("/admin");
   await expect(page).toHaveURL(/\/admin\/login/);
