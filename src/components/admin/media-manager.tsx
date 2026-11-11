@@ -157,21 +157,15 @@ export function MediaManager({
         </div>
       </div>
       <div className="admin-media-explainer">
-        <strong>Setelah foto diunggah, halaman mana yang berubah?</strong>
+        <strong>Foto yang diunggah akan tampil di mana?</strong>
         <p>
-          <b>Unggah saja:</b> belum mengubah halaman publik. Untuk menampilkan foto kegiatan,
-          masukkan file ke <Link href="/admin/galeri">album Galeri</Link> yang berstatus Terbit.
-          Foto akan tampil di halaman album dan album akan muncul di{" "}
-          <Link href="/galeri">/galeri</Link>.
+          Foto tersimpan di sini, lalu dapat ditambahkan ke{" "}
+          <Link href="/admin/galeri">album Galeri</Link> atau dipilih saat mengubah halaman lain.
+          Mengunggah file saja belum menampilkannya di website.
         </p>
         <p>
-          Foto untuk halaman lain, seperti beranda atau negara tujuan, perlu dipilih pada editor
-          halaman tersebut. Di daftar file di bawah, bagian <b>Dipakai di</b> menunjukkan album yang
-          sudah memakai foto.
-        </p>
-        <p>
-          <strong>Hanya untuk admin</strong> khusus berkas internal atau file yang belum boleh
-          dilihat pengunjung. Foto kegiatan biasa gunakan akses publik.
+          Untuk foto kegiatan, buka <Link href="/admin/galeri">Galeri</Link> setelah mengunggah.
+          Untuk foto direktur, negara, atau berita, buka menu kontennya dan pilih fotonya di sana.
         </p>
       </div>
       {!configured && (

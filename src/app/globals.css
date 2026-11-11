@@ -2163,6 +2163,12 @@ a {
   color: #183f76;
 }
 
+.admin-message .admin-button {
+  display: table;
+  width: max-content;
+  margin-top: 10px;
+}
+
 .error-page {
   display: grid;
   min-height: 100vh;

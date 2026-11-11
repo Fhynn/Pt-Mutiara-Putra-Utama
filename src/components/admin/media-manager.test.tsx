@@ -39,7 +39,7 @@ describe("pengelolaan foto privat", () => {
     );
 
     render(<MediaManager initialItems={[privateItem]} configured />);
-    expect(screen.getByText(/khusus berkas internal/)).toBeTruthy();
+    expect(screen.getByText("Perlu menyimpan file hanya untuk admin?")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Lihat file" }).getAttribute("href")).toBe(
       "/api/admin/media/foto-1/preview"
     );

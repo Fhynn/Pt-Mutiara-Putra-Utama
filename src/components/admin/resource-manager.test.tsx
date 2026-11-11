@@ -118,3 +118,42 @@ describe("foto negara di admin", () => {
     });
   });
 });
+
+describe("foto beranda di admin", () => {
+  it("dapat diunggah langsung dari editor halaman", async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        items: [{ id: "foto-hero", kind: "IMAGE", publicUrl: "https://example.com/hero.jpg" }]
+      })
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("scrollTo", vi.fn());
+
+    render(
+      <ResourceManager
+        resource="halaman"
+        config={adminResources.halaman}
+        initialItems={[
+          { id: "hero-1", key: "hero", title: "Pembuka", status: "DRAFT", content: {} }
+        ]}
+        relationOptions={{ mediaUrls: [] }}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Ubah" }));
+    fireEvent.change(screen.getByLabelText("Unggah foto utama"), {
+      target: { files: [new File(["foto"], "hero.jpg", { type: "image/jpeg" })] }
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("pratinjau-foto").getAttribute("data-src")).toBe(
+        "https://example.com/hero.jpg"
+      )
+    );
+    expect(fetchMock).toHaveBeenCalledWith("/api/admin/media", {
+      method: "POST",
+      body: expect.any(FormData)
+    });
+  });
+});

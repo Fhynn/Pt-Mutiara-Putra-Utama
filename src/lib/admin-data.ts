@@ -26,7 +26,9 @@ export async function listAdminResource(resource: string, query = "") {
       : {};
   const rows = await delegate(config).findMany({
     where,
-    orderBy: { createdAt: "desc" },
+    orderBy: config.fields.some((field) => field.key === "displayOrder")
+      ? [{ displayOrder: "asc" }, { createdAt: "asc" }]
+      : { createdAt: "desc" },
     take: 100
   });
   return serializeBigInt(rows) as Record<string, unknown>[];
@@ -112,6 +114,14 @@ export async function getAdminRelationOptions(config: AdminResourceConfig) {
 export async function createAdminResource(resource: string, data: Record<string, unknown>) {
   const config = adminResources[resource];
   if (!config) throw new Error("Resource admin tidak dikenal.");
+  if (config.fields.some((field) => field.key === "displayOrder") && data.displayOrder == null) {
+    const [last] = await delegate(config).findMany({
+      orderBy: { displayOrder: "desc" },
+      take: 1,
+      select: { displayOrder: true }
+    });
+    data.displayOrder = Number(last?.displayOrder ?? -1) + 1;
+  }
   return delegate(config).create({ data });
 }
 

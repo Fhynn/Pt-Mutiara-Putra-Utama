@@ -93,6 +93,64 @@ export async function POST(
       );
     }
     const status = String(data.status ?? "");
+    if (resource === "galeri" && status === "PUBLISHED") {
+      const photoCount = parsed.id
+        ? await prisma.galleryItem.count({ where: { albumId: parsed.id } })
+        : 0;
+      if (photoCount === 0)
+        return NextResponse.json(
+          { error: "Simpan album dulu, tambahkan setidaknya satu foto, lalu pilih Tampilkan di website." },
+          { status: 400 }
+        );
+    }
+    if (
+      resource === "testimoni" &&
+      status === "PUBLISHED" &&
+      (data.approval !== "APPROVED" || data.consentToPublish !== true)
+    ) {
+      return NextResponse.json(
+        { error: "Testimoni hanya bisa ditampilkan setelah disetujui dan izin publikasi dicatat." },
+        { status: 400 }
+      );
+    }
+    if (status === "PUBLISHED" && data.isFeatured === false) {
+      let shouldFeature = false;
+      if (resource === "galeri") {
+        const previous = parsed.id
+          ? await prisma.galleryAlbum.findUnique({
+              where: { id: parsed.id },
+              select: { status: true }
+            })
+          : null;
+        if (previous?.status !== "PUBLISHED")
+          shouldFeature =
+            (await prisma.galleryAlbum.count({
+              where: { status: "PUBLISHED", isFeatured: true }
+            })) === 0;
+      } else if (resource === "negara") {
+        const previous = parsed.id
+          ? await prisma.country.findUnique({ where: { id: parsed.id }, select: { status: true } })
+          : null;
+        if (previous?.status !== "PUBLISHED")
+          shouldFeature =
+            (await prisma.country.count({
+              where: { status: "PUBLISHED", isFeatured: true }
+            })) === 0;
+      } else if (resource === "pelatihan") {
+        const previous = parsed.id
+          ? await prisma.trainingProgram.findUnique({
+              where: { id: parsed.id },
+              select: { status: true }
+            })
+          : null;
+        if (previous?.status !== "PUBLISHED")
+          shouldFeature =
+            (await prisma.trainingProgram.count({
+              where: { status: "PUBLISHED", isFeatured: true }
+            })) === 0;
+      }
+      if (shouldFeature) data.isFeatured = true;
+    }
     if (
       (status === "PUBLISHED" || status === "OPEN") &&
       !hasPermission(access.session.user.role, "content:publish", access.session.user.permissions)
@@ -102,7 +160,13 @@ export async function POST(
         { status: 403 }
       );
     }
-    if (status === "PUBLISHED" || status === "OPEN") data.publishedAt = new Date();
+    if (
+      (status === "PUBLISHED" || status === "OPEN") &&
+      ["halaman", "galeri", "negara", "lowongan", "berita", "testimoni", "pelatihan"].includes(
+        resource
+      )
+    )
+      data.publishedAt = new Date();
     const item = parsed.id
       ? await updateAdminResource(resource, parsed.id, data)
       : await createAdminResource(resource, data);

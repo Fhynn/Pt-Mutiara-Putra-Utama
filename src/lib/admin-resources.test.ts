@@ -37,4 +37,18 @@ describe("form admin ramah pengguna", () => {
 
     expect(result.socialLinks).toEqual({ instagram: "https://instagram.com/mpu" });
   });
+
+  it("menyerahkan urutan baru ke sistem dan mengambil tahun dari tanggal terbit", () => {
+    const album = normalizeAdminPayload(adminResources.galeri, {
+      title: "Pelatihan CPMI",
+      displayOrder: ""
+    });
+    const legal = normalizeAdminPayload(adminResources.legalitas, {
+      issuedAt: "2021-05-12",
+      issuedYear: ""
+    });
+
+    expect(album).not.toHaveProperty("displayOrder");
+    expect(legal.issuedYear).toBe(2021);
+  });
 });

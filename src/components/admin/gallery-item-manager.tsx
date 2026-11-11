@@ -160,14 +160,15 @@ export function GalleryItemManager({
           </p>
         ) : (
           <p>
-            Album masih draf. Foto yang ditambahkan belum terlihat oleh pengunjung. Ubah statusnya
-            menjadi <b>Terbit</b> di <Link href="/admin/galeri">daftar album Galeri</Link>.
+            Album belum terlihat oleh pengunjung. Setelah fotonya lengkap, pilih
+            <b> Tampilkan di website</b> saat mengubah album di{" "}
+            <Link href="/admin/galeri">daftar Galeri</Link>.
           </p>
         )}
         <p>
-          Beranda memakai foto dari album terbit yang ditandai <b>Unggulan</b> dengan urutan paling
-          atas. Album ini {albumFeatured ? "sudah" : "belum"} ditandai Unggulan. Ubah tanda dan
-          urutannya di <Link href="/admin/galeri">daftar album</Link>.
+          {albumFeatured
+            ? "Album ini juga dapat tampil di bagian Galeri pada beranda setelah diterbitkan."
+            : "Jika ingin album ini tampil di beranda, aktifkan Tampilkan di beranda saat mengubah album."}
         </p>
       </div>
 

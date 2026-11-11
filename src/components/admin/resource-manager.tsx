@@ -60,8 +60,8 @@ const fieldNameLabels: Record<string, string> = {
   updatedAt: "Terakhir diubah",
   publishedAt: "Tanggal terbit",
   deadline: "Batas pendaftaran",
-  displayOrder: "Urutan",
-  isFeatured: "Unggulan",
+  displayOrder: "Urutan tampilan",
+  isFeatured: "Tampil di beranda",
   status: "Status",
   key: "Bagian",
   referenceNumber: "Nomor pendaftaran",
@@ -76,10 +76,22 @@ const fieldNameLabels: Record<string, string> = {
 };
 
 const resourceDescriptions: Record<string, string> = {
-  negara: "Isi informasi negara. Bendera dibuat otomatis; foto dapat diunggah jika ada.",
-  lowongan: "Kelola lowongan terverifikasi, negara tujuan, persyaratan, dan batas pendaftaran.",
-  galeri: "Susun album kegiatan, tanggal, lokasi, dan status publikasinya.",
-  berita: "Tulis dan terbitkan berita atau kegiatan resmi MPU."
+  halaman: "Perubahan teks dan foto akan muncul di halaman Beranda setelah ditampilkan di website.",
+  profil: "Perubahan akan muncul di halaman Tentang Kami.",
+  pengaturan: "Ubah kontak, alamat, dan identitas yang dipakai di seluruh website.",
+  negara: "Informasi negara muncul di halaman Negara Tujuan dan detailnya.",
+  lowongan: "Lowongan yang dibuka muncul di halaman Lowongan dan halaman negara terkait.",
+  galeri:
+    "Album yang ditampilkan muncul di halaman Galeri. Setelah membuat album, tambahkan fotonya.",
+  berita: "Artikel yang ditampilkan muncul di halaman Berita.",
+  testimoni:
+    "Testimoni muncul di halaman Testimoni jika izin publikasi dan persetujuannya sudah lengkap.",
+  pelatihan: "Program yang ditampilkan muncul di halaman Program Pelatihan.",
+  layanan: "Layanan yang ditampilkan muncul di halaman Layanan dan Beranda.",
+  tim: "Anggota tim yang ditampilkan muncul di halaman Tentang Kami.",
+  alur: "Tahapan yang ditampilkan muncul di bagian Alur Penempatan pada Beranda.",
+  faq: "Pertanyaan yang ditampilkan muncul di halaman FAQ dan beberapa di Beranda.",
+  legalitas: "Dokumen yang ditampilkan muncul di halaman Legalitas dan sebagian di Beranda."
 };
 
 function slugify(value: string) {
@@ -133,6 +145,48 @@ const advancedFieldKeys = new Set([
   "sourceUrl",
   "needsReview"
 ]);
+
+const detailGroups: Record<string, { title: string; keys: string[]; description: string }> = {
+  negara: {
+    title: "Kriteria, dokumen, dan pekerjaan",
+    description:
+      "Isi sesuai informasi program yang sudah disetujui. Bagian ini muncul di halaman detail negara.",
+    keys: [
+      "programDescription",
+      "criteria",
+      "requirements",
+      "salaryDetails",
+      "informalSectorInfo",
+      "formalSectorInfo",
+      "sectors"
+    ]
+  },
+  lowongan: {
+    title: "Rincian pekerjaan dan persyaratan",
+    description: "Tambahkan rincian yang sudah pasti sebelum membuka lowongan.",
+    keys: [
+      "employmentType",
+      "responsibilities",
+      "requirements",
+      "qualifications",
+      "facilities",
+      "positions",
+      "feeNotes"
+    ]
+  },
+  pengaturan: {
+    title: "Informasi tambahan website",
+    description: "Isi bagian ini hanya bila informasinya sudah tersedia.",
+    keys: [
+      "alternateEmail",
+      "mapUrl",
+      "officeHours",
+      "socialLinks",
+      "announcement",
+      "announcementEnabled"
+    ]
+  }
+};
 
 // These values are generated or retained by the system. They do not need an editor in the CMS.
 const internalFieldKeys = new Set([
@@ -240,12 +294,16 @@ function SectionContentEditor({
   sectionKey,
   value,
   mediaOptions,
-  onChange
+  onChange,
+  onImageUpload,
+  imageUploading
 }: {
   sectionKey: string;
   value: Record<string, unknown>;
   mediaOptions: AdminOption[];
   onChange: (value: Record<string, unknown>) => void;
+  onImageUpload: (file: File) => Promise<void>;
+  imageUploading: boolean;
 }) {
   const blueprint =
     sectionBlueprints[sectionKey] ??
@@ -257,60 +315,107 @@ function SectionContentEditor({
 
   return (
     <div className="admin-structured-editor">
-      {blueprint.map((item) => (
-        <label
-          className={item.type === "textarea" || item.type === "list" ? "wide" : ""}
-          key={item.key}
-        >
-          <span>{item.label}</span>
-          {item.type === "textarea" ? (
-            <textarea
-              rows={4}
-              value={String(value[item.key] ?? "")}
-              onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
-            />
-          ) : item.type === "list" ? (
-            <StringListEditor
-              label={item.label}
-              value={Array.isArray(value[item.key]) ? (value[item.key] as string[]) : []}
-              onChange={(items) => onChange({ ...value, [item.key]: items })}
-            />
-          ) : item.type === "image" ? (
-            <select
-              value={String(value[item.key] ?? "")}
-              onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
-            >
-              <option value="">Pilih foto dari koleksi</option>
-              {mediaOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-              {value[item.key] &&
-              !mediaOptions.some((option) => option.value === value[item.key]) ? (
-                <option value={String(value[item.key])}>Foto yang sedang digunakan</option>
-              ) : null}
-            </select>
-          ) : item.type === "link" ? (
-            <select
-              value={String(value[item.key] ?? "")}
-              onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
-            >
-              <option value="">Pilih halaman tujuan</option>
-              {pageLinks.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <input
-              value={String(value[item.key] ?? "")}
-              onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
-            />
-          )}
-        </label>
-      ))}
+      {blueprint.map((item) =>
+        item.type === "image" ? (
+          <div className="wide admin-simple-media-field" key={item.key}>
+            <strong>{item.label}</strong>
+            <div className="admin-simple-media-content">
+              <div className="admin-simple-media-preview">
+                {value[item.key] ? (
+                  <Image
+                    src={String(value[item.key])}
+                    alt={item.label}
+                    fill
+                    sizes="(max-width: 700px) 100vw, 220px"
+                  />
+                ) : (
+                  <span>Belum ada foto</span>
+                )}
+              </div>
+              <div className="admin-simple-media-actions">
+                <label className="admin-button primary admin-simple-media-upload">
+                  <span>
+                    {imageUploading
+                      ? "Mengunggah…"
+                      : value[item.key]
+                        ? "Ganti foto"
+                        : "Unggah foto"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif"
+                    aria-label={`Unggah ${item.label.toLowerCase()}`}
+                    disabled={imageUploading}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      event.target.value = "";
+                      if (file) void onImageUpload(file);
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+            {mediaOptions.length > 0 ? (
+              <details>
+                <summary>Pilih foto yang sudah ada</summary>
+                <select
+                  aria-label={`Pilih ${item.label.toLowerCase()} yang sudah ada`}
+                  value={String(value[item.key] ?? "")}
+                  onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
+                >
+                  <option value="">Belum dipilih</option>
+                  {mediaOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                  {value[item.key] &&
+                  !mediaOptions.some((option) => option.value === value[item.key]) ? (
+                    <option value={String(value[item.key])}>Foto yang sedang digunakan</option>
+                  ) : null}
+                </select>
+              </details>
+            ) : null}
+          </div>
+        ) : (
+          <label
+            className={item.type === "textarea" || item.type === "list" ? "wide" : ""}
+            key={item.key}
+          >
+            <span>{item.label}</span>
+            {item.type === "textarea" ? (
+              <textarea
+                rows={4}
+                value={String(value[item.key] ?? "")}
+                onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
+              />
+            ) : item.type === "list" ? (
+              <StringListEditor
+                label={item.label}
+                value={Array.isArray(value[item.key]) ? (value[item.key] as string[]) : []}
+                onChange={(items) => onChange({ ...value, [item.key]: items })}
+              />
+            ) : item.type === "link" ? (
+              <select
+                value={String(value[item.key] ?? "")}
+                onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
+              >
+                <option value="">Pilih halaman tujuan</option>
+                {pageLinks.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                value={String(value[item.key] ?? "")}
+                onChange={(event) => onChange({ ...value, [item.key]: event.target.value })}
+              />
+            )}
+          </label>
+        )
+      )}
     </div>
   );
 }
@@ -339,10 +444,18 @@ export function ResourceManager({
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [photoUploading, setPhotoUploading] = useState<string | null>(null);
+  const [savedAlbumId, setSavedAlbumId] = useState<string | null>(null);
   const [availableRelationOptions, setAvailableRelationOptions] = useState(relationOptions);
+  const detailGroup = detailGroups[resource];
   const standardFields = config.fields.filter(
     (field) =>
-      !field.hidden && !internalFieldKeys.has(field.key) && !advancedFieldKeys.has(field.key)
+      !field.hidden &&
+      !internalFieldKeys.has(field.key) &&
+      !advancedFieldKeys.has(field.key) &&
+      !detailGroup?.keys.includes(field.key)
+  );
+  const detailFields = config.fields.filter(
+    (field) => !field.hidden && detailGroup?.keys.includes(field.key)
   );
   const advancedFields = config.fields.filter(
     (field) =>
@@ -413,11 +526,57 @@ export function ResourceManager({
     }
   }
 
+  async function uploadSectionImage(file: File) {
+    setPhotoUploading("sectionImage");
+    setMessage("");
+    try {
+      const data = new FormData();
+      data.append("files", file);
+      data.append("visibility", "PUBLIC");
+      data.append("altText", file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " "));
+      const response = await fetch("/api/admin/media", { method: "POST", body: data });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Foto gagal diunggah.");
+      const uploaded = body.items?.[0];
+      if (uploaded?.kind !== "IMAGE" || !uploaded.publicUrl)
+        throw new Error("Foto belum siap digunakan. Coba unggah ulang.");
+      setAvailableRelationOptions((current) => ({
+        ...current,
+        mediaUrls: [
+          {
+            value: uploaded.publicUrl,
+            label: file.name,
+            previewUrl: uploaded.publicUrl,
+            kind: "IMAGE"
+          },
+          ...(current.mediaUrls ?? [])
+        ]
+      }));
+      setForm((current) => ({
+        ...current,
+        content: {
+          ...(current.content &&
+          typeof current.content === "object" &&
+          !Array.isArray(current.content)
+            ? current.content
+            : {}),
+          image: uploaded.publicUrl
+        }
+      }));
+      setMessage("Foto berhasil diunggah. Klik Simpan perubahan untuk menampilkannya.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Foto gagal diunggah.");
+    } finally {
+      setPhotoUploading(null);
+    }
+  }
+
   function edit(item: Record<string, unknown>) {
     setEditingId(String(item.id));
     setForm(formFromItem(config, item));
     setFormOpen(true);
     setMessage("");
+    setSavedAlbumId(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -429,6 +588,7 @@ export function ResourceManager({
 
   async function save(event: React.FormEvent) {
     event.preventDefault();
+    const isNewAlbum = resource === "galeri" && !editingId;
     setBusy(true);
     setMessage("");
     try {
@@ -439,13 +599,18 @@ export function ResourceManager({
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "Gagal menyimpan data.");
+      setSavedAlbumId(isNewAlbum ? String(body.item?.id ?? "") : null);
       await reload();
       if (!singleton) {
         setEditingId(null);
         setForm(initialForm(config));
         setFormOpen(false);
       }
-      setMessage("Perubahan berhasil disimpan.");
+      setMessage(
+        isNewAlbum
+          ? "Album tersimpan. Tambahkan foto agar album dapat ditampilkan."
+          : "Perubahan berhasil disimpan."
+      );
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Gagal menyimpan data.");
     } finally {
@@ -501,6 +666,8 @@ export function ResourceManager({
           value={value && typeof value === "object" && !Array.isArray(value) ? value : {}}
           mediaOptions={availableRelationOptions.mediaUrls ?? []}
           onChange={(content) => updateField(field, content)}
+          onImageUpload={uploadSectionImage}
+          imageUploading={photoUploading === "sectionImage"}
         />
       );
     if (field.type === "select" || field.type === "relation") {
@@ -650,7 +817,7 @@ export function ResourceManager({
         key={field.key}
       >
         <span>
-          {field.label}
+          {field.key === "status" ? "Tampilan di website" : field.label}
           {field.required ? " *" : ""}
         </span>
         {renderField(field)}
@@ -678,6 +845,7 @@ export function ResourceManager({
               setForm(initialForm(config));
               setFormOpen(true);
               setMessage("");
+              setSavedAlbumId(null);
             }}
           >
             <Plus size={16} aria-hidden="true" /> Tambah {config.singular}
@@ -709,10 +877,17 @@ export function ResourceManager({
           ) : (
             <form onSubmit={save}>
               <div className="admin-form-grid">{standardFields.map(renderFormField)}</div>
+              {detailFields.length > 0 && detailGroup && (
+                <details className="admin-advanced admin-detail-group">
+                  <summary>{detailGroup.title}</summary>
+                  <p>{detailGroup.description}</p>
+                  <div className="admin-form-grid">{detailFields.map(renderFormField)}</div>
+                </details>
+              )}
               {advancedFields.length > 0 && (
                 <details className="admin-advanced">
-                  <summary>Pengaturan lanjutan</summary>
-                  <p>Bagian ini biasanya tidak perlu diubah.</p>
+                  <summary>Pengaturan tambahan</summary>
+                  <p>Ubah bagian ini hanya jika diperlukan.</p>
                   <div className="admin-form-grid">{advancedFields.map(renderFormField)}</div>
                 </details>
               )}
@@ -730,9 +905,14 @@ export function ResourceManager({
         </section>
       )}
       {message && (
-        <p className="admin-message" role="status">
+        <div className="admin-message" role="status">
           {message}
-        </p>
+          {savedAlbumId ? (
+            <a className="admin-button primary" href={`/admin/galeri/${savedAlbumId}`}>
+              Tambahkan foto ke album
+            </a>
+          ) : null}
+        </div>
       )}
       {!singleton && (
         <section className="admin-panel">

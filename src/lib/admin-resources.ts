@@ -50,10 +50,22 @@ export type AdminResourceConfig = {
 };
 
 const publication: readonly AdminOption[] = [
-  { value: "DRAFT", label: "Draf — belum tampil di website" },
-  { value: "PUBLISHED", label: "Terbit — tampil di website" },
-  { value: "ARCHIVED", label: "Arsip — disimpan, tidak ditampilkan" }
+  { value: "DRAFT", label: "Simpan, belum tampil di website" },
+  { value: "PUBLISHED", label: "Tampilkan di website" },
+  { value: "ARCHIVED", label: "Disembunyikan dari website" }
 ];
+const featured = (help: string): AdminField => ({
+  key: "isFeatured",
+  label: "Tampilkan di beranda",
+  type: "boolean",
+  help
+});
+const order = (): AdminField => ({
+  key: "displayOrder",
+  label: "Urutan tampilan",
+  type: "number",
+  help: "Diisi otomatis saat menambah data. Ubah hanya jika ingin mengganti urutan."
+});
 const iconOptions: readonly AdminOption[] = [
   { value: "Megaphone", label: "Pengeras suara" },
   { value: "Search", label: "Pencarian" },
@@ -186,7 +198,7 @@ export const adminResources: Record<string, AdminResourceConfig> = {
     singular: "bagian beranda",
     model: "pageSection",
     permission: "content",
-    listFields: ["key", "title", "status", "displayOrder"],
+    listFields: ["key", "title", "status"],
     searchFields: ["key", "title"],
     noCreate: true,
     noDelete: true,
@@ -222,12 +234,28 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       text("title", "Judul", true),
       slug(),
       area("description", "Deskripsi"),
-      text("category", "Kategori", true),
+      {
+        key: "category",
+        label: "Jenis kegiatan",
+        type: "select",
+        required: true,
+        options: choices(
+          ["Kantor", "Kantor"],
+          ["Sosialisasi", "Sosialisasi"],
+          ["Rekrutmen", "Rekrutmen"],
+          ["Pelatihan", "Pelatihan"],
+          ["Kegiatan", "Kegiatan"],
+          ["Pemberangkatan", "Pemberangkatan"],
+          ["Lainnya", "Lainnya"]
+        )
+      },
       text("location", "Lokasi"),
       { key: "eventDate", label: "Tanggal kegiatan", type: "date" },
       select("status", "Status", publication),
-      { key: "isFeatured", label: "Unggulan", type: "boolean" },
-      { key: "displayOrder", label: "Urutan", type: "number" }
+      featured(
+        "Album pertama yang diterbitkan akan ditampilkan di beranda secara otomatis. Aktifkan ini untuk memilih album lain."
+      ),
+      order()
     ]
   },
   negara: {
@@ -279,8 +307,8 @@ export const adminResources: Record<string, AdminResourceConfig> = {
         )
       ),
       select("status", "Publikasi", publication),
-      { key: "isFeatured", label: "Unggulan", type: "boolean" },
-      { key: "displayOrder", label: "Urutan", type: "number" },
+      featured("Negara terpilih tampil di bagian Negara Tujuan pada beranda."),
+      order(),
       text("metaTitle", "Judul untuk Google"),
       area("metaDescription", "Deskripsi untuk Google")
     ]
@@ -304,7 +332,6 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       list("requirements", "Persyaratan"),
       list("qualifications", "Kualifikasi"),
       list("facilities", "Fasilitas"),
-      text("currency", "Mata uang"),
       { key: "positions", label: "Jumlah posisi", type: "number" },
       { key: "deadline", label: "Batas pendaftaran", type: "date" },
       text("sourceReference", "Referensi job order"),
@@ -314,14 +341,12 @@ export const adminResources: Record<string, AdminResourceConfig> = {
         "status",
         "Status",
         choices(
-          ["DRAFT", "Draf"],
-          ["OPEN", "Dibuka"],
-          ["CLOSED", "Ditutup"],
-          ["EXPIRED", "Kedaluwarsa"],
-          ["ARCHIVED", "Diarsipkan"]
+          ["DRAFT", "Simpan, belum tampil di website"],
+          ["OPEN", "Tampilkan sebagai lowongan dibuka"],
+          ["CLOSED", "Tutup lowongan"]
         )
       ),
-      { key: "isFeatured", label: "Unggulan", type: "boolean" }
+      featured("Lowongan terpilih dapat ditonjolkan di website.")
     ]
   },
   berita: {
@@ -340,7 +365,7 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       relation("categoryId", "Kategori artikel", "articleCategories"),
       list("tags", "Kata kunci / tag"),
       select("status", "Status", publication),
-      { key: "isFeatured", label: "Unggulan", type: "boolean" },
+      featured("Artikel terpilih dapat ditonjolkan di website."),
       text("metaTitle", "Judul untuk Google"),
       area("metaDescription", "Deskripsi untuk Google")
     ]
@@ -369,8 +394,8 @@ export const adminResources: Record<string, AdminResourceConfig> = {
         )
       ),
       select("status", "Status", publication),
-      { key: "isFeatured", label: "Unggulan", type: "boolean" },
-      { key: "displayOrder", label: "Urutan", type: "number" }
+      featured("Testimoni terpilih tampil lebih dahulu."),
+      order()
     ]
   },
   pelatihan: {
@@ -378,7 +403,7 @@ export const adminResources: Record<string, AdminResourceConfig> = {
     singular: "program",
     model: "trainingProgram",
     permission: "content",
-    listFields: ["title", "status", "isFeatured", "displayOrder"],
+    listFields: ["title", "status", "isFeatured"],
     searchFields: ["title", "description"],
     fields: [
       text("title", "Judul", true),
@@ -387,8 +412,8 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       list("materials", "Materi pelatihan"),
       relation("coverMediaId", "Foto utama", "media"),
       select("status", "Status", publication),
-      { key: "isFeatured", label: "Unggulan", type: "boolean" },
-      { key: "displayOrder", label: "Urutan", type: "number" }
+      featured("Program terpilih tampil di beranda."),
+      order()
     ]
   },
   layanan: {
@@ -396,7 +421,7 @@ export const adminResources: Record<string, AdminResourceConfig> = {
     singular: "layanan",
     model: "service",
     permission: "content",
-    listFields: ["title", "status", "displayOrder"],
+    listFields: ["title", "status"],
     searchFields: ["title", "description"],
     fields: [
       text("title", "Judul", true),
@@ -406,7 +431,7 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       area("detail", "Rincian"),
       { key: "href", label: "Halaman tujuan", type: "select", options: pageLinkOptions },
       select("status", "Status", publication),
-      { key: "displayOrder", label: "Urutan", type: "number" }
+      order()
     ]
   },
   tim: {
@@ -414,7 +439,7 @@ export const adminResources: Record<string, AdminResourceConfig> = {
     singular: "anggota",
     model: "teamMember",
     permission: "content",
-    listFields: ["name", "position", "status", "displayOrder"],
+    listFields: ["name", "position", "status"],
     searchFields: ["name", "position"],
     fields: [
       text("name", "Nama", true),
@@ -422,7 +447,7 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       area("bio", "Bio"),
       relation("photoMediaId", "Foto anggota tim", "media"),
       select("status", "Status", publication),
-      { key: "displayOrder", label: "Urutan", type: "number" }
+      order()
     ]
   },
   alur: {
@@ -430,14 +455,14 @@ export const adminResources: Record<string, AdminResourceConfig> = {
     singular: "tahap",
     model: "placementStep",
     permission: "content",
-    listFields: ["title", "status", "displayOrder"],
+    listFields: ["title", "status"],
     searchFields: ["title", "description"],
     fields: [
       text("title", "Judul", true),
       area("description", "Deskripsi"),
       { key: "icon", label: "Ikon", type: "select", options: iconOptions, required: true },
       select("status", "Status", publication),
-      { key: "displayOrder", label: "Urutan", type: "number" }
+      order()
     ]
   },
   faq: {
@@ -445,14 +470,27 @@ export const adminResources: Record<string, AdminResourceConfig> = {
     singular: "FAQ",
     model: "faq",
     permission: "content",
-    listFields: ["question", "category", "status", "displayOrder"],
+    listFields: ["question", "category", "status"],
     searchFields: ["question", "answer"],
     fields: [
-      text("category", "Kategori", true),
+      {
+        key: "category",
+        label: "Topik",
+        type: "select",
+        required: true,
+        options: choices(
+          ["Pendaftaran", "Pendaftaran"],
+          ["Persyaratan", "Persyaratan"],
+          ["Proses", "Proses penempatan"],
+          ["Biaya", "Biaya"],
+          ["Legalitas", "Legalitas"],
+          ["Lainnya", "Lainnya"]
+        )
+      },
       text("question", "Pertanyaan", true),
       area("answer", "Jawaban", true),
       select("status", "Status", publication),
-      { key: "displayOrder", label: "Urutan", type: "number" }
+      order()
     ]
   },
   legalitas: {
@@ -467,7 +505,11 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       text("permitType", "Jenis izin", true),
       text("permitNumber", "Nomor"),
       { key: "issuedAt", label: "Tanggal terbit", type: "date" },
-      { key: "issuedYear", label: "Tahun", type: "number" },
+      {
+        key: "issuedYear",
+        label: "Tahun terbit (jika tanggal lengkap tidak diketahui)",
+        type: "number"
+      },
       { key: "validUntil", label: "Berlaku sampai", type: "date" },
       area("description", "Keterangan"),
       text("sourceUrl", "Tautan sumber resmi"),
@@ -476,7 +518,7 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       { key: "verifiedAt", label: "Tanggal verifikasi", type: "date" },
       { key: "needsReview", label: "Perlu ditinjau", type: "boolean" },
       select("status", "Status", publication),
-      { key: "displayOrder", label: "Urutan", type: "number" }
+      order()
     ]
   },
   pendaftar: {
@@ -551,9 +593,10 @@ export function normalizeAdminPayload(config: AdminResourceConfig, raw: Record<s
   for (const field of config.fields) {
     const value = raw[field.key];
     if (value === undefined) continue;
-    if (field.type === "number")
+    if (field.type === "number") {
+      if (field.key === "displayOrder" && (value === "" || value === null)) continue;
       result[field.key] = value === "" || value === null ? null : Number(value);
-    else if (field.type === "boolean") result[field.key] = Boolean(value);
+    } else if (field.type === "boolean") result[field.key] = Boolean(value);
     else if (field.type === "date") result[field.key] = value ? new Date(String(value)) : null;
     else if (field.type === "slug")
       result[field.key] =
@@ -568,5 +611,7 @@ export function normalizeAdminPayload(config: AdminResourceConfig, raw: Record<s
       );
     else result[field.key] = value === "" ? null : value;
   }
+  if (result.issuedAt instanceof Date && !Number.isNaN(result.issuedAt.getTime()))
+    result.issuedYear = result.issuedAt.getFullYear();
   return result;
 }
