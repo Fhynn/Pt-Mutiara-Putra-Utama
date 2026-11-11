@@ -1,13 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { X } from "lucide-react";
+import { Play, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function GalleryLightbox({
   items
 }: {
-  items: Array<{ id: string; src: string; alt: string; caption?: string | null }>;
+  items: Array<{
+    id: string;
+    src: string;
+    kind: string;
+    alt: string;
+    caption?: string | null;
+  }>;
 }) {
   const [selected, setSelected] = useState<(typeof items)[number] | null>(null);
   useEffect(() => {
@@ -26,7 +32,15 @@ export function GalleryLightbox({
             onClick={() => setSelected(item)}
             style={{ border: 0, padding: 0, cursor: "zoom-in" }}
           >
-            <Image src={item.src} alt={item.alt} width={900} height={700} />
+            {item.kind === "IMAGE" ? (
+              <Image src={item.src} alt={item.alt} width={900} height={700} />
+            ) : item.kind === "VIDEO" ? (
+              <video src={item.src} muted playsInline preload="metadata" aria-label={item.alt} />
+            ) : (
+              <div className="gallery-video-placeholder">
+                <Play aria-hidden="true" /> Video
+              </div>
+            )}
             <span>{item.caption ?? item.alt}</span>
           </button>
         ))}
@@ -71,13 +85,36 @@ export function GalleryLightbox({
             onClick={(event) => event.stopPropagation()}
             style={{ maxWidth: 1100, maxHeight: "88vh" }}
           >
-            <Image
-              src={selected.src}
-              alt={selected.alt}
-              width={1200}
-              height={900}
-              style={{ width: "auto", maxWidth: "100%", maxHeight: "80vh", objectFit: "contain" }}
-            />
+            {selected.kind === "IMAGE" ? (
+              <Image
+                src={selected.src}
+                alt={selected.alt}
+                width={1200}
+                height={900}
+                style={{
+                  width: "auto",
+                  maxWidth: "100%",
+                  maxHeight: "80vh",
+                  objectFit: "contain"
+                }}
+              />
+            ) : selected.kind === "VIDEO" ? (
+              <video
+                src={selected.src}
+                controls
+                autoPlay
+                style={{ width: "min(960px, 100%)", maxHeight: "80vh" }}
+              />
+            ) : (
+              <a
+                href={selected.src}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button button-primary"
+              >
+                Buka video
+              </a>
+            )}
             <p style={{ color: "white", textAlign: "center" }}>
               {selected.caption ?? selected.alt}
             </p>

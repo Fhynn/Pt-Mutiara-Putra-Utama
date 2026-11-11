@@ -41,12 +41,18 @@ export default async function AlbumPage({ params }: { params: Promise<{ slug: st
   } catch {}
   if (!album) notFound();
   const items = album.items
-    .filter((item) => item.media.publicUrl && !item.media.isDeleted)
+    .filter(
+      (item) =>
+        !item.media.isDeleted &&
+        item.media.visibility === "PUBLIC" &&
+        (item.media.kind === "EMBED" ? Boolean(item.media.embedUrl) : Boolean(item.media.publicUrl))
+    )
     .map((item) => ({
       id: item.id,
-      src: item.media.publicUrl!,
-      alt: item.media.altText,
-      caption: item.caption
+      src: (item.media.kind === "EMBED" ? item.media.embedUrl : item.media.publicUrl)!,
+      kind: item.media.kind,
+      alt: item.media.altText || item.media.title || "Dokumentasi kegiatan",
+      caption: item.caption ?? item.media.caption
     }));
   return (
     <>

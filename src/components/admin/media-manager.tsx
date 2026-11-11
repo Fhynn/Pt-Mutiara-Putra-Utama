@@ -24,6 +24,9 @@ type MediaRow = {
   focalX: number;
   focalY: number;
   _count: { usages: number; galleryItems: number };
+  galleryItems?: Array<{
+    album: { id: string; title: string; slug: string; status: string };
+  }>;
 };
 export function MediaManager({
   initialItems,
@@ -154,11 +157,17 @@ export function MediaManager({
         </div>
       </div>
       <div className="admin-media-explainer">
-        <strong>Cara menampilkan foto di website</strong>
+        <strong>Setelah foto diunggah, halaman mana yang berubah?</strong>
         <p>
-          <b>1. Unggah file</b> di sini. <b>2. Tambahkan ke album</b> melalui{" "}
-          <Link href="/admin/galeri">Galeri</Link>, atau pilih di editor halaman. File baru tidak
-          langsung muncul di website.
+          <b>Unggah saja:</b> belum mengubah halaman publik. Untuk menampilkan foto kegiatan,
+          masukkan file ke <Link href="/admin/galeri">album Galeri</Link> yang berstatus Terbit.
+          Foto akan tampil di halaman album dan album akan muncul di{" "}
+          <Link href="/galeri">/galeri</Link>.
+        </p>
+        <p>
+          Foto untuk halaman lain, seperti beranda atau negara tujuan, perlu dipilih pada editor
+          halaman tersebut. Di daftar file di bawah, bagian <b>Dipakai di</b> menunjukkan album yang
+          sudah memakai foto.
         </p>
         <p>
           <strong>Hanya untuk admin</strong> khusus berkas internal atau file yang belum boleh
@@ -287,11 +296,15 @@ export function MediaManager({
                 />
               </label>
               <label className="wide">
-                <span>Keterangan yang tampil di website</span>
+                <span>Keterangan file (opsional)</span>
                 <textarea
                   value={editing.caption ?? ""}
                   onChange={(e) => setEditing({ ...editing, caption: e.target.value || null })}
                 />
+                <small>
+                  Keterangan yang tampil di album diatur melalui{" "}
+                  <Link href="/admin/galeri">Galeri</Link>.
+                </small>
               </label>
             </div>
             <details className="admin-advanced">
@@ -435,11 +448,22 @@ export function MediaManager({
                   <td className="media-name-cell">
                     <strong>{item.title || item.originalName}</strong>
                     {item.title ? <small>{item.originalName}</small> : null}
-                    <small>
-                      {item._count.usages + item._count.galleryItems > 0
-                        ? "Sudah dipakai di website atau galeri"
-                        : "Belum dipakai di website"}
-                    </small>
+                    {item.galleryItems?.length ? (
+                      <small className="admin-media-usage">
+                        Dipakai di:{" "}
+                        {item.galleryItems.map(({ album }, index) => (
+                          <span key={album.id}>
+                            {index > 0 ? ", " : ""}
+                            <Link href={`/admin/galeri/${album.id}`}>{album.title}</Link>
+                            {album.status === "PUBLISHED" ? " (terbit)" : " (draf)"}
+                          </span>
+                        ))}
+                      </small>
+                    ) : item._count.usages > 0 ? (
+                      <small>Dipakai di bagian website lain</small>
+                    ) : (
+                      <small>Belum dimasukkan ke album Galeri</small>
+                    )}
                   </td>
                   <td>
                     {item.kind === "IMAGE"

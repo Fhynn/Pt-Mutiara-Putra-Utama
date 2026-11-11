@@ -198,7 +198,10 @@ export function HomePage({ data }: { data: HomeData }) {
   const countries = data.countries.length ? data.countries : fallbackCountries;
   const steps = data.steps.length ? data.steps : fallbackSteps;
   const faqs = data.faqs.length ? data.faqs : fallbackFaqs;
-  const dbGallery = data.galleries[0]?.items ?? [];
+  const dbGallery =
+    data.galleries[0]?.items.filter(
+      (item) => item.media.kind === "IMAGE" && item.media.publicUrl
+    ) ?? [];
 
   return (
     <div className="mpu-home">

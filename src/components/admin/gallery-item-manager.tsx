@@ -1,157 +1,320 @@
 "use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { ImageIcon, Video } from "lucide-react";
 import { useState } from "react";
+
+type Media = {
+  id: string;
+  originalName: string;
+  title: string | null;
+  altText: string;
+  publicUrl: string | null;
+  kind: string;
+};
+
 type Item = {
   id: string;
   mediaId: string;
   caption: string | null;
   displayOrder: number;
   isCover: boolean;
-  media: { originalName: string; publicUrl: string | null; kind: string };
+  media: Omit<Media, "id">;
 };
-type Media = { id: string; originalName: string; kind: string };
+
+function MediaPreview({
+  media
+}: {
+  media: Pick<Media, "kind" | "publicUrl" | "altText" | "originalName">;
+}) {
+  return (
+    <div className="admin-album-thumb">
+      {media.kind === "IMAGE" && media.publicUrl ? (
+        <Image
+          src={media.publicUrl}
+          alt={media.altText || media.originalName}
+          fill
+          sizes="(max-width: 700px) 100vw, (max-width: 1200px) 50vw, 300px"
+        />
+      ) : media.kind === "VIDEO" && media.publicUrl ? (
+        <video src={media.publicUrl} controls preload="metadata" aria-label={media.originalName} />
+      ) : media.kind === "EMBED" || media.kind === "VIDEO" ? (
+        <Video aria-label="Video" />
+      ) : (
+        <ImageIcon aria-label="Pratinjau tidak tersedia" />
+      )}
+    </div>
+  );
+}
+
 export function GalleryItemManager({
   albumId,
+  albumSlug,
+  albumStatus,
+  albumFeatured,
   initialItems,
   media
 }: {
   albumId: string;
+  albumSlug: string;
+  albumStatus: string;
+  albumFeatured: boolean;
   initialItems: Item[];
   media: Media[];
 }) {
   const [items, setItems] = useState(initialItems);
   const [mediaId, setMediaId] = useState("");
   const [message, setMessage] = useState("");
-  async function add(e: React.FormEvent) {
-    e.preventDefault();
-    const r = await fetch("/api/admin/gallery-items", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ albumId, mediaId, caption: null, isCover: items.length === 0 })
-    });
-    const b = await r.json();
-    if (!r.ok) return setMessage(b.error);
-    location.reload();
+  const [busy, setBusy] = useState(false);
+  const selectedMedia = media.find((asset) => asset.id === mediaId);
+  const isPublished = albumStatus === "PUBLISHED";
+
+  async function add(event: React.FormEvent) {
+    event.preventDefault();
+    if (!mediaId || busy) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await fetch("/api/admin/gallery-items", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          albumId,
+          mediaId,
+          caption: null,
+          isCover: items.length === 0 && selectedMedia?.kind === "IMAGE"
+        })
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Foto tidak dapat ditambahkan.");
+      setItems((current) => [...current, body.item]);
+      setMediaId("");
+      setMessage("Foto ditambahkan ke album.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Foto tidak dapat ditambahkan.");
+    } finally {
+      setBusy(false);
+    }
   }
+
   function move(index: number, delta: number) {
     const next = [...items];
     const target = index + delta;
     if (target < 0 || target >= next.length) return;
     [next[index], next[target]] = [next[target], next[index]];
     setItems(next.map((item, displayOrder) => ({ ...item, displayOrder })));
+    setMessage("Urutan berubah. Klik Simpan perubahan untuk menampilkannya di website.");
   }
+
   async function save() {
-    const r = await fetch("/api/admin/gallery-items", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ albumId, items })
-    });
-    const b = await r.json();
-    setMessage(r.ok ? "Urutan dan caption disimpan." : b.error);
+    setBusy(true);
+    try {
+      const response = await fetch("/api/admin/gallery-items", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          albumId,
+          items: items.map(({ id, displayOrder, caption, isCover }) => ({
+            id,
+            displayOrder,
+            caption,
+            isCover
+          }))
+        })
+      });
+      const body = await response.json();
+      setMessage(response.ok ? "Sampul, urutan, dan keterangan foto disimpan." : body.error);
+    } catch {
+      setMessage("Perubahan belum tersimpan. Coba lagi.");
+    } finally {
+      setBusy(false);
+    }
   }
+
   async function remove(id: string) {
-    if (!confirm("Keluarkan media dari album?")) return;
-    const r = await fetch(`/api/admin/gallery-items?id=${id}`, { method: "DELETE" });
-    if (r.ok) setItems(items.filter((item) => item.id !== id));
+    if (!window.confirm("Keluarkan foto dari album ini? File tetap tersimpan di Foto & Video."))
+      return;
+    try {
+      const response = await fetch(`/api/admin/gallery-items?id=${id}`, { method: "DELETE" });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Foto belum dapat dikeluarkan.");
+      setItems((current) => current.filter((item) => item.id !== id));
+      setMessage("Foto dikeluarkan dari album. File aslinya tetap tersedia di Foto & Video.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Foto belum dapat dikeluarkan.");
+    }
   }
+
   return (
     <>
-      <section className="admin-panel" style={{ marginBottom: 20 }}>
+      <div className="admin-media-explainer admin-album-guide">
+        <strong>Di mana foto album ini tampil?</strong>
+        {isPublished ? (
+          <p>
+            Album sudah terbit. Foto yang ditambahkan tampil di{" "}
+            <Link href={`/galeri/${albumSlug}`} target="_blank">
+              halaman album ini
+            </Link>
+            , dan album tercantum di <Link href="/galeri">halaman Galeri</Link>.
+          </p>
+        ) : (
+          <p>
+            Album masih draf. Foto yang ditambahkan belum terlihat oleh pengunjung. Ubah statusnya
+            menjadi <b>Terbit</b> di <Link href="/admin/galeri">daftar album Galeri</Link>.
+          </p>
+        )}
+        <p>
+          Beranda memakai foto dari album terbit yang ditandai <b>Unggulan</b> dengan urutan paling
+          atas. Album ini {albumFeatured ? "sudah" : "belum"} ditandai Unggulan. Ubah tanda dan
+          urutannya di <Link href="/admin/galeri">daftar album</Link>.
+        </p>
+      </div>
+
+      <section className="admin-panel admin-album-add">
+        <div className="admin-panel-header">
+          <h2>Tambahkan foto atau video</h2>
+          <Link className="admin-button" href="/admin/media">
+            Unggah file baru
+          </Link>
+        </div>
         <form onSubmit={add}>
-          <div className="admin-form-grid">
-            <label>
-              <span>Pilih media</span>
-              <select required value={mediaId} onChange={(e) => setMediaId(e.target.value)}>
-                <option value="">Pilih…</option>
-                {media.map((asset) => (
-                  <option value={asset.id} key={asset.id}>
-                    {asset.originalName} ({asset.kind})
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-          <button className="admin-button primary" style={{ marginTop: 18 }}>
-            Tambahkan ke album
+          <label>
+            <span>Pilih file yang sudah diunggah</span>
+            <select required value={mediaId} onChange={(event) => setMediaId(event.target.value)}>
+              <option value="">Pilih foto atau video…</option>
+              {media.map((asset) => (
+                <option value={asset.id} key={asset.id}>
+                  {asset.title || asset.altText || asset.originalName} ({asset.originalName})
+                </option>
+              ))}
+            </select>
+          </label>
+          {selectedMedia ? (
+            <div className="admin-album-selected">
+              <MediaPreview media={selectedMedia} />
+              <div>
+                <strong>
+                  {selectedMedia.title || selectedMedia.altText || selectedMedia.originalName}
+                </strong>
+                <small>{selectedMedia.originalName}</small>
+              </div>
+            </div>
+          ) : null}
+          <button className="admin-button primary" disabled={!mediaId || busy}>
+            {busy ? "Menambahkan…" : "Tambahkan ke album"}
           </button>
+          {!media.length ? (
+            <p>Belum ada foto atau video yang dapat dipilih. Unggah file melalui Foto & Video.</p>
+          ) : null}
         </form>
       </section>
-      <section className="admin-panel">
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Urutan</th>
-                <th>Media</th>
-                <th>Caption</th>
-                <th>Cover</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item, index) => (
-                <tr key={item.id}>
-                  <td>{index + 1}</td>
-                  <td>{item.media.originalName}</td>
-                  <td>
+
+      <section className="admin-panel admin-album-items">
+        <div className="admin-panel-header">
+          <div>
+            <h2>Isi album ({items.length})</h2>
+            <p>
+              Pilih satu foto sebagai sampul album. Urutan di bawah mengikuti urutan di website.
+            </p>
+          </div>
+        </div>
+        {items.length ? (
+          <div className="admin-album-grid">
+            {items.map((item, index) => (
+              <article className="admin-album-card" key={item.id}>
+                <div className="admin-album-card-visual">
+                  <MediaPreview media={item.media} />
+                  {item.isCover ? (
+                    <span className="admin-album-cover-badge">Sampul album</span>
+                  ) : null}
+                </div>
+                <div className="admin-album-card-body">
+                  <span className="admin-album-order">Urutan {index + 1}</span>
+                  <strong>
+                    {item.media.title || item.media.altText || item.media.originalName}
+                  </strong>
+                  <small title={item.media.originalName}>{item.media.originalName}</small>
+                  <label>
+                    <span>Keterangan foto</span>
                     <textarea
                       value={item.caption ?? ""}
-                      onChange={(e) =>
+                      onChange={(event) => {
                         setItems(
                           items.map((row) =>
-                            row.id === item.id ? { ...row, caption: e.target.value || null } : row
+                            row.id === item.id
+                              ? { ...row, caption: event.target.value || null }
+                              : row
                           )
-                        )
-                      }
+                        );
+                        setMessage("Keterangan berubah. Klik Simpan perubahan.");
+                      }}
+                      placeholder="Contoh: Kegiatan pelatihan di kantor cabang"
                     />
-                  </td>
-                  <td>
-                    <input
-                      type="radio"
-                      checked={item.isCover}
-                      name="cover"
-                      onChange={() =>
-                        setItems(items.map((row) => ({ ...row, isCover: row.id === item.id })))
-                      }
-                    />
-                  </td>
-                  <td>
-                    <div className="admin-actions">
-                      <button
-                        className="admin-button"
-                        disabled={index === 0}
-                        onClick={() => move(index, -1)}
-                        type="button"
-                      >
-                        Naik
-                      </button>
-                      <button
-                        className="admin-button"
-                        disabled={index === items.length - 1}
-                        onClick={() => move(index, 1)}
-                        type="button"
-                      >
-                        Turun
-                      </button>
-                      <button
-                        className="admin-button danger"
-                        onClick={() => remove(item.id)}
-                        type="button"
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div style={{ padding: 20 }}>
-          <button className="admin-button primary" onClick={save}>
-            Simpan urutan
-          </button>
-          {message && <p className="admin-message">{message}</p>}
-        </div>
+                  </label>
+                  {item.media.kind === "IMAGE" ? (
+                    <label className="admin-album-cover-choice">
+                      <input
+                        type="radio"
+                        checked={item.isCover}
+                        name="cover"
+                        onChange={() => {
+                          setItems(items.map((row) => ({ ...row, isCover: row.id === item.id })));
+                          setMessage("Sampul berubah. Klik Simpan perubahan.");
+                        }}
+                      />
+                      <span>Jadikan sampul album</span>
+                    </label>
+                  ) : (
+                    <small>Sampul album dipilih dari foto.</small>
+                  )}
+                  <div className="admin-actions">
+                    <button
+                      className="admin-button"
+                      disabled={index === 0}
+                      onClick={() => move(index, -1)}
+                      type="button"
+                    >
+                      Naik
+                    </button>
+                    <button
+                      className="admin-button"
+                      disabled={index === items.length - 1}
+                      onClick={() => move(index, 1)}
+                      type="button"
+                    >
+                      Turun
+                    </button>
+                    <button
+                      className="admin-button danger"
+                      onClick={() => remove(item.id)}
+                      type="button"
+                    >
+                      Keluarkan
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="admin-album-empty">
+            Album ini belum berisi foto. Pilih file di atas untuk menambahkannya.
+          </p>
+        )}
+        {items.length ? (
+          <div className="admin-album-footer">
+            <button className="admin-button primary" disabled={busy} onClick={save}>
+              {busy ? "Menyimpan…" : "Simpan perubahan"}
+            </button>
+            <span>Simpan setelah mengubah sampul, keterangan, atau urutan.</span>
+          </div>
+        ) : null}
+        {message ? (
+          <p className="admin-message" role="status">
+            {message}
+          </p>
+        ) : null}
       </section>
     </>
   );

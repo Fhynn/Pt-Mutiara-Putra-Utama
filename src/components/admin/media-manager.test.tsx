@@ -58,4 +58,43 @@ describe("pengelolaan foto privat", () => {
     ).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Jadikan publik" })).toBeNull();
   });
+
+  it("menunjukkan album yang memakai foto dan status terbitnya", () => {
+    render(
+      <MediaManager
+        configured
+        initialItems={[
+          {
+            id: "foto-galeri",
+            originalName: "kegiatan.jpg",
+            kind: "IMAGE",
+            mimeType: "image/jpeg",
+            visibility: "PUBLIC",
+            publicUrl: "https://example.com/kegiatan.jpg",
+            sizeBytes: "1000",
+            permissionStatus: "CLIENT_PROVIDED",
+            altText: "Kegiatan MPU",
+            focalX: 0.5,
+            focalY: 0.5,
+            _count: { usages: 0, galleryItems: 1 },
+            galleryItems: [
+              {
+                album: {
+                  id: "album-1",
+                  title: "Dokumentasi PT Pusat",
+                  slug: "dokumentasi-pt-pusat",
+                  status: "PUBLISHED"
+                }
+              }
+            ]
+          }
+        ]}
+      />
+    );
+
+    expect(screen.getByRole("link", { name: "Dokumentasi PT Pusat" }).getAttribute("href")).toBe(
+      "/admin/galeri/album-1"
+    );
+    expect(screen.getByText("(terbit)")).toBeTruthy();
+  });
 });

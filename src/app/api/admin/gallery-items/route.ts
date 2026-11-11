@@ -29,14 +29,27 @@ export async function POST(request: Request) {
       })
       .parse(await request.json());
     const media = await prisma.mediaAsset.findFirst({
-      where: { id: input.mediaId, isDeleted: false, visibility: "PUBLIC" },
-      select: { id: true }
+      where: {
+        id: input.mediaId,
+        isDeleted: false,
+        visibility: "PUBLIC",
+        kind: { in: ["IMAGE", "VIDEO", "EMBED"] }
+      },
+      select: { id: true, kind: true }
     });
     if (!media)
       return NextResponse.json(
-        { error: "File hanya untuk admin. Jadikan publik dahulu di Foto & Video." },
+        { error: "Pilih foto atau video publik dari Foto & Video." },
         { status: 400 }
       );
+    if (input.isCover && media.kind !== "IMAGE")
+      return NextResponse.json({ error: "Sampul album harus berupa foto." }, { status: 400 });
+    const existing = await prisma.galleryItem.findUnique({
+      where: { albumId_mediaId: { albumId: input.albumId, mediaId: input.mediaId } },
+      select: { id: true }
+    });
+    if (existing)
+      return NextResponse.json({ error: "File ini sudah ada di album." }, { status: 409 });
     const count = await prisma.galleryItem.count({ where: { albumId: input.albumId } });
     const item = await prisma.$transaction(async (tx) => {
       if (input.isCover)
@@ -44,7 +57,20 @@ export async function POST(request: Request) {
           where: { albumId: input.albumId },
           data: { isCover: false }
         });
-      return tx.galleryItem.create({ data: { ...input, displayOrder: count } });
+      return tx.galleryItem.create({
+        data: { ...input, displayOrder: count },
+        include: {
+          media: {
+            select: {
+              originalName: true,
+              title: true,
+              altText: true,
+              publicUrl: true,
+              kind: true
+            }
+          }
+        }
+      });
     });
     await writeAudit({
       actorId: session.user.id,
@@ -80,6 +106,15 @@ export async function PATCH(request: Request) {
     .parse(await request.json());
   if (input.items.filter((item) => item.isCover).length > 1)
     return NextResponse.json({ error: "Hanya satu cover diperbolehkan." }, { status: 400 });
+  const cover = input.items.find((item) => item.isCover);
+  if (cover) {
+    const coverItem = await prisma.galleryItem.findUnique({
+      where: { id: cover.id, albumId: input.albumId },
+      select: { media: { select: { kind: true } } }
+    });
+    if (!coverItem || coverItem.media.kind !== "IMAGE")
+      return NextResponse.json({ error: "Sampul album harus berupa foto." }, { status: 400 });
+  }
   await prisma.$transaction(
     input.items.map((item) =>
       prisma.galleryItem.update({

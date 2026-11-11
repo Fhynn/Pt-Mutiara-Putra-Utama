@@ -13,7 +13,14 @@ export default async function MediaPage() {
     notFound();
   const items = await prisma.mediaAsset.findMany({
     where: { isDeleted: false },
-    include: { _count: { select: { usages: true, galleryItems: true } } },
+    include: {
+      _count: { select: { usages: true, galleryItems: true } },
+      galleryItems: {
+        select: {
+          album: { select: { id: true, title: true, slug: true, status: true } }
+        }
+      }
+    },
     orderBy: { createdAt: "desc" }
   });
   return (

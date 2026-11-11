@@ -24,7 +24,12 @@ export default async function GalleryPage() {
     albums = await prisma.galleryAlbum.findMany({
       where: { status: "PUBLISHED" },
       include: {
-        items: { include: { media: true }, orderBy: { displayOrder: "asc" }, take: 1 },
+        items: {
+          where: { media: { kind: "IMAGE", isDeleted: false, visibility: "PUBLIC" } },
+          include: { media: true },
+          orderBy: [{ isCover: "desc" }, { displayOrder: "asc" }],
+          take: 1
+        },
         _count: { select: { items: true } }
       },
       orderBy: { displayOrder: "asc" }
