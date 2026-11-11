@@ -45,12 +45,12 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
   const criteria = stringList(country.criteria);
   const documents = stringList(country.requirements);
   const salaryDetails = stringList(country.salaryDetails);
-  const statusLabel =
-    country.programStatus === "AVAILABLE"
-      ? "Program tersedia"
-      : country.programStatus === "NOT_OPEN"
-        ? "Program belum dibuka"
-        : "Konfirmasi program kepada petugas MPU";
+  const hasOpenJobs = country.jobs.length > 0;
+  const jobStatusLabel = hasOpenJobs
+    ? `${country.jobs.length} lowongan sedang dibuka`
+    : country.programStatus === "NOT_OPEN"
+      ? "Program belum dibuka"
+      : "Belum ada lowongan diumumkan";
 
   return (
     <>
@@ -59,7 +59,7 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
           <Breadcrumb
             items={[{ label: "Negara Tujuan", href: "/negara-tujuan" }, { label: country.name }]}
           />
-          <span className="eyebrow">Negara Tujuan · {statusLabel}</span>
+          <span className="eyebrow">Negara Tujuan · Informasi Persyaratan</span>
           <h1 className="page-title">Kriteria &amp; Persyaratan Kerja ke {country.name}</h1>
           <p>{country.summary}</p>
         </div>
@@ -69,18 +69,21 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
         <div className="container">
           <div className="country-program-intro">
             <div>
-              <span className="eyebrow">Informasi Program</span>
-              <h2 className="section-title">Persyaratan program {country.name}</h2>
+              <span className="eyebrow">Panduan Calon Pekerja</span>
+              <h2 className="section-title">Persyaratan kerja ke {country.name}</h2>
               <p className="lead">
                 {country.programDescription ??
-                  `Penjelasan program ${country.name} belum dipublikasikan. Hubungi petugas MPU untuk informasi terbaru.`}
+                  `Persyaratan rinci untuk ${country.name} belum dipublikasikan. Hubungi petugas MPU untuk informasi terbaru.`}
               </p>
             </div>
             <div className="country-program-action">
-              <span className="status-pill">{statusLabel}</span>
+              <span className="status-pill">{jobStatusLabel}</span>
               <Link className="button button-primary" href={`/daftar?country=${country.slug}`}>
-                Daftar Minat ke {country.name}
+                Daftar sebagai calon CPMI
               </Link>
+              <p className="country-registration-note">
+                Formulir ini untuk pendataan calon pekerja, bukan lamaran pada lowongan tertentu.
+              </p>
             </div>
           </div>
 
@@ -135,11 +138,17 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
               <div>
                 <h2>Gaji</h2>
                 {salaryDetails.length ? (
-                  <ul>
-                    {salaryDetails.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
+                  <>
+                    <ul>
+                      {salaryDetails.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                    <p className="country-salary-note">
+                      Nominal ini bukan penawaran lowongan. Rincian gaji akhir tercantum pada
+                      kontrak kerja.
+                    </p>
+                  </>
                 ) : (
                   <p>Rincian gaji belum dipublikasikan.</p>
                 )}
@@ -167,8 +176,8 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
 
           <div className="country-jobs-section">
             <div className="country-jobs-heading">
-              <span className="eyebrow">Lowongan Terverifikasi</span>
-              <h2 className="section-title">Lowongan aktif untuk {country.name}</h2>
+              <span className="eyebrow">Lowongan Kerja</span>
+              <h2 className="section-title">Lowongan yang dibuka di {country.name}</h2>
             </div>
             {country.jobs.length ? (
               <div className="content-grid">
@@ -184,8 +193,10 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
               </div>
             ) : (
               <EmptyState
-                title={`Belum ada lowongan aktif untuk ${country.name}`}
-                description="Kriteria negara tetap dapat dipelajari, tetapi pendaftaran minat tidak berarti lowongan sedang dibuka."
+                title={`Belum ada lowongan ${country.name} yang diumumkan`}
+                description="Persyaratan di atas dapat Anda baca sebagai panduan. Pendaftaran calon CPMI tetap bisa dilakukan untuk pemeriksaan data awal."
+                href="/lowongan"
+                label="Lihat semua lowongan"
               />
             )}
           </div>

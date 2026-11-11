@@ -1008,6 +1008,22 @@ a {
   text-align: center;
 }
 
+.country-registration-note {
+  max-width: 285px;
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.country-salary-note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
 .country-requirements-grid {
   display: grid;
   gap: 24px;
@@ -1184,6 +1200,11 @@ a {
   .country-program-action {
     justify-items: start;
     min-width: 0;
+  }
+
+  .country-registration-note {
+    max-width: 420px;
+    text-align: left;
   }
 }
 

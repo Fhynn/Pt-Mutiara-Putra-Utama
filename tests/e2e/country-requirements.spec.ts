@@ -61,7 +61,7 @@ test("revisi klien menampilkan Brunei, ABK Taiwan, dan pekerjaan Malaysia", asyn
     page.getByText("Konstruksi, pembuatan kue, dan bidang formal lain sesuai program.")
   ).toBeVisible();
   await expect(page.getByText("Rincian gaji belum dipublikasikan.")).toBeVisible();
-  await expect(page.getByText("Konfirmasi program kepada petugas MPU").first()).toBeVisible();
+  await expect(page.getByText("Belum ada lowongan diumumkan")).toBeVisible();
 
   await page.goto("/negara-tujuan/taiwan");
   await expect(page.getByText(/ABK \(anak buah kapal\)/).first()).toBeVisible();
@@ -74,4 +74,30 @@ test("revisi klien menampilkan Brunei, ABK Taiwan, dan pekerjaan Malaysia", asyn
     "src",
     /director-martua-2026/
   );
+});
+
+test("halaman Singapura membedakan persyaratan, pendaftaran CPMI, dan lowongan", async ({
+  page
+}) => {
+  await page.goto("/negara-tujuan/singapura");
+
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Persyaratan kerja ke Singapura", exact: true })
+  ).toBeVisible();
+  await expect(page.getByText("Belum ada lowongan diumumkan")).toBeVisible();
+  await expect(
+    page.getByText(
+      "Formulir ini untuk pendataan calon pekerja, bukan lamaran pada lowongan tertentu."
+    )
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Daftar sebagai calon CPMI" })).toHaveAttribute(
+    "href",
+    "/daftar?country=singapura"
+  );
+  await expect(
+    page.getByRole("heading", { name: "Belum ada lowongan Singapura yang diumumkan" })
+  ).toBeVisible();
+  await expect(page.getByText(/Nominal ini bukan penawaran lowongan/)).toBeVisible();
+  await expect(page.getByText(/sumber yang diperiksa/i)).toHaveCount(0);
+  await expect(page.getByText(/pernah dipublikasikan MPU/i)).toHaveCount(0);
 });

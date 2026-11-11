@@ -72,9 +72,9 @@ const countries = [
     slug: "taiwan",
     isoCode: "TW",
     summary:
-      "Pilihan pekerjaan yang diinformasikan MPU meliputi perawatan lansia, asisten rumah tangga, pabrik, nelayan, serta ABK (anak buah kapal). Ketersediaan program perlu dikonfirmasi.",
+      "Jenis pekerjaan yang dicantumkan MPU untuk Taiwan meliputi perawatan lansia, asisten rumah tangga, pabrik, nelayan, serta ABK (anak buah kapal).",
     programDescription:
-      "Rangkuman ini mengikuti informasi persyaratan Taiwan yang pernah dipublikasikan MPU. Konfirmasikan ketersediaan program, biaya, dan rincian kontrak kepada petugas sebelum memulai proses.",
+      "Kriteria dan dokumen di bawah menjadi panduan awal. Lihat bagian lowongan untuk mengetahui pekerjaan yang sedang dibuka.",
     criteria: [
       "Warga Negara Indonesia (WNI)",
       "Pria atau wanita",
@@ -107,9 +107,9 @@ const countries = [
     slug: "hong-kong",
     isoCode: "HK",
     summary:
-      "Informasi MPU mencantumkan sektor informal untuk penjaga anak/bayi dan asisten rumah tangga. Sektor formal belum tersedia pada sumber yang diperiksa.",
+      "Jenis pekerjaan yang dicantumkan MPU untuk Hong Kong meliputi penjaga anak/bayi dan asisten rumah tangga.",
     programDescription:
-      "Rangkuman ini mengikuti informasi persyaratan Hong Kong yang pernah dipublikasikan MPU. Konfirmasikan ketersediaan program, biaya, dan rincian kontrak kepada petugas sebelum memulai proses.",
+      "Kriteria dan dokumen di bawah menjadi panduan awal. Lihat bagian lowongan untuk mengetahui pekerjaan yang sedang dibuka.",
     criteria: [
       "Warga Negara Indonesia (WNI)",
       "Wanita",
@@ -122,7 +122,7 @@ const countries = [
     requirements: sharedDocumentRequirements,
     salaryDetails: ["HK$5.100 (sekitar Rp11.000.000) — sektor informal"],
     informalSectorInfo: "Penjaga anak/bayi dan asisten rumah tangga.",
-    formalSectorInfo: "Belum tersedia pada informasi MPU yang diperiksa.",
+    formalSectorInfo: "Belum ada informasi pekerjaan sektor formal untuk Hong Kong.",
     sectors: ["Penjaga anak/bayi", "Asisten rumah tangga"]
   },
   {
@@ -130,9 +130,9 @@ const countries = [
     slug: "singapura",
     isoCode: "SG",
     summary:
-      "Informasi MPU mencantumkan sektor informal untuk penjaga anak/bayi dan asisten rumah tangga. Sektor formal belum tersedia pada sumber yang diperiksa.",
+      "Jenis pekerjaan yang dicantumkan MPU untuk Singapura meliputi penjaga anak/bayi dan asisten rumah tangga.",
     programDescription:
-      "Rangkuman ini mengikuti informasi persyaratan Singapura yang pernah dipublikasikan MPU. Konfirmasikan ketersediaan program, biaya, dan rincian kontrak kepada petugas sebelum memulai proses.",
+      "Kriteria dan dokumen di bawah menjadi panduan awal. Lihat bagian lowongan untuk mengetahui pekerjaan yang sedang dibuka.",
     criteria: [
       "Warga Negara Indonesia (WNI)",
       "Wanita",
@@ -144,7 +144,7 @@ const countries = [
     requirements: sharedDocumentRequirements,
     salaryDetails: ["SGD550 (sekitar Rp8.000.000) — sektor informal"],
     informalSectorInfo: "Penjaga anak/bayi dan asisten rumah tangga.",
-    formalSectorInfo: "Belum tersedia pada informasi MPU yang diperiksa.",
+    formalSectorInfo: "Belum ada informasi pekerjaan sektor formal untuk Singapura.",
     sectors: ["Penjaga anak/bayi", "Asisten rumah tangga"]
   },
   {
@@ -154,7 +154,7 @@ const countries = [
     summary:
       "Pilihan pekerjaan yang diinformasikan MPU meliputi penjaga anak/bayi, perawatan lansia, asisten rumah tangga, konstruksi, dan pekerja kebun sawit atau karet.",
     programDescription:
-      "Rangkuman ini mengikuti informasi persyaratan Malaysia yang pernah dipublikasikan MPU. Konfirmasikan ketersediaan program, biaya, dan rincian kontrak kepada petugas sebelum memulai proses.",
+      "Kriteria dan dokumen di bawah menjadi panduan awal. Lihat bagian lowongan untuk mengetahui pekerjaan yang sedang dibuka.",
     criteria: [
       "Warga Negara Indonesia (WNI)",
       "Wanita",
@@ -181,9 +181,9 @@ const countries = [
     slug: "brunei-darussalam",
     isoCode: "BN",
     summary:
-      "MPU menginformasikan pilihan pekerjaan sektor formal di Brunei Darussalam, termasuk konstruksi dan pembuatan kue. Rincian program dan ketersediaan lowongan perlu dikonfirmasi kepada petugas.",
+      "Jenis pekerjaan yang dicantumkan MPU untuk Brunei Darussalam meliputi konstruksi dan pembuatan kue.",
     programDescription:
-      "Informasi awal dari revisi klien 10 November 2026. Kriteria, dokumen, gaji, biaya, dan kontrak akan dijelaskan sesuai program yang berlaku.",
+      "Kriteria dan dokumen rinci untuk Brunei Darussalam belum dipublikasikan. Tanyakan persyaratannya kepada petugas MPU.",
     criteria: [],
     requirements: [],
     salaryDetails: [],

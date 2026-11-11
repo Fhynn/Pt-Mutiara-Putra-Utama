@@ -454,8 +454,8 @@ export function HomePage({ data }: { data: HomeData }) {
         <div className="container">
           <SectionHeading
             eyebrow="Negara Tujuan"
-            title="Jelajahi pilihan negara secara bertanggung jawab"
-            description="Pilihan negara bukan pernyataan bahwa lowongan sedang aktif. Periksa status program dan lowongan sebelum mendaftar."
+            title="Lihat pilihan negara tujuan"
+            description="Baca persyaratan tiap negara. Lowongan yang sedang dibuka ada di halaman Lowongan."
           />
           <div className="country-grid">
             {countries.map((country) => (
@@ -469,7 +469,7 @@ export function HomePage({ data }: { data: HomeData }) {
                 </div>
                 <div className="country-body">
                   <h3 className="country-name">{country.name}</h3>
-                  <span className="status-pill">Informasi lebih lanjut</span>
+                  <span className="status-pill">Lihat persyaratan</span>
                   <div className="tags">
                     {country.sectors.slice(0, 3).map((sector) => (
                       <span className="tag" key={sector}>

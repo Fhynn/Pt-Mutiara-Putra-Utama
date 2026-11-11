@@ -7,7 +7,7 @@ import { getPublishedCountries } from "@/lib/public-data";
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Negara Tujuan",
-  description: "Informasi negara tujuan dan status program PT Mutiara Putra Utama."
+  description: "Kriteria kerja dan pilihan negara tujuan PT Mutiara Putra Utama."
 };
 
 export default async function CountriesPage() {
@@ -16,8 +16,8 @@ export default async function CountriesPage() {
     <>
       <PageHero
         breadcrumb="Negara Tujuan"
-        title="Negara tujuan dan status program"
-        description="Daftar ini menunjukkan pilihan informasi, bukan jaminan bahwa program atau lowongan sedang dibuka."
+        title="Pilihan negara tujuan"
+        description="Lihat kriteria tiap negara. Pekerjaan yang sedang dibuka tercantum di halaman Lowongan."
       />
       <section className="section">
         <div className="container">
@@ -35,10 +35,10 @@ export default async function CountriesPage() {
                   <h2 className="country-name">{country.name}</h2>
                   <span className="status-pill">
                     {country.programStatus === "AVAILABLE"
-                      ? "Tersedia"
+                      ? "Program tersedia"
                       : country.programStatus === "NOT_OPEN"
-                        ? "Belum dibuka"
-                        : "Informasi lebih lanjut"}
+                        ? "Program belum dibuka"
+                        : "Lihat persyaratan"}
                   </span>
                   <div className="tags">
                     {country.sectors.map((sector) => (
