@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { AdminField, AdminOption, AdminResourceConfig } from "@/lib/admin-resources";
@@ -74,8 +75,7 @@ const fieldNameLabels: Record<string, string> = {
 };
 
 const resourceDescriptions: Record<string, string> = {
-  negara:
-    "Atur kriteria calon pekerja, dokumen tahap lanjutan, gaji dari sumber, sektor, dan status program setiap negara.",
+  negara: "Atur bendera, foto negara, kriteria, dokumen, pekerjaan, dan status program.",
   lowongan: "Kelola lowongan terverifikasi, negara tujuan, persyaratan, dan batas pendaftaran.",
   galeri: "Susun album kegiatan, tanggal, lokasi, dan status publikasinya.",
   berita: "Tulis dan terbitkan berita atau kegiatan resmi MPU."
@@ -337,6 +337,8 @@ export function ResourceManager({
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState<string | null>(null);
+  const [availableRelationOptions, setAvailableRelationOptions] = useState(relationOptions);
   const standardFields = config.fields.filter(
     (field) =>
       !field.hidden && !internalFieldKeys.has(field.key) && !advancedFieldKeys.has(field.key)
@@ -364,6 +366,46 @@ export function ResourceManager({
       }
       return next;
     });
+  }
+
+  async function uploadCountryImage(field: AdminField, file: File) {
+    setPhotoUploading(field.key);
+    setMessage("");
+    try {
+      const data = new FormData();
+      data.append("files", file);
+      data.append("visibility", "PUBLIC");
+      data.append(
+        "altText",
+        field.key === "flagUrl"
+          ? `Bendera ${String(form.name || "negara tujuan")}`
+          : `Foto negara ${String(form.name || "tujuan")}`
+      );
+      const response = await fetch("/api/admin/media", { method: "POST", body: data });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.error ?? "Foto gagal diunggah.");
+      const uploaded = body.items?.[0];
+      if (!uploaded?.id || uploaded.kind !== "IMAGE" || !uploaded.publicUrl)
+        throw new Error("Foto belum siap digunakan. Coba unggah ulang.");
+      const option: AdminOption = {
+        value: field.key === "flagUrl" ? uploaded.publicUrl : uploaded.id,
+        label: file.name,
+        previewUrl: uploaded.publicUrl
+      };
+      const relation = field.relation ?? "mediaImages";
+      setAvailableRelationOptions((current) => ({
+        ...current,
+        [relation]: [option, ...(current[relation] ?? [])]
+      }));
+      updateField(field, option.value);
+      setMessage(
+        "Foto berhasil diunggah dan dipilih. Simpan negara; foto tampil setelah negara diterbitkan."
+      );
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Foto gagal diunggah.");
+    } finally {
+      setPhotoUploading(null);
+    }
   }
 
   function edit(item: Record<string, unknown>) {
@@ -452,13 +494,13 @@ export function ResourceManager({
         <SectionContentEditor
           sectionKey={String(form.key ?? "")}
           value={value && typeof value === "object" && !Array.isArray(value) ? value : {}}
-          mediaOptions={relationOptions.mediaUrls ?? []}
+          mediaOptions={availableRelationOptions.mediaUrls ?? []}
           onChange={(content) => updateField(field, content)}
         />
       );
     if (field.type === "select" || field.type === "relation") {
       const options =
-        field.type === "relation" ? relationOptions[field.relation ?? ""] : field.options;
+        field.type === "relation" ? availableRelationOptions[field.relation ?? ""] : field.options;
       return (
         <select
           disabled={field.readOnly}
@@ -503,6 +545,53 @@ export function ResourceManager({
   }
 
   function renderFormField(field: AdminField) {
+    if (resource === "negara" && (field.key === "coverMediaId" || field.key === "flagUrl")) {
+      const selected = availableRelationOptions[field.relation ?? ""]?.find(
+        (option) => option.value === form[field.key]
+      );
+      const isFlag = field.key === "flagUrl";
+      return (
+        <div className="wide admin-country-photo-field" key={field.key}>
+          <div className="admin-country-photo-picker">
+            <label>
+              <span>{field.label}</span>
+              {renderField(field)}
+            </label>
+            <div className={`admin-country-photo-preview ${isFlag ? "flag" : ""}`}>
+              {selected?.previewUrl ? (
+                <Image
+                  src={selected.previewUrl}
+                  alt={selected.label}
+                  fill
+                  sizes="(max-width: 700px) 100vw, 220px"
+                />
+              ) : (
+                <span>
+                  {isFlag
+                    ? "Bendera bawaan dipakai jika kode negara tersedia."
+                    : "Foto negara belum dipilih."}
+                </span>
+              )}
+            </div>
+          </div>
+          {field.help ? <p>{field.help}</p> : null}
+          <label className="admin-country-photo-upload">
+            <span>Atau unggah {isFlag ? "gambar bendera" : "foto negara"} baru</span>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/avif"
+              disabled={photoUploading !== null}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = "";
+                if (file) void uploadCountryImage(field, file);
+              }}
+            />
+          </label>
+          {photoUploading === field.key ? <small>Mengunggah foto…</small> : null}
+        </div>
+      );
+    }
     return (
       <label
         className={
@@ -580,7 +669,11 @@ export function ResourceManager({
                 </details>
               )}
               <div className="admin-actions" style={{ marginTop: 18 }}>
-                <button className="admin-button primary" disabled={busy} type="submit">
+                <button
+                  className="admin-button primary"
+                  disabled={busy || photoUploading !== null}
+                  type="submit"
+                >
                   {busy ? "Menyimpan…" : "Simpan perubahan"}
                 </button>
               </div>

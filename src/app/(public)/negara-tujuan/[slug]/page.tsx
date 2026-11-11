@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Banknote, BriefcaseBusiness, FileText } from "lucide-react";
@@ -42,6 +43,21 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
     .catch(() => null);
   if (!country) notFound();
 
+  const cover = country.coverMediaId
+    ? await prisma.mediaAsset
+        .findFirst({
+          where: {
+            id: country.coverMediaId,
+            kind: "IMAGE",
+            visibility: "PUBLIC",
+            isDeleted: false,
+            publicUrl: { not: null }
+          },
+          select: { publicUrl: true, altText: true }
+        })
+        .catch(() => null)
+    : null;
+
   const criteria = stringList(country.criteria);
   const documents = stringList(country.requirements);
   const salaryDetails = stringList(country.salaryDetails);
@@ -55,13 +71,26 @@ export default async function CountryDetail({ params }: { params: Promise<{ slug
   return (
     <>
       <section className="page-hero country-page-hero">
-        <div className="container">
-          <Breadcrumb
-            items={[{ label: "Negara Tujuan", href: "/negara-tujuan" }, { label: country.name }]}
-          />
-          <span className="eyebrow">Negara Tujuan · Informasi Persyaratan</span>
-          <h1 className="page-title">Kriteria &amp; Persyaratan Kerja ke {country.name}</h1>
-          <p>{country.summary}</p>
+        <div className={`container ${cover?.publicUrl ? "country-hero-layout" : ""}`}>
+          <div>
+            <Breadcrumb
+              items={[{ label: "Negara Tujuan", href: "/negara-tujuan" }, { label: country.name }]}
+            />
+            <span className="eyebrow">Negara Tujuan · Informasi Persyaratan</span>
+            <h1 className="page-title">Kriteria &amp; Persyaratan Kerja ke {country.name}</h1>
+            <p>{country.summary}</p>
+          </div>
+          {cover?.publicUrl ? (
+            <div className="country-hero-photo">
+              <Image
+                src={cover.publicUrl}
+                alt={cover.altText || `Foto negara ${country.name}`}
+                fill
+                priority
+                sizes="(max-width: 900px) 100vw, 480px"
+              />
+            </div>
+          ) : null}
         </div>
       </section>
 

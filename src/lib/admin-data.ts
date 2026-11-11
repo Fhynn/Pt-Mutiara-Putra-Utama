@@ -63,15 +63,37 @@ export async function getAdminRelationOptions(config: AdminResourceConfig) {
           value: row.id,
           label: row.title || row.altText || row.originalName
         }));
+      } else if (relation === "mediaImages") {
+        const rows = await prisma.mediaAsset.findMany({
+          where: {
+            isDeleted: false,
+            visibility: "PUBLIC",
+            kind: "IMAGE",
+            publicUrl: { not: null }
+          },
+          orderBy: { createdAt: "desc" },
+          take: 250
+        });
+        result[relation] = rows.map((row) => ({
+          value: row.id,
+          label: row.title || row.altText || row.originalName,
+          previewUrl: row.publicUrl!
+        }));
       } else if (relation === "mediaUrls") {
         const rows = await prisma.mediaAsset.findMany({
-          where: { isDeleted: false, kind: "IMAGE", publicUrl: { not: null } },
+          where: {
+            isDeleted: false,
+            visibility: "PUBLIC",
+            kind: "IMAGE",
+            publicUrl: { not: null }
+          },
           orderBy: { createdAt: "desc" },
           take: 250
         });
         result[relation] = rows.map((row) => ({
           value: row.publicUrl!,
-          label: row.title || row.altText || row.originalName
+          label: row.title || row.altText || row.originalName,
+          previewUrl: row.publicUrl!
         }));
       } else if (relation === "articleCategories") {
         const rows = await prisma.articleCategory.findMany({ orderBy: { name: "asc" } });

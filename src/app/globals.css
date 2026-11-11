@@ -978,6 +978,48 @@ a {
   color: #ff9ba7;
 }
 
+.country-hero-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: 42px;
+}
+
+.country-hero-layout .page-title {
+  font-size: clamp(2.25rem, 3.5vw, 3.4rem);
+}
+
+.country-hero-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #e9eef6;
+}
+
+.country-hero-photo img {
+  object-fit: cover;
+}
+
+@media (max-width: 900px) {
+  .country-hero-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .country-hero-photo {
+    aspect-ratio: 16 / 8;
+    max-height: 260px;
+  }
+}
+
+@media (max-width: 600px) {
+  .country-hero-photo {
+    max-height: 190px;
+  }
+}
+
 .country-requirements-section {
   background: linear-gradient(180deg, #f7f9fc 0, #fff 360px);
 }
@@ -4609,6 +4651,72 @@ body {
 .admin-album-items > .admin-message {
   margin: 0;
   padding: 0 20px 18px;
+}
+
+.admin-country-photo-field {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 16px;
+  background: #f8fafd;
+}
+
+.admin-country-photo-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  align-items: start;
+  gap: 16px;
+}
+
+.admin-country-photo-preview {
+  position: relative;
+  display: grid;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: #e9eef6;
+  color: var(--muted);
+  text-align: center;
+}
+
+.admin-country-photo-preview.flag {
+  background: white;
+}
+
+.admin-country-photo-preview img {
+  object-fit: cover;
+}
+
+.admin-country-photo-preview.flag img {
+  object-fit: contain;
+}
+
+.admin-country-photo-preview span {
+  padding: 12px;
+  font-size: 0.8rem;
+}
+
+.admin-country-photo-field > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.admin-country-photo-upload {
+  width: min(100%, 560px);
+}
+
+@media (max-width: 620px) {
+  .admin-country-photo-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-country-photo-preview {
+    width: min(100%, 260px);
+  }
 }
 
 @media (max-width: 1100px) {

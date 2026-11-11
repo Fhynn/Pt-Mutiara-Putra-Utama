@@ -18,7 +18,14 @@ export type AdminField = {
     | "slug";
   required?: boolean;
   options?: readonly AdminOption[];
-  relation?: "countries" | "sectors" | "users" | "media" | "mediaUrls" | "articleCategories";
+  relation?:
+    | "countries"
+    | "sectors"
+    | "users"
+    | "media"
+    | "mediaImages"
+    | "mediaUrls"
+    | "articleCategories";
   autoFrom?: string;
   readOnly?: boolean;
   hidden?: boolean;
@@ -26,7 +33,7 @@ export type AdminField = {
   help?: string;
 };
 
-export type AdminOption = { value: string; label: string };
+export type AdminOption = { value: string; label: string; previewUrl?: string };
 
 export type AdminResourceConfig = {
   title: string;
@@ -240,7 +247,14 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       },
       area("summary", "Ringkasan"),
       area("programDescription", "Penjelasan program", false),
-      relation("coverMediaId", "Foto utama", "media"),
+      {
+        ...relation("flagUrl", "Bendera untuk kartu negara", "mediaUrls"),
+        help: "Bendera Taiwan, Hong Kong, Singapura, Malaysia, dan Brunei sudah tersedia. Untuk negara lain, unggah benderanya di sini."
+      },
+      {
+        ...relation("coverMediaId", "Foto negara untuk halaman detail", "mediaImages"),
+        help: "Foto tampil di bagian atas halaman detail setelah negara diterbitkan. Kartu daftar tetap memakai bendera."
+      },
       list(
         "criteria",
         "Kriteria calon pekerja",
