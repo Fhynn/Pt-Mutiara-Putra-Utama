@@ -41,6 +41,11 @@
 - Halaman Negara Tujuan dan beranda diperiksa secara visual pada desktop dan ponsel. Ringkasan pekerjaan terbaca, bendera tidak terdistorsi, dan halaman tidak mengalami overflow horizontal. Uji browser carousel lulus pada desktop, tablet, dan ponsel.
 - Garis posisi carousel dihapus atas revisi klien. Petunjuk teks dan interaksi geser tetap dipertahankan.
 
+## Hero beranda — 12 November 2026
+
+- Kolase dan kotak teks di atas foto dihapus. Hero memakai satu foto tim klien dari pustaka media; foto bawaan lama di bagian hero Neon diganti hanya bila masih menggunakan nilai bawaan.
+- Halaman beranda diperiksa secara visual pada desktop, tablet, dan ponsel. Satu foto utama tampil tanpa distorsi dan tanpa overflow horizontal; tiga uji browser khusus hero lulus.
+
 ## Penghapusan catatan sumber situs lama — 11 November 2026
 
 - Blok sumber, tautan ke halaman lama, dan tanggal pemeriksaan dihapus dari detail negara. Data lama pada lima negara dibersihkan di Neon; kriteria, dokumen, gaji, serta sektor tetap tersedia untuk diedit admin.

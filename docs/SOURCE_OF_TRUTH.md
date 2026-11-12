@@ -2,6 +2,10 @@
 
 Tanggal inventarisasi: 5 November 2026. Status `confirmed` berarti tercantum jelas pada sumber yang disebut; bukan jaminan masih mutakhir tanpa konfirmasi klien.
 
+## Foto utama beranda — 12 November 2026
+
+Foto utama beranda memakai dokumentasi tim di kantor MPU dari berkas klien `PT PUSAT/IMG_1534.JPG`, yang dioptimalkan menjadi `public/client/gallery-team.webp`. Materi foto klien telah dinyatakan boleh dipakai untuk website oleh pemilik proyek pada 10 November 2026. Status: `confirmed` sebagai aset klien untuk publikasi.
+
 ## Revisi persyaratan pekerjaan — 12 November 2026
 
 Pemilik proyek menyampaikan naskah revisi klien berjudul **Persyaratan Dokumen dan Informasi Lowongan Kerja Luar Negeri** pada 12 November 2026. Seluruh rincian di bawah berstatus `confirmed` sebagai isi revisi klien dan **menggantikan angka usia, tinggi badan, pendidikan, dan gaji dari halaman lama** untuk tampilan pekerjaan negara. Catatan lama pada tabel berikutnya adalah arsip sumber historis, bukan syarat aktif pada halaman pekerjaan baru.

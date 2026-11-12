@@ -204,6 +204,10 @@ export function HomePage({ data }: { data: HomeData }) {
   const clientPhoto = (url: string) => data.clientMedia[url] ?? url;
   const heroSection = data.page?.sections?.find((section) => section.key === "hero");
   const hero = (heroSection?.content ?? {}) as HeroSection;
+  const heroTitle =
+    hero.title ?? "Penempatan Pekerja Migran Indonesia yang Legal, Aman, dan Profesional";
+  const heroAccent = "Legal, Aman, dan Profesional";
+  const heroAccentIndex = heroTitle.indexOf(heroAccent);
   const services = data.services.length ? data.services : fallbackServices;
   const values = data.values.length ? data.values : fallbackValues;
   const countries = data.countries.length ? data.countries : fallbackCountries;
@@ -223,7 +227,16 @@ export function HomePage({ data }: { data: HomeData }) {
               {hero.eyebrow ?? "PT. MUTIARA PUTRA UTAMA — EMPLOYMENT AGENCY"}
             </span>
             <h1 className="display-title">
-              Penempatan Pekerja Migran Indonesia yang <span>Legal, Aman, dan Profesional</span>
+              {heroAccentIndex < 0 ? (
+                heroTitle
+              ) : (
+                <>
+                  {heroTitle.slice(0, heroAccentIndex).trimEnd()}
+                  {heroAccentIndex > 0 ? " " : null}
+                  <span>{heroAccent}</span>
+                  {heroTitle.slice(heroAccentIndex + heroAccent.length)}
+                </>
+              )}
             </h1>
             <p className="lead">
               {hero.body ??
@@ -249,38 +262,17 @@ export function HomePage({ data }: { data: HomeData }) {
               </span>
             </div>
           </div>
-          <div className="hero-visual" aria-label="Dokumentasi kegiatan PT Mutiara Putra Utama">
-            <div className="hero-collage-main">
-              <Image
-                className="hero-image"
-                src={clientPhoto(hero.image ?? "/client/hero-training.webp")}
-                alt="Kegiatan kelas persiapan calon pekerja migran Indonesia"
-                width={1000}
-                height={1100}
-                priority
-              />
-            </div>
-            <div className="hero-collage-small hero-collage-team">
-              <Image
-                src={clientPhoto("/client/gallery-team.webp")}
-                alt="Tim PT Mutiara Putra Utama dalam kegiatan kantor"
-                width={560}
-                height={420}
-              />
-            </div>
-            <div className="hero-collage-small hero-collage-training">
-              <Image
-                src={clientPhoto("/client/training-class.webp")}
-                alt="Peserta mengikuti kegiatan persiapan"
-                width={560}
-                height={420}
-              />
-            </div>
-            <div className="hero-badge">
-              <strong>Mulai dari informasi yang benar</strong>
-              <span>Periksa program, syarat, biaya, dan legalitas sebelum mendaftar.</span>
-            </div>
-          </div>
+          <figure className="hero-visual">
+            <Image
+              className="hero-image"
+              src={clientPhoto(hero.image ?? "/client/gallery-team.webp")}
+              alt="Dokumentasi kegiatan PT Mutiara Putra Utama"
+              width={1200}
+              height={900}
+              sizes="(max-width: 780px) 100vw, 50vw"
+              priority
+            />
+          </figure>
         </div>
       </section>
 

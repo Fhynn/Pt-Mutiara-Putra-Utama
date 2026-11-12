@@ -350,7 +350,7 @@ async function main() {
         primaryHref: "/kontak",
         secondaryLabel: "Lihat Lowongan",
         secondaryHref: "/lowongan",
-        image: "/client/hero-training.webp"
+        image: "/client/gallery-team.webp"
       }
     ],
     [
