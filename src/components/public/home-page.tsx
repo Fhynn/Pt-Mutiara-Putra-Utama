@@ -22,6 +22,7 @@ import type { getHomeData } from "@/lib/public-data";
 import { formatDate } from "@/lib/utils";
 import { FaqAccordion } from "@/components/public/faq-accordion";
 import { CountryFlag } from "@/components/public/country-flag";
+import { CountryCarousel } from "@/components/public/country-carousel";
 import { SectionHeading } from "@/components/public/section-heading";
 
 type HomeData = Awaited<ReturnType<typeof getHomeData>>;
@@ -468,7 +469,7 @@ export function HomePage({ data }: { data: HomeData }) {
             title="Lihat pilihan negara tujuan"
             description="Baca persyaratan tiap negara. Lowongan yang sedang dibuka ada di halaman Lowongan."
           />
-          <div className="country-grid">
+          <CountryCarousel>
             {countries.map((country) => (
               <article className="country-card" key={country.id}>
                 <div className="country-visual">
@@ -480,23 +481,6 @@ export function HomePage({ data }: { data: HomeData }) {
                 </div>
                 <div className="country-body">
                   <h3 className="country-name">{country.name}</h3>
-                  <span className="status-pill">Lihat persyaratan</span>
-                  <div className="tags">
-                    {(country.occupations.length
-                      ? country.occupations
-                          .filter((item) => item.status === "PUBLISHED")
-                          .map((item) => item.title)
-                      : country._count?.occupations
-                        ? []
-                        : country.sectors
-                    )
-                      .slice(0, 3)
-                      .map((sector) => (
-                        <span className="tag" key={sector}>
-                          {sector}
-                        </span>
-                      ))}
-                  </div>
                   <p>{country.summary}</p>
                   <Link className="text-link" href={`/negara-tujuan/${country.slug}`}>
                     Lihat detail <ArrowRight size={15} />
@@ -504,7 +488,7 @@ export function HomePage({ data }: { data: HomeData }) {
                 </div>
               </article>
             ))}
-          </div>
+          </CountryCarousel>
           <div style={{ marginTop: 28 }}>
             <Link className="button button-secondary" href="/negara-tujuan">
               Lihat Semua Negara

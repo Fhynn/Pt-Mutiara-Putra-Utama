@@ -35,6 +35,11 @@
 - `npm run db:validate`, `npm run lint`, `npm run typecheck`, `npm run format:check`, dan `npm run build` lulus. Unit test 27/27 lulus; 21 uji browser khusus persyaratan dan formulir lulus pada desktop, tablet, dan ponsel.
 - Seluruh suite browser: 42 lulus dan 3 tes admin dilewati karena kredensial QA tidak dikonfigurasi. Pengujian ini mencakup audit halaman publik serta lebar desktop, tablet, dan ponsel.
 
+## Kartu negara geser — 12 November 2026
+
+- Empat kartu tampil dengan lebar konsisten pada desktop; Brunei tetap ada di sisi kanan dan bisa dijangkau dengan drag cursor, sentuhan, atau panah keyboard. Label “Lihat persyaratan” dan chip pekerjaan dihapus dari kartu.
+- Halaman Negara Tujuan dan beranda diperiksa secara visual pada desktop dan ponsel. Ringkasan pekerjaan terbaca, bendera tidak terdistorsi, dan halaman tidak mengalami overflow horizontal. Uji browser carousel lulus pada desktop, tablet, dan ponsel.
+
 ## Penghapusan catatan sumber situs lama — 11 November 2026
 
 - Blok sumber, tautan ke halaman lama, dan tanggal pemeriksaan dihapus dari detail negara. Data lama pada lima negara dibersihkan di Neon; kriteria, dokumen, gaji, serta sektor tetap tersedia untuk diedit admin.

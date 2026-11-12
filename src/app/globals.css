@@ -4503,14 +4503,6 @@ body {
   line-height: 1.2;
 }
 
-/* Lima negara tetap memakai kartu berukuran sama pada layar lebar. */
-@media (min-width: 1101px) {
-  .country-grid:has(> .country-card:nth-child(5)),
-  .mpu-home .country-grid:has(> .country-card:nth-child(5)) {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-}
-
 .country-grid .country-flag-brunei,
 .mpu-home .country-flag-brunei {
   object-fit: contain;
@@ -5727,5 +5719,144 @@ body {
   }
   .occupation-panel-heading h2 {
     font-size: 1.14rem;
+  }
+}
+
+/* Empat kartu negara tetap berukuran sama; negara berikutnya bisa digeser. */
+.country-carousel {
+  min-width: 0;
+  margin-top: 20px;
+}
+
+.country-carousel-hint {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.country-carousel-hint-hidden {
+  visibility: hidden;
+}
+
+.country-carousel-indicator {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  margin-top: 13px;
+  border-radius: 999px;
+  background: #e5eaf2;
+}
+
+.country-carousel-indicator span {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--red);
+}
+
+.country-carousel .country-carousel-track,
+.mpu-home .country-carousel-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 54px) / 4);
+  grid-template-columns: none;
+  align-items: stretch;
+  gap: 18px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  margin-top: 0;
+  padding-bottom: 2px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.country-carousel-track:active {
+  cursor: grabbing;
+}
+
+.country-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.country-carousel-track > .country-card {
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.country-carousel-track .country-flag {
+  -webkit-user-drag: none;
+}
+
+.country-carousel-track .country-body p,
+.mpu-home .country-carousel-track .country-body p {
+  min-height: 82px;
+  margin: 0 0 24px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 1100px) {
+  .country-carousel .country-carousel-track,
+  .mpu-home .country-carousel-track {
+    grid-auto-columns: calc((100% - 18px) / 2);
+  }
+}
+
+@media (max-width: 620px) {
+  .country-carousel .country-carousel-track,
+  .mpu-home .country-carousel-track {
+    grid-auto-columns: calc(100% - 34px);
+    gap: 12px;
+  }
+
+  .country-carousel-track > .country-card,
+  .mpu-home .country-carousel-track > .country-card {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: start;
+    gap: 7px 12px;
+    padding: 12px;
+  }
+
+  .country-carousel-track .country-visual,
+  .mpu-home .country-carousel-track .country-visual {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: start;
+  }
+
+  .country-carousel-track .country-name,
+  .mpu-home .country-carousel-track .country-name {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: end;
+  }
+
+  .country-carousel-track .country-body p,
+  .mpu-home .country-carousel-track .country-body p {
+    display: block;
+    grid-column: 2;
+    grid-row: 2;
+    min-height: 0;
+    margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  .country-carousel-track .country-body .text-link,
+  .mpu-home .country-carousel-track .country-body .text-link {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: 4px;
   }
 }

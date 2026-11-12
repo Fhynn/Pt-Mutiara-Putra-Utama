@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { PageHero } from "@/components/public/page-hero";
 import { CountryFlag } from "@/components/public/country-flag";
+import { CountryCarousel } from "@/components/public/country-carousel";
 import { getPublishedCountries } from "@/lib/public-data";
 
 export const revalidate = 60;
@@ -21,7 +22,7 @@ export default async function CountriesPage() {
       />
       <section className="section">
         <div className="container">
-          <div className="country-grid">
+          <CountryCarousel>
             {countries.map((country) => (
               <article className="country-card" key={country.id}>
                 <div className="country-visual">
@@ -33,29 +34,6 @@ export default async function CountriesPage() {
                 </div>
                 <div className="country-body">
                   <h2 className="country-name">{country.name}</h2>
-                  <span className="status-pill">
-                    {country.programStatus === "AVAILABLE"
-                      ? "Program tersedia"
-                      : country.programStatus === "NOT_OPEN"
-                        ? "Program belum dibuka"
-                        : "Lihat persyaratan"}
-                  </span>
-                  <div className="tags">
-                    {(country.occupations.length
-                      ? country.occupations
-                          .filter((item) => item.status === "PUBLISHED")
-                          .map((item) => item.title)
-                      : country._count.occupations
-                        ? []
-                        : country.sectors
-                    )
-                      .slice(0, 3)
-                      .map((sector) => (
-                        <span className="tag" key={sector}>
-                          {sector}
-                        </span>
-                      ))}
-                  </div>
                   <p>{country.summary}</p>
                   <Link className="text-link" href={`/negara-tujuan/${country.slug}`}>
                     Lihat detail <ArrowRight size={15} />
@@ -63,7 +41,7 @@ export default async function CountriesPage() {
                 </div>
               </article>
             ))}
-          </div>
+          </CountryCarousel>
           {!countries.length ? (
             <p className="empty-state">
               Informasi negara tujuan belum tersedia. Silakan hubungi petugas MPU untuk konsultasi.
