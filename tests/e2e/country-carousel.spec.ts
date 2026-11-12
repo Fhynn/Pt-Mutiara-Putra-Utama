@@ -6,6 +6,7 @@ test("kartu negara tetap lebar dan bisa digeser tanpa tombol", async ({ page }, 
   const cards = track.locator(".country-card");
   await expect(cards).toHaveCount(5);
   await expect(track.locator(".status-pill, .tags")).toHaveCount(0);
+  await expect(page.locator(".country-carousel-indicator")).toHaveCount(0);
   await expect(cards.first().getByText("Pilihan pekerjaan di Taiwan:")).toBeVisible();
   await expect(page.getByText("Geser untuk melihat negara lain")).toBeVisible();
   await page.screenshot({
@@ -46,6 +47,7 @@ test("kartu negara di beranda memakai ringkasan yang sama", async ({ page }, tes
   const track = page.locator(".country-carousel-track");
   await expect(track.locator(".country-card")).toHaveCount(5);
   await expect(track.locator(".status-pill, .tags")).toHaveCount(0);
+  await expect(page.locator(".country-carousel-indicator")).toHaveCount(0);
   await expect(track.getByText("Pilihan pekerjaan di Brunei Darussalam:")).toBeVisible();
   await track.screenshot({
     path: `artifacts/screenshots/home-country-carousel-${testInfo.project.name}.png`

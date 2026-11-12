@@ -39,6 +39,7 @@
 
 - Empat kartu tampil dengan lebar konsisten pada desktop; Brunei tetap ada di sisi kanan dan bisa dijangkau dengan drag cursor, sentuhan, atau panah keyboard. Label “Lihat persyaratan” dan chip pekerjaan dihapus dari kartu.
 - Halaman Negara Tujuan dan beranda diperiksa secara visual pada desktop dan ponsel. Ringkasan pekerjaan terbaca, bendera tidak terdistorsi, dan halaman tidak mengalami overflow horizontal. Uji browser carousel lulus pada desktop, tablet, dan ponsel.
+- Garis posisi carousel dihapus atas revisi klien. Petunjuk teks dan interaksi geser tetap dipertahankan.
 
 ## Penghapusan catatan sumber situs lama — 11 November 2026
 

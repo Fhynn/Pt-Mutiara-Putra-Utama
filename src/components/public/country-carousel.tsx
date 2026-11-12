@@ -1,38 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { MoveHorizontal } from "lucide-react";
 
 export function CountryCarousel({ children }: { children: ReactNode }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startScroll: number; active: boolean } | null>(null);
   const suppressClickRef = useRef(false);
-  const [indicator, setIndicator] = useState({ visible: false, width: 100, left: 0 });
-
-  const updateIndicator = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const maxScroll = track.scrollWidth - track.clientWidth;
-    const width = Math.min(100, (track.clientWidth / track.scrollWidth) * 100);
-    setIndicator({
-      visible: maxScroll > 2,
-      width,
-      left: maxScroll > 0 ? (track.scrollLeft / maxScroll) * (100 - width) : 0
-    });
-  }, []);
+  const [hasOverflow, setHasOverflow] = useState(false);
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-    const observer = new ResizeObserver(updateIndicator);
+    const updateOverflow = () => setHasOverflow(track.scrollWidth > track.clientWidth + 2);
+    const observer = new ResizeObserver(updateOverflow);
     observer.observe(track);
-    track.addEventListener("scroll", updateIndicator, { passive: true });
-    updateIndicator();
+    updateOverflow();
     return () => {
       observer.disconnect();
-      track.removeEventListener("scroll", updateIndicator);
     };
-  }, [updateIndicator]);
+  }, []);
 
   function onPointerDown(event: PointerEvent<HTMLDivElement>) {
     if (event.pointerType !== "mouse" || event.button !== 0) return;
@@ -99,9 +86,7 @@ export function CountryCarousel({ children }: { children: ReactNode }) {
 
   return (
     <div className="country-carousel">
-      <div
-        className={`country-carousel-hint${indicator.visible ? "" : " country-carousel-hint-hidden"}`}
-      >
+      <div className={`country-carousel-hint${hasOverflow ? "" : " country-carousel-hint-hidden"}`}>
         <MoveHorizontal size={17} aria-hidden="true" />
         <span>Geser untuk melihat negara lain</span>
       </div>
@@ -129,11 +114,6 @@ export function CountryCarousel({ children }: { children: ReactNode }) {
       >
         {children}
       </div>
-      {indicator.visible ? (
-        <div className="country-carousel-indicator" aria-hidden="true">
-          <span style={{ width: `${indicator.width}%`, left: `${indicator.left}%` }} />
-        </div>
-      ) : null}
     </div>
   );
 }
