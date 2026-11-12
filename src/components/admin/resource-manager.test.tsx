@@ -17,6 +17,30 @@ afterEach(() => {
 });
 
 describe("foto negara di admin", () => {
+  it("menampilkan tautan halaman terkait sesudah perubahan disimpan", async () => {
+    const profile = { id: "profile-1", history: "Sejarah perusahaan" };
+    const fetchMock = vi.fn(async (_url: string, options?: RequestInit) =>
+      options?.method === "POST"
+        ? { ok: true, json: async () => ({ item: profile }) }
+        : { ok: true, json: async () => ({ items: [profile] }) }
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(
+      <ResourceManager
+        resource="profil"
+        config={adminResources.profil}
+        initialItems={[profile]}
+        relationOptions={{}}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Simpan perubahan" }));
+    const link = await screen.findByRole("link", { name: /Lihat hasil di website/ });
+    expect(link.getAttribute("href")).toBe("/tentang-kami");
+    expect(link.getAttribute("target")).toBe("_blank");
+  });
+
   it("mengedit syarat dan gaji tiap pekerjaan tanpa JSON", async () => {
     const fetchMock = vi.fn(async (_url: string, options?: RequestInit) =>
       options?.method === "POST"

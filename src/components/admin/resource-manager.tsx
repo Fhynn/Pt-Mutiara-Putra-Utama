@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { FileText, Plus, Trash2 } from "lucide-react";
+import { ExternalLink, FileText, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { AdminField, AdminOption, AdminResourceConfig } from "@/lib/admin-resources";
+import { getAdminPublicLink, type AdminPublicLink } from "@/lib/admin-public-links";
 import { inferCountryIso } from "@/lib/country-flags";
 
 type FormValue = string | number | boolean | string[] | Record<string, unknown> | null;
@@ -519,6 +520,7 @@ export function ResourceManager({
   const [formOpen, setFormOpen] = useState(singleton && Boolean(initialItems[0]));
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
+  const [resultLink, setResultLink] = useState<AdminPublicLink | null>(null);
   const [busy, setBusy] = useState(false);
   const [photoUploading, setPhotoUploading] = useState<string | null>(null);
   const [savedAlbumId, setSavedAlbumId] = useState<string | null>(null);
@@ -556,6 +558,8 @@ export function ResourceManager({
   );
 
   function updateField(field: AdminField, value: FormValue) {
+    setMessage("");
+    setResultLink(null);
     setForm((current) => {
       const next = { ...current, [field.key]: value };
       if (resource === "negara" && field.key === "name") {
@@ -576,6 +580,7 @@ export function ResourceManager({
   async function uploadMediaForField(field: AdminField, file: File) {
     setPhotoUploading(field.key);
     setMessage("");
+    setResultLink(null);
     try {
       const data = new FormData();
       data.append("files", file);
@@ -615,6 +620,7 @@ export function ResourceManager({
   async function uploadSectionImage(file: File) {
     setPhotoUploading("sectionImage");
     setMessage("");
+    setResultLink(null);
     try {
       const data = new FormData();
       data.append("files", file);
@@ -662,6 +668,7 @@ export function ResourceManager({
     setForm(formFromItem(config, item));
     setFormOpen(true);
     setMessage("");
+    setResultLink(null);
     setSavedAlbumId(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -677,6 +684,7 @@ export function ResourceManager({
     const isNewAlbum = resource === "galeri" && !editingId;
     setBusy(true);
     setMessage("");
+    setResultLink(null);
     try {
       const response = await fetch(`/api/admin/${resource}`, {
         method: "POST",
@@ -685,6 +693,9 @@ export function ResourceManager({
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.error ?? "Gagal menyimpan data.");
+      setResultLink(
+        getAdminPublicLink(resource, body.item ?? form, availableRelationOptions.countries ?? [])
+      );
       setSavedAlbumId(isNewAlbum ? String(body.item?.id ?? "") : null);
       await reload();
       if (!singleton) {
@@ -706,6 +717,9 @@ export function ResourceManager({
 
   async function remove(id: string) {
     if (!window.confirm("Hapus data ini? Tindakan akan dicatat di riwayat aktivitas.")) return;
+    const removedItem = items.find((item) => String(item.id) === id);
+    setMessage("");
+    setResultLink(null);
     const response = await fetch(`/api/admin/${resource}?id=${encodeURIComponent(id)}`, {
       method: "DELETE"
     });
@@ -716,6 +730,10 @@ export function ResourceManager({
     }
     await reload();
     setMessage("Data berhasil dihapus.");
+    if (removedItem)
+      setResultLink(
+        getAdminPublicLink(resource, removedItem, availableRelationOptions.countries ?? [], true)
+      );
   }
 
   function renderField(field: AdminField) {
@@ -945,6 +963,7 @@ export function ResourceManager({
               setForm(initialForm(config));
               setFormOpen(true);
               setMessage("");
+              setResultLink(null);
               setSavedAlbumId(null);
             }}
           >
@@ -1012,6 +1031,47 @@ export function ResourceManager({
               Tambahkan foto ke album
             </a>
           ) : null}
+          {resultLink ? (
+            <div className="admin-result-actions">
+              <a
+                className="admin-button primary"
+                href={resultLink.href}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink size={15} aria-hidden="true" /> {resultLink.label}
+              </a>
+              {resource === "pengaturan" && resultLink.live ? (
+                <>
+                  <a
+                    className="admin-button"
+                    href="/kontak"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Kontak
+                  </a>
+                  <a
+                    className="admin-button"
+                    href="/kebijakan-privasi"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Kebijakan privasi
+                  </a>
+                  <a
+                    className="admin-button"
+                    href="/syarat-ketentuan"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Syarat & ketentuan
+                  </a>
+                </>
+              ) : null}
+              {resultLink.note ? <small>{resultLink.note}</small> : null}
+            </div>
+          ) : null}
         </div>
       )}
       {!singleton && (
@@ -1044,45 +1104,67 @@ export function ResourceManager({
               </thead>
               <tbody>
                 {filtered.length ? (
-                  filtered.map((item) => (
-                    <tr key={String(item.id)}>
-                      {config.listFields.map((fieldKey) => {
-                        const field = config.fields.find((candidate) => candidate.key === fieldKey);
-                        return (
-                          <td key={fieldKey}>
-                            {displayValue(item[fieldKey], field, relationOptions)}
-                          </td>
-                        );
-                      })}
-                      {!config.readonly && (
-                        <td>
-                          <div className="admin-actions">
-                            <button
-                              className="admin-button"
-                              type="button"
-                              onClick={() => edit(item)}
-                            >
-                              Ubah
-                            </button>
-                            {resource === "galeri" && (
-                              <a className="admin-button" href={`/admin/galeri/${String(item.id)}`}>
-                                Kelola foto
-                              </a>
-                            )}
-                            {!config.noDelete && (
+                  filtered.map((item) => {
+                    const publicLink = getAdminPublicLink(
+                      resource,
+                      item,
+                      availableRelationOptions.countries ?? []
+                    );
+                    return (
+                      <tr key={String(item.id)}>
+                        {config.listFields.map((fieldKey) => {
+                          const field = config.fields.find(
+                            (candidate) => candidate.key === fieldKey
+                          );
+                          return (
+                            <td key={fieldKey}>
+                              {displayValue(item[fieldKey], field, relationOptions)}
+                            </td>
+                          );
+                        })}
+                        {!config.readonly && (
+                          <td>
+                            <div className="admin-actions">
                               <button
-                                className="admin-button danger"
+                                className="admin-button"
                                 type="button"
-                                onClick={() => remove(String(item.id))}
+                                onClick={() => edit(item)}
                               >
-                                Hapus
+                                Ubah
                               </button>
-                            )}
-                          </div>
-                        </td>
-                      )}
-                    </tr>
-                  ))
+                              {resource === "galeri" && (
+                                <a
+                                  className="admin-button"
+                                  href={`/admin/galeri/${String(item.id)}`}
+                                >
+                                  Kelola foto
+                                </a>
+                              )}
+                              {publicLink?.live && (
+                                <a
+                                  className="admin-button"
+                                  href={publicLink.href}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <ExternalLink size={14} aria-hidden="true" /> Lihat hasil
+                                </a>
+                              )}
+                              {!config.noDelete && (
+                                <button
+                                  className="admin-button danger"
+                                  type="button"
+                                  onClick={() => remove(String(item.id))}
+                                >
+                                  Hapus
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan={config.listFields.length + 1}>Belum ada data.</td>

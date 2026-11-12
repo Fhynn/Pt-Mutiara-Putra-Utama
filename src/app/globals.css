@@ -1909,6 +1909,7 @@ a {
 
 .admin-form-grid {
   display: grid;
+  align-items: start;
   gap: 16px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1919,6 +1920,7 @@ a {
 
 .admin-panel label {
   display: grid;
+  align-content: start;
   gap: 7px;
   color: #34405a;
   font-size: 0.82rem;
@@ -1996,6 +1998,7 @@ a {
 .admin-subgrid,
 .admin-structured-editor {
   display: grid;
+  align-items: start;
   gap: 14px;
   border: 1px solid #dce3ee;
   border-radius: 9px;
@@ -2098,6 +2101,28 @@ a {
   margin-top: 10px;
 }
 
+.admin-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+
+.admin-message .admin-result-actions .admin-button {
+  display: inline-flex;
+  margin-top: 0;
+}
+
+.admin-result-actions small {
+  flex-basis: 100%;
+  line-height: 1.5;
+}
+
+.mpu-home section[id] {
+  scroll-margin-top: 92px;
+}
+
 .error-page {
   display: grid;
   min-height: 100vh;
@@ -2184,12 +2209,15 @@ a {
 
 .status-badge {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 999px;
   padding: 4px 8px;
   background: #edf2f8;
   color: #40506c;
   font-size: 0.68rem;
   font-weight: 800;
+  line-height: 1.25;
 }
 
 .status-badge.published,
@@ -2203,6 +2231,12 @@ a {
 .status-badge.private {
   background: #fff2d8;
   color: #895b00;
+}
+
+.admin-media-table .status-badge {
+  min-height: 27px;
+  padding: 5px 10px;
+  white-space: nowrap;
 }
 
 .media-library-toolbar {
@@ -4955,7 +4989,15 @@ body {
 }
 
 .admin-media-embed form {
-  margin-top: 15px;
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 0;
+}
+
+.admin-media-embed form > .admin-button {
+  justify-self: start;
+  margin-top: 4px;
 }
 
 .admin-inbox-toolbar {
@@ -5651,4 +5693,50 @@ body {
     grid-row: 3;
     margin-top: 4px;
   }
+}
+
+/* Keep dropdown arrows comfortably inside the field on every browser. */
+select:not([multiple]) {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-inline-end: 44px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m4 6 4 4 4-4' stroke='%23263759' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-position: right 16px center;
+  background-repeat: no-repeat;
+  background-size: 16px 16px;
+}
+
+/* Use plus/minus instead of the browser's triangle for open/close sections. */
+details > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  list-style: none;
+}
+
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details > summary::marker {
+  content: "";
+}
+
+details > summary::after {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-inline: auto 3px;
+  background-image:
+    linear-gradient(currentColor, currentColor), linear-gradient(currentColor, currentColor);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:
+    12px 2px,
+    2px 12px;
+  content: "";
+}
+
+details[open] > summary::after {
+  background-image: linear-gradient(currentColor, currentColor);
 }

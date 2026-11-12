@@ -28,6 +28,10 @@ Formulir meminta **Pekerjaan yang diminati**. Jika pengunjung masuk dari halaman
 
 Halaman negara menampilkan pekerjaan yang sudah diterbitkan. Pengunjung membuka pekerjaan untuk melihat syarat, dokumen, dan gajinya. Pekerjaan yang disimpan sebagai draf tidak tampil dan tidak bisa dipilih di formulir.
 
+Setelah menyimpan konten yang sudah terbit, klik **Lihat hasil di website** pada pemberitahuan atau baris data. Tautan membuka halaman yang sesuai di tab baru, sehingga halaman admin tetap terbuka. Setelah menghapus konten, tautan membuka halaman daftarnya untuk memeriksa hasil penghapusan. Konten draf belum memiliki halaman publik; pemberitahuan akan menjelaskan bahwa konten harus diterbitkan dahulu. Foto yang baru diunggah dapat dilihat di daftar **Foto & Video**, lalu dipilih untuk album atau halaman yang diinginkan.
+
+Perubahan pada **Pendaftar**, **Pesan Masuk**, dan **Pengguna** hanya dapat diperiksa di dashboard. Tautan hasil pada bagian tersebut tetap menuju halaman admin yang terlindungi, bukan membuka data pribadi di website publik.
+
 Kolom **Pengaturan lanjutan** biasanya tidak perlu diubah. Alamat halaman dan beberapa pengaturan teknis dibuat otomatis atau sudah diisi dari data website.
 
 Kolom teknis seperti judul untuk mesin pencari dan kode analitik tidak ditampilkan dalam pekerjaan harian admin.

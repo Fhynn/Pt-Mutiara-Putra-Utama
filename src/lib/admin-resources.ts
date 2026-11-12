@@ -35,7 +35,14 @@ export type AdminField = {
   help?: string;
 };
 
-export type AdminOption = { value: string; label: string; previewUrl?: string; kind?: string };
+export type AdminOption = {
+  value: string;
+  label: string;
+  previewUrl?: string;
+  kind?: string;
+  slug?: string;
+  isPublished?: boolean;
+};
 
 export type AdminResourceConfig = {
   title: string;

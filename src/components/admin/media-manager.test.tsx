@@ -96,5 +96,8 @@ describe("pengelolaan foto privat", () => {
       "/admin/galeri/album-1"
     );
     expect(screen.getByText("(terbit)")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "lihat di website" }).getAttribute("href")).toBe(
+      "/galeri/dokumentasi-pt-pusat"
+    );
   });
 });

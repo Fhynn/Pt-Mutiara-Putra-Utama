@@ -42,7 +42,12 @@ export async function getAdminRelationOptions(config: AdminResourceConfig) {
     [...requested].map(async (relation) => {
       if (relation === "countries") {
         const rows = await prisma.country.findMany({ orderBy: { name: "asc" } });
-        result[relation] = rows.map((row) => ({ value: row.id, label: row.name }));
+        result[relation] = rows.map((row) => ({
+          value: row.id,
+          label: row.name,
+          slug: row.slug,
+          isPublished: row.status === "PUBLISHED"
+        }));
       } else if (relation === "sectors") {
         const rows = await prisma.sector.findMany({ orderBy: { name: "asc" } });
         result[relation] = rows.map((row) => ({ value: row.id, label: row.name }));

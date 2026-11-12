@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ImageIcon, LockKeyhole, Search } from "lucide-react";
+import { ExternalLink, ImageIcon, LockKeyhole, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type MediaRow = {
@@ -39,6 +39,7 @@ export function MediaManager({
   const [files, setFiles] = useState<File[]>([]);
   const [visibility, setVisibility] = useState("PUBLIC");
   const [message, setMessage] = useState("");
+  const [resultLink, setResultLink] = useState<{ href: string; label: string } | null>(null);
   const [busy, setBusy] = useState(false);
   const [busyFileId, setBusyFileId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -64,6 +65,7 @@ export function MediaManager({
     e.preventDefault();
     setBusy(true);
     setMessage("");
+    setResultLink(null);
     try {
       const data = new FormData();
       files.forEach((file) => data.append("files", file));
@@ -78,6 +80,7 @@ export function MediaManager({
       );
       setFiles([]);
       await reload();
+      setResultLink({ href: "#media-list", label: "Lihat file tersimpan" });
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "File gagal diunggah.");
     } finally {
@@ -86,6 +89,7 @@ export function MediaManager({
   }
   async function addEmbed(e: React.FormEvent) {
     e.preventDefault();
+    setResultLink(null);
     const r = await fetch("/api/admin/media", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -96,14 +100,19 @@ export function MediaManager({
     if (r.ok) {
       setEmbed({ title: "", embedUrl: "", altText: "" });
       await reload();
+      setResultLink({ href: "#media-list", label: "Lihat video tersimpan" });
     }
   }
   async function remove(id: string) {
     if (!confirm("Hapus media ini dari daftar?")) return;
+    setResultLink(null);
     const r = await fetch(`/api/admin/media?id=${id}`, { method: "DELETE" });
     const b = await r.json();
     setMessage(r.ok ? "Media dihapus." : b.error);
-    if (r.ok) await reload();
+    if (r.ok) {
+      await reload();
+      setResultLink({ href: "#media-list", label: "Lihat daftar file" });
+    }
   }
   async function makePublic(item: MediaRow) {
     if (
@@ -114,6 +123,7 @@ export function MediaManager({
       return;
     setBusyFileId(item.id);
     setMessage("");
+    setResultLink(null);
     try {
       const response = await fetch("/api/admin/media", {
         method: "PATCH",
@@ -127,6 +137,7 @@ export function MediaManager({
       );
       setEditing(null);
       await reload();
+      setResultLink({ href: "/admin/galeri", label: "Pilih file untuk Galeri" });
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "File belum bisa dijadikan publik.");
     } finally {
@@ -136,6 +147,7 @@ export function MediaManager({
   async function saveMetadata(e: React.FormEvent) {
     e.preventDefault();
     if (!editing) return;
+    setResultLink(null);
     const r = await fetch("/api/admin/media", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -144,8 +156,19 @@ export function MediaManager({
     const b = await r.json();
     setMessage(r.ok ? "Keterangan media disimpan." : b.error);
     if (r.ok) {
+      const publishedAlbum = editing.galleryItems?.find(
+        ({ album }) => album.status === "PUBLISHED"
+      );
       setEditing(null);
       await reload();
+      setResultLink(
+        publishedAlbum
+          ? {
+              href: `/galeri/${encodeURIComponent(publishedAlbum.album.slug)}`,
+              label: "Lihat hasil di website"
+            }
+          : { href: "#media-list", label: "Lihat file di daftar" }
+      );
     }
   }
   return (
@@ -246,9 +269,19 @@ export function MediaManager({
         </details>
       </div>
       {message && (
-        <p className="admin-message" role="status">
+        <div className="admin-message" role="status">
           {message}
-        </p>
+          {resultLink ? (
+            <a
+              className="admin-button primary"
+              href={resultLink.href}
+              target={resultLink.href.startsWith("#") ? undefined : "_blank"}
+              rel={resultLink.href.startsWith("#") ? undefined : "noopener noreferrer"}
+            >
+              <ExternalLink size={15} aria-hidden="true" /> {resultLink.label}
+            </a>
+          ) : null}
+        </div>
       )}
       {editing && (
         <section className="admin-panel" style={{ marginTop: 20 }}>
@@ -338,7 +371,7 @@ export function MediaManager({
           </form>
         </section>
       )}
-      <section className="admin-panel" style={{ marginTop: 20 }}>
+      <section className="admin-panel" id="media-list" style={{ marginTop: 20 }}>
         <div className="admin-panel-header media-library-toolbar">
           <div>
             <h2>File tersimpan ({filteredItems.length})</h2>
@@ -409,7 +442,20 @@ export function MediaManager({
                           <span key={album.id}>
                             {index > 0 ? ", " : ""}
                             <Link href={`/admin/galeri/${album.id}`}>{album.title}</Link>
-                            {album.status === "PUBLISHED" ? " (terbit)" : " (draf)"}
+                            {album.status === "PUBLISHED" ? (
+                              <>
+                                {" (terbit) "}
+                                <Link
+                                  href={`/galeri/${album.slug}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  lihat di website
+                                </Link>
+                              </>
+                            ) : (
+                              " (draf)"
+                            )}
                           </span>
                         ))}
                       </small>
@@ -446,7 +492,11 @@ export function MediaManager({
                       <button
                         className="admin-button"
                         type="button"
-                        onClick={() => setEditing(item)}
+                        onClick={() => {
+                          setEditing(item);
+                          setMessage("");
+                          setResultLink(null);
+                        }}
                       >
                         Ubah
                       </button>

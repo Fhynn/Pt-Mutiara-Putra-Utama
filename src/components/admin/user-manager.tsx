@@ -39,6 +39,7 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
   const [form, setForm] = useState<Record<string, string | boolean>>(empty);
   const [id, setId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [saved, setSaved] = useState(false);
   async function reload() {
     const r = await fetch("/api/admin/users");
     const b = await r.json();
@@ -46,6 +47,7 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
   }
   async function save(e: React.FormEvent) {
     e.preventDefault();
+    setSaved(false);
     const r = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -57,9 +59,12 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
       setForm(empty);
       setId(null);
       await reload();
+      setSaved(true);
     }
   }
   function edit(user: UserRow) {
+    setMessage("");
+    setSaved(false);
     setId(user.id);
     setForm({
       name: user.name,
@@ -146,9 +151,18 @@ export function UserManager({ initialItems }: { initialItems: UserRow[] }) {
             )}
           </div>
         </form>
-        {message && <p className="admin-message">{message}</p>}
+        {message && (
+          <div className="admin-message" role="status">
+            {message}
+            {saved ? (
+              <a className="admin-button primary" href="#admin-users-list">
+                Lihat akun di daftar
+              </a>
+            ) : null}
+          </div>
+        )}
       </section>
-      <section className="admin-panel">
+      <section className="admin-panel" id="admin-users-list">
         <div className="admin-table-wrap">
           <table className="admin-table">
             <thead>

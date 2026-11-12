@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ImageIcon, Video } from "lucide-react";
+import { ExternalLink, ImageIcon, Video } from "lucide-react";
 import { useState } from "react";
 
 type Media = {
@@ -67,6 +67,7 @@ export function GalleryItemManager({
   const [mediaOptions, setMediaOptions] = useState(media);
   const [mediaId, setMediaId] = useState("");
   const [message, setMessage] = useState("");
+  const [showResultLink, setShowResultLink] = useState(false);
   const [busy, setBusy] = useState(false);
   const selectedMedia = mediaOptions.find((asset) => asset.id === mediaId);
   const isPublished = albumStatus === "PUBLISHED";
@@ -75,6 +76,7 @@ export function GalleryItemManager({
     if (!files?.length || busy) return;
     setBusy(true);
     setMessage("");
+    setShowResultLink(false);
     try {
       const data = new FormData();
       Array.from(files).forEach((file) => data.append("files", file));
@@ -109,6 +111,7 @@ export function GalleryItemManager({
         added += 1;
       }
       setMessage(`${added} file berhasil ditambahkan ke album.`);
+      setShowResultLink(added > 0);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "File belum dapat ditambahkan.");
     } finally {
@@ -121,6 +124,7 @@ export function GalleryItemManager({
     if (!mediaId || busy) return;
     setBusy(true);
     setMessage("");
+    setShowResultLink(false);
     try {
       const response = await fetch("/api/admin/gallery-items", {
         method: "POST",
@@ -137,6 +141,7 @@ export function GalleryItemManager({
       setItems((current) => [...current, body.item]);
       setMediaId("");
       setMessage("Foto ditambahkan ke album.");
+      setShowResultLink(true);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Foto tidak dapat ditambahkan.");
     } finally {
@@ -151,6 +156,7 @@ export function GalleryItemManager({
     [next[index], next[target]] = [next[target], next[index]];
     setItems(next.map((item, displayOrder) => ({ ...item, displayOrder })));
     setMessage("Urutan berubah. Klik Simpan perubahan untuk menampilkannya di website.");
+    setShowResultLink(false);
   }
 
   async function save() {
@@ -171,8 +177,10 @@ export function GalleryItemManager({
       });
       const body = await response.json();
       setMessage(response.ok ? "Sampul, urutan, dan keterangan foto disimpan." : body.error);
+      setShowResultLink(response.ok);
     } catch {
       setMessage("Perubahan belum tersimpan. Coba lagi.");
+      setShowResultLink(false);
     } finally {
       setBusy(false);
     }
@@ -187,8 +195,10 @@ export function GalleryItemManager({
       if (!response.ok) throw new Error(body.error ?? "Foto belum dapat dikeluarkan.");
       setItems((current) => current.filter((item) => item.id !== id));
       setMessage("Foto dikeluarkan dari album. File aslinya tetap tersedia di Foto & Video.");
+      setShowResultLink(true);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Foto belum dapat dikeluarkan.");
+      setShowResultLink(false);
     }
   }
 
@@ -312,6 +322,7 @@ export function GalleryItemManager({
                           )
                         );
                         setMessage("Keterangan berubah. Klik Simpan perubahan.");
+                        setShowResultLink(false);
                       }}
                       placeholder="Contoh: Kegiatan pelatihan di kantor cabang"
                     />
@@ -325,6 +336,7 @@ export function GalleryItemManager({
                         onChange={() => {
                           setItems(items.map((row) => ({ ...row, isCover: row.id === item.id })));
                           setMessage("Sampul berubah. Klik Simpan perubahan.");
+                          setShowResultLink(false);
                         }}
                       />
                       <span>Jadikan sampul album</span>
@@ -375,9 +387,24 @@ export function GalleryItemManager({
           </div>
         ) : null}
         {message ? (
-          <p className="admin-message" role="status">
+          <div className="admin-message" role="status">
             {message}
-          </p>
+            {showResultLink && isPublished ? (
+              <a
+                className="admin-button primary"
+                href={`/galeri/${albumSlug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink size={15} aria-hidden="true" /> Lihat hasil di website
+              </a>
+            ) : null}
+            {showResultLink && !isPublished ? (
+              <small>
+                Album belum tampil untuk pengunjung. Terbitkan album setelah fotonya siap.
+              </small>
+            ) : null}
+          </div>
         ) : null}
       </section>
     </>

@@ -1,5 +1,17 @@
 # QA Report — 5 November 2026
 
+## Penataan form dan label dashboard — 12 November 2026
+
+- Form admin utama dan form bertingkat tidak lagi meregangkan kolom input ketika kolom sebelahnya memiliki teks bantuan yang lebih panjang. Pada pemeriksaan browser lokal, pilihan dan input usia sama-sama setinggi 42 px.
+- Label akses media **Hanya admin** tetap satu baris di desktop dan ponsel. Komponen media diperiksa pada lebar 1100, 390, dan 320 px tanpa overflow horizontal.
+- Form video memiliki jarak antarfield yang konsisten, judul sejajar dengan kolom input, serta jarak 20 px antara field terakhir dan tombol tambah.
+
+## Tautan hasil perubahan dashboard — 12 November 2026
+
+- Setelah konten diterbitkan atau diperbarui, dashboard menampilkan tautan langsung ke halaman publik yang sesuai; baris data terbit juga memiliki tombol lihat hasil. Setelah penghapusan, tautan menuju halaman daftar terkait. Draf dan lowongan kedaluwarsa tidak diarahkan ke detail yang tidak tersedia.
+- Album yang diterbitkan menampilkan tautan setelah foto ditambah, diubah, atau dikeluarkan. Media yang sudah dipakai di album terbit menampilkan tautan ke album publik; media yang belum dipakai tetap dijelaskan sebagai file tersimpan.
+- Pemetaan rute, tampilan tautan setelah penyimpanan, serta alur media dan status pendaftar diuji. Seluruh 31 unit test lulus; lint, typecheck, format, dan build production lokal juga lulus. Perubahan belum di-push sesuai permintaan pemilik proyek.
+
 ## Pilihan pekerjaan formulir CPMI — 11 November 2026
 
 - Formulir pendaftaran kini meminta pekerjaan yang diminati sesuai negara dan jenis kelamin. Malaysia memisahkan ART dari konstruksi/perkebunan; Taiwan menggunakan daftar pekerjaan negara untuk kedua jenis kelamin sampai ada rincian pemisahan pekerjaan yang dikonfirmasi.

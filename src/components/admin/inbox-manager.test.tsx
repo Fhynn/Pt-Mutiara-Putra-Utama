@@ -52,5 +52,8 @@ describe("dashboard pendaftar", () => {
       body: JSON.stringify({ id: "app-1", data: { status: "CONTACTED" } })
     });
     await waitFor(() => expect(screen.getAllByText("Sudah dihubungi").length).toBeGreaterThan(0));
+    expect(screen.getByRole("link", { name: "Buka hasil di dashboard" }).getAttribute("href")).toBe(
+      "/admin/pendaftar?id=app-1"
+    );
   });
 });

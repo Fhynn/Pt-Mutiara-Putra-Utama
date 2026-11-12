@@ -74,6 +74,7 @@ export function InboxManager({
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [resultId, setResultId] = useState<string | null>(null);
   const [revealedNik, setRevealedNik] = useState("");
   const labels = kind === "pendaftar" ? applicationStatusLabels : messageStatusLabels;
   const selected = items.find((item) => item.id === selectedId);
@@ -95,6 +96,7 @@ export function InboxManager({
     if (!selected || !pendingStatus || pendingStatus === selected.status) return;
     setBusy(true);
     setMessage("");
+    setResultId(null);
     try {
       const response = await fetch(`/api/admin/${kind}`, {
         method: "POST",
@@ -108,6 +110,7 @@ export function InboxManager({
       );
       setStatus("");
       setMessage("Status berhasil disimpan.");
+      setResultId(selected.id);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Status tidak dapat disimpan.");
     } finally {
@@ -119,6 +122,7 @@ export function InboxManager({
     if (!selected || !canEdit) return;
     setBusy(true);
     setMessage("");
+    setResultId(null);
     try {
       const response = await fetch(`/api/admin/applications/${selected.id}/identity`, {
         cache: "no-store"
@@ -144,6 +148,7 @@ export function InboxManager({
       return;
     setBusy(true);
     setMessage("");
+    setResultId(null);
     try {
       const response = await fetch(`/api/admin/applications/${selected.id}/anonymize`, {
         method: "POST"
@@ -188,6 +193,7 @@ export function InboxManager({
         )
       );
       setMessage("Data pribadi dan foto telah dihapus.");
+      setResultId(selected.id);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Data belum dapat dihapus.");
     } finally {
@@ -245,6 +251,7 @@ export function InboxManager({
                   setSelectedId(item.id);
                   setStatus("");
                   setMessage("");
+                  setResultId(null);
                   setRevealedNik("");
                 }}
                 type="button"
@@ -458,9 +465,19 @@ export function InboxManager({
                 </div>
               )}
               {message && (
-                <p className="admin-message" role="status">
+                <div className="admin-message" role="status">
                   {message}
-                </p>
+                  {resultId === selected.id ? (
+                    <a
+                      className="admin-button primary"
+                      href={`/admin/${kind}?id=${encodeURIComponent(resultId)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Buka hasil di dashboard
+                    </a>
+                  ) : null}
+                </div>
               )}
             </>
           ) : (

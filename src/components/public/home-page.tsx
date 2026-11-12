@@ -276,7 +276,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="trust-strip" aria-label="Fakta singkat perusahaan">
+      <section className="trust-strip" id="fakta" aria-label="Fakta singkat perusahaan">
         <div className="container trust-grid">
           <div className="trust-item">
             <span className="trust-icon">
@@ -317,7 +317,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section" id="tentang">
         <div className="container split-grid">
           <div className="media-frame">
             <Image
@@ -349,7 +349,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="section section-muted">
+      <section className="section section-muted" id="layanan">
         <div className="container">
           <div className="services-layout">
             <SectionHeading
@@ -383,7 +383,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="section legal-band">
+      <section className="section legal-band" id="legalitas">
         <div className="container legal-grid">
           <div className="legal-visual">
             <div className="document-sheet document-sheet-back">
@@ -454,7 +454,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section" id="negara-tujuan">
         <div className="container">
           <SectionHeading
             eyebrow="Negara Tujuan"
@@ -489,7 +489,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="section section-muted">
+      <section className="section section-muted" id="alur">
         <div className="container">
           <SectionHeading
             eyebrow="Alur Penempatan"
@@ -508,7 +508,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section" id="pelatihan">
         <div className="container split-grid">
           <div className="media-frame">
             <Image
@@ -548,7 +548,7 @@ export function HomePage({ data }: { data: HomeData }) {
       </section>
 
       {data.testimonials.length ? (
-        <section className="section section-muted">
+        <section className="section section-muted" id="testimoni">
           <div className="container">
             <SectionHeading
               eyebrow="Cerita Alumni"
@@ -558,7 +558,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </section>
       ) : null}
 
-      <section className="section section-muted">
+      <section className="section section-muted" id="galeri">
         <div className="container">
           <SectionHeading
             eyebrow="Galeri Kegiatan"
@@ -588,7 +588,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section" id="faq">
         <div className="container">
           <SectionHeading
             eyebrow="FAQ"
@@ -606,7 +606,7 @@ export function HomePage({ data }: { data: HomeData }) {
         </div>
       </section>
 
-      <section className="final-cta">
+      <section className="final-cta" id="cta">
         <div className="container cta-grid">
           <div>
             <h2>Siap Memulai Karier ke Luar Negeri?</h2>
