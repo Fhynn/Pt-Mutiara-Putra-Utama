@@ -27,6 +27,14 @@
 - Pada server production lokal setelah build, respons hangat: Beranda 41 ms, Tentang 28 ms, Negara Tujuan 31 ms, Galeri 11 ms, Lowongan 7 ms. Akses pertama Lowongan sekitar 591 ms untuk mengisi cache data; angka ini pengukuran lokal, bukan jaminan latency Vercel.
 - Setelah deploy awal, akses pertama Lowongan di Vercel sempat sekitar 10 detik. Lowongan dan Daftar kemudian diubah menjadi halaman statis dengan filter dan pilihan awal yang diproses di browser. Build menunjukkan kedua route sebagai static; 18 tes browser khusus navigasi, filter, dan pendaftaran lulus pada desktop, tablet, serta mobile. Setelah deploy `b6ca75f`, respons Lowongan live 0,36–0,66 detik dan Daftar 0,34–0,86 detik pada pengukuran ini; Vercel melaporkan cache `PRERENDER`/`HIT`. Waktu pengunjung lain dapat berbeda menurut jaringan dan lokasi.
 
+## Revisi pekerjaan per negara — 12 November 2026
+
+- Migrasi `202611120001_country_occupations` diterapkan ke Neon. Sebelas pekerjaan klien didaftarkan pada lima negara; pekerjaan yang dibuat dapat disunting dan disembunyikan satu per satu di admin.
+- Negara → pekerjaan → persyaratan → formulir diperiksa pada desktop, tablet, dan ponsel. Pilihan negara, pekerjaan, dan jenis kelamin yang memang ditentukan klien terisi otomatis dan dapat diubah. Posisi tanpa ketentuan jenis kelamin tidak diberi asumsi gender.
+- Pemeriksaan visual lokal mencakup halaman Malaysia dan rincian pekerjaan pada desktop serta ponsel. Kartu dan teks tidak melampaui lebar layar. Detail gaji yang belum diberikan klien ditampilkan sebagai “Belum dicantumkan”.
+- `npm run db:validate`, `npm run lint`, `npm run typecheck`, `npm run format:check`, dan `npm run build` lulus. Unit test 27/27 lulus; 21 uji browser khusus persyaratan dan formulir lulus pada desktop, tablet, dan ponsel.
+- Seluruh suite browser: 42 lulus dan 3 tes admin dilewati karena kredensial QA tidak dikonfigurasi. Pengujian ini mencakup audit halaman publik serta lebar desktop, tablet, dan ponsel.
+
 ## Penghapusan catatan sumber situs lama — 11 November 2026
 
 - Blok sumber, tautan ke halaman lama, dan tanggal pemeriksaan dihapus dari detail negara. Data lama pada lima negara dibersihkan di Neon; kriteria, dokumen, gaji, serta sektor tetap tersedia untuk diedit admin.

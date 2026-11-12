@@ -41,11 +41,20 @@ export default async function CountriesPage() {
                         : "Lihat persyaratan"}
                   </span>
                   <div className="tags">
-                    {country.sectors.map((sector) => (
-                      <span className="tag" key={sector}>
-                        {sector}
-                      </span>
-                    ))}
+                    {(country.occupations.length
+                      ? country.occupations
+                          .filter((item) => item.status === "PUBLISHED")
+                          .map((item) => item.title)
+                      : country._count.occupations
+                        ? []
+                        : country.sectors
+                    )
+                      .slice(0, 3)
+                      .map((sector) => (
+                        <span className="tag" key={sector}>
+                          {sector}
+                        </span>
+                      ))}
                   </div>
                   <p>{country.summary}</p>
                   <Link className="text-link" href={`/negara-tujuan/${country.slug}`}>

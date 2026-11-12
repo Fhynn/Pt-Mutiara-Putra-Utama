@@ -1,127 +1,79 @@
 import { expect, test } from "@playwright/test";
 
-test("halaman Hong Kong menampilkan kriteria, dokumen, dan gaji tanpa sumber situs lama", async ({
-  page
-}) => {
-  await page.goto("/negara-tujuan/hong-kong");
-
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Kriteria & Persyaratan Kerja ke Hong Kong"
-  );
-  await expect(page.getByText("Usia 21–35 tahun")).toBeVisible();
-  await expect(page.getByText("Kartu Tanda Penduduk (KTP)")).toBeVisible();
-  await expect(page.getByText(/HK\$5\.100/)).toBeVisible();
+test("Malaysia menampilkan lima pekerjaan dengan rincian yang terpisah", async ({ page }) => {
+  await page.goto("/negara-tujuan/malaysia");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pekerjaan di Malaysia");
+  await expect(page.locator(".country-occupation-card")).toHaveCount(5);
+  await expect(page.getByRole("heading", { name: "Terapis SPA" })).toBeVisible();
+  await page.getByRole("link", { name: "Lihat syarat dan daftar" }).first().click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Asisten Rumah Tangga (ART)");
+  await expect(page.getByText("Usia 21–45 tahun")).toBeVisible();
+  await expect(page.getByText("RM 1.500")).toBeVisible();
   await expect(
-    page.getByText("Penjaga anak/bayi dan asisten rumah tangga.", { exact: true })
+    page.getByText("Surat izin suami, bagi calon pekerja perempuan yang berstatus menikah")
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /Buka sumber persyaratan/i })).toHaveCount(0);
-  await expect(page.getByText(/Sumber terakhir diperiksa/i)).toHaveCount(0);
-  await expect(page.getByText(/Nominal di atas berasal dari/i)).toHaveCount(0);
-
-  const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-  );
-  expect(overflow).toBeLessThanOrEqual(1);
-
-  if ((page.viewportSize()?.width ?? 1000) <= 520) {
-    await page.getByRole("button", { name: "Lihat 4 kriteria lainnya" }).click();
-    await expect(page.getByText("Tinggi badan minimal 155 cm")).toBeVisible();
-  }
+  await expect(
+    page.getByText(
+      "Surat izin orang tua, bagi calon pekerja yang berstatus belum kawin atau cerai hidup"
+    )
+  ).toBeVisible();
 });
 
-test("halaman daftar meminta data diri dan menjelaskan penyimpanan foto privat", async ({
-  page
-}) => {
-  await page.goto("/daftar?country=hong-kong");
+test("gaji dan pengalaman Malaysia tidak tercampur antarkategori pekerjaan", async ({ page }) => {
+  await page.goto("/negara-tujuan/malaysia/pekerjaan/konstruksi");
+  await expect(page.getByText("Usia 18–43 tahun")).toBeVisible();
+  await expect(page.getByText("Pengalaman kerja minimal 1 tahun")).toBeVisible();
+  await expect(page.getByText("RM 1.700")).toBeVisible();
 
-  await expect(page.getByRole("heading", { name: "Siapkan data diri dan foto" })).toBeVisible();
-  await expect(page.getByText(/NIK dan foto disimpan secara privat/)).toBeVisible();
-  await expect(page.getByLabel("Nomor NIK *")).toBeVisible();
-  await expect(page.getByLabel("Unggah foto diri *")).toBeVisible();
+  await page.goto("/negara-tujuan/malaysia/pekerjaan/perkebunan-sawit");
+  await expect(page.getByText("RM 1.700")).toBeVisible();
+  await expect(page.getByText("Pengalaman kerja minimal 1 tahun")).toHaveCount(0);
+
+  await page.goto("/negara-tujuan/malaysia/pekerjaan/terapis-spa");
+  await expect(page.getByText("Belum dicantumkan")).toBeVisible();
 });
 
-test("empat negara tetap memiliki persyaratan spesifik", async ({ page }) => {
-  for (const [slug, name, salary] of [
-    ["taiwan", "Taiwan", "NT$20.000"],
-    ["hong-kong", "Hong Kong", "HK$5.100"],
-    ["singapura", "Singapura", "SGD550"],
-    ["malaysia", "Malaysia", "RM1.500"]
+test("setiap negara memakai pekerjaan dan gaji dari revisi klien", async ({ page }) => {
+  for (const [country, occupation, title, salary] of [
+    ["hong-kong", "asisten-rumah-tangga", "Asisten Rumah Tangga (ART)", "HKD 5.220"],
+    ["taiwan", "asisten-rumah-tangga", "Asisten Rumah Tangga (ART)", "NTD 20.000"],
+    ["taiwan", "anak-buah-kapal", "Anak Buah Kapal (ABK)", "Belum dicantumkan"],
+    ["singapura", "asisten-rumah-tangga", "Asisten Rumah Tangga (ART)", "SGD 550"],
+    ["brunei-darussalam", "baker-pembuat-kue", "Baker (Pembuat Kue)", "Belum dicantumkan"]
   ] as const) {
-    await page.goto(`/negara-tujuan/${slug}`);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText(name);
-    await expect(page.getByText(salary, { exact: false })).toBeVisible();
+    await page.goto(`/negara-tujuan/${country}/pekerjaan/${occupation}`);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
+    await expect(page.locator(".occupation-salary-box strong")).toHaveText(salary);
     await expect(page.getByRole("heading", { name: "Dokumen yang perlu disiapkan" })).toBeVisible();
   }
 });
 
-test("revisi klien menampilkan Brunei, ABK Taiwan, dan pekerjaan Malaysia", async ({ page }) => {
-  await page.goto("/negara-tujuan/brunei-darussalam");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Brunei Darussalam");
-  await expect(
-    page.getByText("Konstruksi, pembuatan kue, dan bidang formal lain sesuai program.")
-  ).toBeVisible();
-  await expect(page.getByText("Rincian gaji belum dipublikasikan.")).toBeVisible();
-  await expect(page.getByText("Belum ada lowongan diumumkan")).toBeVisible();
-
-  await page.goto("/negara-tujuan/taiwan");
-  await expect(page.getByText(/ABK \(anak buah kapal\)/).first()).toBeVisible();
-
-  await page.goto("/negara-tujuan/malaysia");
-  await expect(page.getByText(/Konstruksi dan pekerjaan kebun sawit\/karet/)).toBeVisible();
-
-  await page.goto("/tentang-kami");
-  await expect(page.getByAltText("Foto Direktur Utama PT Mutiara Putra Utama")).toHaveAttribute(
-    "src",
-    /director-martua-2026/
+test("halaman pekerjaan mengisi formulir dan pilihan tetap bisa diubah", async ({ page }) => {
+  await page.goto("/negara-tujuan/malaysia/pekerjaan/konstruksi");
+  await page.getByRole("link", { name: "Daftar untuk pekerjaan ini" }).click();
+  await expect(page.getByLabel("Negara tujuan *")).toHaveValue(/.+/);
+  await expect(page.locator("#countryId option:checked")).toHaveText("Malaysia");
+  await expect(page.getByLabel("Jenis kelamin *")).toHaveValue("LAKI_LAKI");
+  await expect(page.getByLabel("Pekerjaan yang diminati *")).toHaveValue("Konstruksi");
+  await page.getByLabel("Jenis kelamin *").selectOption("PEREMPUAN");
+  await expect(page.getByLabel("Pekerjaan yang diminati *")).toHaveValue("");
+  await page.getByLabel("Pekerjaan yang diminati *").selectOption("Asisten Rumah Tangga (ART)");
+  await expect(page.getByLabel("Pekerjaan yang diminati *")).toHaveValue(
+    "Asisten Rumah Tangga (ART)"
   );
-});
-
-test("Malaysia dan Taiwan membedakan kriteria perempuan serta laki-laki", async ({ page }) => {
-  await page.goto("/negara-tujuan/malaysia");
-  await expect(page.getByRole("heading", { name: "Kriteria perempuan" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Kriteria laki-laki" })).toBeVisible();
-  await expect(page.getByText("Asisten rumah tangga (ART)")).toBeVisible();
-  await expect(page.getByText("Konstruksi", { exact: true }).first()).toBeVisible();
-  await expect(page.getByText("Perkebunan sawit dan karet")).toBeVisible();
-  await expect(
-    page.getByText("Rincian kriteria untuk laki-laki belum diberikan MPU.")
-  ).toBeVisible();
-
-  await page.goto("/negara-tujuan/taiwan");
-  if ((page.viewportSize()?.width ?? 1000) <= 520) {
-    await page.getByRole("button", { name: "Lihat 2 kriteria perempuan lainnya" }).click();
-    await page.getByRole("button", { name: "Lihat 2 kriteria laki-laki lainnya" }).click();
-  }
-  await expect(page.getByText("Tinggi badan minimal 155 cm")).toBeVisible();
-  await expect(page.getByText("Tinggi badan minimal 165 cm")).toBeVisible();
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth
   );
   expect(overflow).toBeLessThanOrEqual(1);
 });
 
-test("halaman Singapura membedakan persyaratan, pendaftaran CPMI, dan lowongan", async ({
+test("pekerjaan tanpa pembatasan jenis kelamin tetap terpilih setelah pendaftar memilih gender", async ({
   page
 }) => {
-  await page.goto("/negara-tujuan/singapura");
-
-  await expect(
-    page.getByRole("heading", { level: 2, name: "Persyaratan kerja ke Singapura", exact: true })
-  ).toBeVisible();
-  await expect(page.getByText("Belum ada lowongan diumumkan")).toBeVisible();
-  await expect(
-    page.getByText(
-      "Formulir ini untuk pendataan calon pekerja, bukan lamaran pada lowongan tertentu."
-    )
-  ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Daftar sebagai calon CPMI" })).toHaveAttribute(
-    "href",
-    "/daftar?country=singapura"
-  );
-  await expect(
-    page.getByRole("heading", { name: "Belum ada lowongan Singapura yang diumumkan" })
-  ).toBeVisible();
-  await expect(page.getByText(/Nominal ini bukan penawaran lowongan/)).toBeVisible();
-  await expect(page.getByText(/sumber yang diperiksa/i)).toHaveCount(0);
-  await expect(page.getByText(/pernah dipublikasikan MPU/i)).toHaveCount(0);
+  await page.goto("/negara-tujuan/malaysia/pekerjaan/terapis-spa");
+  await page.getByRole("link", { name: "Daftar untuk pekerjaan ini" }).click();
+  await expect(page.getByLabel("Jenis kelamin *")).toHaveValue("");
+  await expect(page.getByLabel("Pekerjaan yang diminati *")).toHaveValue("Terapis SPA");
+  await page.getByLabel("Jenis kelamin *").selectOption("PEREMPUAN");
+  await expect(page.getByLabel("Pekerjaan yang diminati *")).toHaveValue("Terapis SPA");
 });

@@ -68,6 +68,10 @@ export async function getHomeData() {
       }),
       prisma.country.findMany({
         where: { status: "PUBLISHED", isFeatured: true },
+        include: {
+          occupations: { where: { status: "PUBLISHED" }, orderBy: { displayOrder: "asc" } },
+          _count: { select: { occupations: true } }
+        },
         orderBy: { displayOrder: "asc" },
         take: 5
       }),
@@ -150,6 +154,10 @@ export const getPublishedCountries = unstable_cache(
     try {
       return await prisma.country.findMany({
         where: { status: "PUBLISHED" },
+        include: {
+          occupations: { where: { status: "PUBLISHED" }, orderBy: { displayOrder: "asc" } },
+          _count: { select: { occupations: true } }
+        },
         orderBy: { displayOrder: "asc" }
       });
     } catch {

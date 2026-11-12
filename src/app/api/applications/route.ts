@@ -66,7 +66,13 @@ export async function POST(request: Request) {
   }
   const country = await prisma.country.findFirst({
     where: { id: parsed.data.countryId, status: "PUBLISHED" },
-    select: { id: true, sectors: true, genderCriteria: true }
+    select: {
+      id: true,
+      occupations: {
+        where: { status: "PUBLISHED" },
+        select: { title: true, gender: true, status: true }
+      }
+    }
   });
   if (!country)
     return NextResponse.json({ message: "Negara tujuan tidak tersedia." }, { status: 400 });

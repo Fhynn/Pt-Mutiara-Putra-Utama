@@ -281,30 +281,11 @@ export const adminResources: Record<string, AdminResourceConfig> = {
         ...relation("coverMediaId", "Foto negara", "mediaImages"),
         help: "Foto ini muncul di halaman detail negara setelah diterbitkan. Bendera dibuat otomatis dari nama negara."
       },
-      {
-        key: "genderCriteria",
-        label: "Kriteria perempuan dan laki-laki",
-        type: "genderCriteria",
-        help: "Aktifkan jika pekerjaan atau syarat untuk perempuan dan laki-laki berbeda. Bagian yang belum pasti boleh dikosongkan."
-      },
-      list(
-        "criteria",
-        "Kriteria calon pekerja",
-        "Tambahkan satu kriteria per baris, misalnya batas usia, pendidikan, atau tinggi badan."
-      ),
       list(
         "requirements",
-        "Dokumen yang perlu disiapkan",
-        "Daftar dokumen untuk tahap lanjutan. Dokumen tidak diunggah melalui formulir pendaftaran awal."
+        "Dokumen umum untuk semua pekerjaan",
+        "Satu dokumen per baris. Rincian usia, pengalaman, dan gaji diubah pada menu Pekerjaan Negara."
       ),
-      list(
-        "salaryDetails",
-        "Rincian gaji",
-        "Tulis nominal dan mata uang yang sudah dipastikan untuk program ini."
-      ),
-      area("informalSectorInfo", "Keterangan sektor informal"),
-      area("formalSectorInfo", "Keterangan sektor formal"),
-      list("sectors", "Bidang pekerjaan singkat", "Dipakai sebagai label pada kartu negara."),
       select(
         "programStatus",
         "Ketersediaan program",
@@ -319,6 +300,38 @@ export const adminResources: Record<string, AdminResourceConfig> = {
       order(),
       text("metaTitle", "Judul untuk Google"),
       area("metaDescription", "Deskripsi untuk Google")
+    ]
+  },
+  "pekerjaan-negara": {
+    title: "Pekerjaan Negara",
+    singular: "pekerjaan negara",
+    model: "countryOccupation",
+    permission: "content",
+    listFields: ["title", "countryId", "gender", "status"],
+    searchFields: ["title"],
+    fields: [
+      relation("countryId", "Negara tujuan", "countries", true),
+      text("title", "Nama pekerjaan", true),
+      slug("title"),
+      {
+        ...select(
+          "gender",
+          "Untuk calon pekerja",
+          choices(["PEREMPUAN", "Perempuan"], ["LAKI_LAKI", "Laki-laki"])
+        ),
+        help: "Biarkan kosong bila revisi klien tidak menentukan jenis kelamin untuk pekerjaan ini."
+      },
+      { key: "ageMin", label: "Usia minimum (tahun)", type: "number" },
+      { key: "ageMax", label: "Usia maksimum (tahun)", type: "number" },
+      text("experienceRequirement", "Pengalaman kerja yang dibutuhkan"),
+      text("healthRequirement", "Syarat kesehatan"),
+      list("additionalCriteria", "Kriteria tambahan", "Isi satu syarat per baris, jika ada."),
+      {
+        ...text("salaryLabel", "Gaji pokok"),
+        help: "Tulis mata uang dan nominal, misalnya RM 1.700. Biarkan kosong bila belum dicantumkan."
+      },
+      select("status", "Publikasi", publication),
+      order()
     ]
   },
   lowongan: {

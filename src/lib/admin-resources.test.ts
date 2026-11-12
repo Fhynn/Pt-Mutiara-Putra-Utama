@@ -19,29 +19,35 @@ describe("form admin ramah pengguna", () => {
     expect(result.responsibilities).toEqual(["Melayani pelanggan", "Menjaga kebersihan"]);
   });
 
-  it("menyediakan field persyaratan negara tanpa editor JSON", () => {
-    const fields = adminResources.negara.fields;
-    const fieldTypes = Object.fromEntries(fields.map((field) => [field.key, field.type]));
-
-    expect(fieldTypes.criteria).toBe("list");
-    expect(fieldTypes.genderCriteria).toBe("genderCriteria");
-    expect(fieldTypes.requirements).toBe("list");
-    expect(fieldTypes.salaryDetails).toBe("list");
-    expect(fieldTypes.informalSectorInfo).toBe("textarea");
-    expect(fieldTypes.formalSectorInfo).toBe("textarea");
+  it("memisahkan dokumen umum dan syarat tiap pekerjaan", () => {
+    const countryFields = Object.fromEntries(
+      adminResources.negara.fields.map((field) => [field.key, field.type])
+    );
+    const occupationFields = Object.fromEntries(
+      adminResources["pekerjaan-negara"].fields.map((field) => [field.key, field.type])
+    );
+    expect(countryFields.requirements).toBe("list");
+    expect(countryFields.salaryDetails).toBeUndefined();
+    expect(occupationFields.countryId).toBe("relation");
+    expect(occupationFields.ageMin).toBe("number");
+    expect(occupationFields.salaryLabel).toBeUndefined();
   });
 
-  it("menyimpan kriteria perempuan dan laki-laki secara terpisah", () => {
-    const result = normalizeAdminPayload(adminResources.negara, {
-      genderCriteria: {
-        women: { jobs: ["ART", ""], criteria: ["Tinggi minimal 145 cm"] },
-        men: { jobs: ["Konstruksi"], criteria: ["  Usia 21–40 tahun  "] }
-      }
+  it("menyimpan gaji dan kriteria tambahan pekerjaan secara terstruktur", () => {
+    const result = normalizeAdminPayload(adminResources["pekerjaan-negara"], {
+      title: "Konstruksi",
+      slug: "",
+      salaryLabel: "RM 1.700",
+      ageMin: "18",
+      ageMax: "43",
+      additionalCriteria: ["  Sehat jasmani dan rohani  ", ""]
     });
-
-    expect(result.genderCriteria).toEqual({
-      women: { jobs: ["ART"], criteria: ["Tinggi minimal 145 cm"] },
-      men: { jobs: ["Konstruksi"], criteria: ["Usia 21–40 tahun"] }
+    expect(result).toMatchObject({
+      slug: "konstruksi",
+      salaryLabel: "RM 1.700",
+      ageMin: 18,
+      ageMax: 43,
+      additionalCriteria: ["Sehat jasmani dan rohani"]
     });
   });
 

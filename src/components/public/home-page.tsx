@@ -88,32 +88,41 @@ const fallbackCountries = [
     name: "Taiwan",
     slug: "taiwan",
     isoCode: "TW",
-    summary: "Informasi awal program dan persyaratan penempatan ke Taiwan.",
-    sectors: ["Agrikultur", "Caregiver", "Industri"]
+    summary: "Pilihan pekerjaan di Taiwan: asisten rumah tangga dan anak buah kapal (ABK).",
+    sectors: ["Asisten Rumah Tangga (ART)", "Anak Buah Kapal (ABK)"],
+    occupations: [],
+    _count: { occupations: 0 }
   },
   {
     id: "hk",
     name: "Hong Kong",
     slug: "hong-kong",
     isoCode: "HK",
-    summary: "Informasi awal program dan persyaratan penempatan ke Hong Kong.",
-    sectors: ["Layanan rumah tangga", "Caregiver"]
+    summary: "Pilihan pekerjaan di Hong Kong: asisten rumah tangga.",
+    sectors: ["Asisten Rumah Tangga (ART)"],
+    occupations: [],
+    _count: { occupations: 0 }
   },
   {
     id: "sg",
     name: "Singapura",
     slug: "singapura",
     isoCode: "SG",
-    summary: "Informasi awal program dan persyaratan penempatan ke Singapura.",
-    sectors: ["Layanan rumah tangga", "Jasa"]
+    summary: "Pilihan pekerjaan di Singapura: asisten rumah tangga.",
+    sectors: ["Asisten Rumah Tangga (ART)"],
+    occupations: [],
+    _count: { occupations: 0 }
   },
   {
     id: "my",
     name: "Malaysia",
     slug: "malaysia",
     isoCode: "MY",
-    summary: "Informasi awal program dan persyaratan penempatan ke Malaysia.",
-    sectors: ["Pertanian", "Konstruksi", "Industri"]
+    summary:
+      "Pilihan pekerjaan di Malaysia: ART, terapis SPA, konstruksi, perkebunan karet dan sawit.",
+    sectors: ["Asisten Rumah Tangga (ART)", "Terapis SPA", "Konstruksi"],
+    occupations: [],
+    _count: { occupations: 0 }
   }
 ];
 
@@ -133,7 +142,7 @@ const fallbackFaqs = [
   ],
   [
     "Berkas umum",
-    "Daftar dokumen ada pada halaman setiap negara. KTP, KK, akta kelahiran, ijazah, surat izin keluarga, dan paspor lama disiapkan untuk verifikasi tahap lanjutan melalui petugas MPU."
+    "Daftar dokumen ada pada halaman rincian pekerjaan. KTP, KK, akta kelahiran atau ijazah, serta dokumen status keluarga disiapkan sesuai keadaan pendaftar untuk verifikasi melalui petugas MPU."
   ],
   [
     "Tahapan proses",
@@ -473,11 +482,20 @@ export function HomePage({ data }: { data: HomeData }) {
                   <h3 className="country-name">{country.name}</h3>
                   <span className="status-pill">Lihat persyaratan</span>
                   <div className="tags">
-                    {country.sectors.slice(0, 3).map((sector) => (
-                      <span className="tag" key={sector}>
-                        {sector}
-                      </span>
-                    ))}
+                    {(country.occupations.length
+                      ? country.occupations
+                          .filter((item) => item.status === "PUBLISHED")
+                          .map((item) => item.title)
+                      : country._count?.occupations
+                        ? []
+                        : country.sectors
+                    )
+                      .slice(0, 3)
+                      .map((sector) => (
+                        <span className="tag" key={sector}>
+                          {sector}
+                        </span>
+                      ))}
                   </div>
                   <p>{country.summary}</p>
                   <Link className="text-link" href={`/negara-tujuan/${country.slug}`}>

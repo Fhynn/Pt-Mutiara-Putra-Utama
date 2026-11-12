@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { applicationSchema } from "@/lib/validation";
@@ -45,8 +45,7 @@ export function ApplicationForm({
     id: string;
     name: string;
     slug?: string;
-    sectors: string[];
-    genderCriteria: unknown;
+    occupations: Array<{ slug: string; title: string; gender: string | null; status: string }>;
   }>;
   jobs: Array<{ id: string; title: string; countryId: string; slug?: string }>;
   defaultCountryId?: string;
@@ -56,6 +55,7 @@ export function ApplicationForm({
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoError, setPhotoError] = useState("");
   const [photoInputKey, setPhotoInputKey] = useState(0);
+  const occupationPrefilled = useRef(false);
   const idempotencyKey = useMemo(() => crypto.randomUUID(), []);
   const {
     register,
@@ -63,7 +63,8 @@ export function ApplicationForm({
     control,
     formState: { errors, isSubmitting },
     reset,
-    setValue
+    setValue,
+    getValues
   } = useForm<Values>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
@@ -99,13 +100,35 @@ export function ApplicationForm({
     const params = new URLSearchParams(window.location.search);
     const selectedJob = jobs.find((job) => job.slug === params.get("job"));
     const selectedCountry = countries.find((country) => country.slug === params.get("country"));
-    if (selectedCountry || selectedJob) {
-      setValue("countryId", selectedCountry?.id ?? selectedJob?.countryId ?? "");
+    const country = selectedCountry ?? countries.find((item) => item.id === selectedJob?.countryId);
+    const selectedOccupation = country?.occupations.find(
+      (occupation) =>
+        occupation.slug === params.get("occupation") && occupation.status === "PUBLISHED"
+    );
+    if (country || selectedJob) {
+      setValue("countryId", country?.id ?? selectedJob?.countryId ?? "");
       setValue("jobId", selectedJob?.id ?? "");
+      if (selectedOccupation) {
+        if (selectedOccupation.gender === "LAKI_LAKI" || selectedOccupation.gender === "PEREMPUAN")
+          setValue("gender", selectedOccupation.gender);
+      }
     }
   }, [countries, jobs, setValue]);
   const countryId = useWatch({ control, name: "countryId" });
   const gender = useWatch({ control, name: "gender" });
+  useEffect(() => {
+    if (occupationPrefilled.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const country = countries.find(
+      (item) => item.id === countryId && item.slug === params.get("country")
+    );
+    const occupation = country?.occupations.find(
+      (item) => item.slug === params.get("occupation") && item.status === "PUBLISHED"
+    );
+    if (!occupation || (occupation.gender && occupation.gender !== gender)) return;
+    setValue("preferredOccupation", occupation.title);
+    occupationPrefilled.current = true;
+  }, [countries, countryId, gender, setValue]);
   const availableJobs = jobs.filter((job) => job.countryId === countryId);
   const selectedCountry = countries.find((country) => country.id === countryId);
   const occupationOptions = selectedCountry
@@ -214,7 +237,17 @@ export function ApplicationForm({
           <label htmlFor="gender">Jenis kelamin *</label>
           <select
             id="gender"
-            {...register("gender", { onChange: () => setValue("preferredOccupation", "") })}
+            {...register("gender", {
+              onChange: (event) => {
+                const country = countries.find((item) => item.id === getValues("countryId"));
+                const selected = getValues("preferredOccupation");
+                if (
+                  !country ||
+                  !getCountryOccupationOptions(country, event.target.value).includes(selected)
+                )
+                  setValue("preferredOccupation", "");
+              }
+            })}
           >
             <option value="">Pilih jenis kelamin</option>
             {genderOptions.map(([value, label]) => (

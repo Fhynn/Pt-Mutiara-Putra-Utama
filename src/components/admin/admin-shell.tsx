@@ -30,6 +30,7 @@ const primaryItems = [
   ["Pendaftar", "/admin/pendaftar", Inbox],
   ["Pesan Masuk", "/admin/pesan", FileText],
   ["Negara Tujuan", "/admin/negara", Globe2],
+  ["Pekerjaan Negara", "/admin/pekerjaan-negara", BriefcaseBusiness],
   ["Lowongan", "/admin/lowongan", BriefcaseBusiness],
   ["Galeri", "/admin/galeri", GalleryHorizontal],
   ["Foto & Video", "/admin/media", ImageIcon]

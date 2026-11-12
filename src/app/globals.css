@@ -5407,3 +5407,325 @@ body {
     align-items: stretch;
   }
 }
+/* Negara tujuan: pilih pekerjaan dahulu, lalu baca syarat pada halaman pekerjaan. */
+.country-occupation-intro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 28px;
+}
+.country-occupation-intro .lead {
+  max-width: 720px;
+  margin: 12px 0 0;
+}
+.country-occupation-count {
+  flex: none;
+  color: var(--navy);
+  background: #eef3fa;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 9px 15px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.country-occupation-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.country-occupation-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  box-shadow: 0 10px 28px rgb(17 28 82 / 5%);
+}
+.country-occupation-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 28px;
+}
+.country-occupation-card-top > svg {
+  width: 24px;
+  height: 24px;
+  color: var(--red);
+}
+.country-occupation-gender {
+  color: #5f6c85;
+  font-size: 0.79rem;
+  text-align: right;
+}
+.country-occupation-card h3 {
+  color: var(--navy);
+  font-size: clamp(1.1rem, 1.5vw, 1.33rem);
+  line-height: 1.25;
+  margin: 19px 0 17px;
+}
+.country-occupation-card dl {
+  margin: 0 0 22px;
+  border-top: 1px solid var(--border);
+}
+.country-occupation-card dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.91rem;
+}
+.country-occupation-card dt {
+  color: #5f6c85;
+}
+.country-occupation-card dd {
+  margin: 0;
+  color: var(--navy);
+  font-weight: 700;
+  text-align: right;
+}
+.country-occupation-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid var(--border);
+  color: var(--red);
+  font-weight: 700;
+  text-decoration: none;
+}
+.country-occupation-link:hover {
+  text-decoration: underline;
+}
+.country-occupation-empty {
+  padding: 32px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+}
+.country-occupation-empty > svg {
+  color: var(--red);
+}
+.country-occupation-empty h3 {
+  color: var(--navy);
+  margin: 10px 0 4px;
+}
+.country-occupation-document-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 22px;
+  padding: 16px 20px;
+  background: #f4f7fb;
+  border-left: 3px solid var(--blue);
+  border-radius: 5px;
+  color: #45536c;
+}
+.country-occupation-document-note svg {
+  width: 20px;
+  flex: none;
+  color: var(--blue);
+}
+.country-occupation-document-note p {
+  margin: 0;
+}
+.country-active-vacancies {
+  margin-top: 48px;
+}
+.country-active-vacancies h2 {
+  color: var(--navy);
+  font-size: 1.5rem;
+}
+.country-active-vacancy-list {
+  display: grid;
+  gap: 10px;
+}
+.country-active-vacancy-list a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--navy);
+  text-decoration: none;
+}
+.occupation-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(290px, 0.8fr);
+  gap: 28px;
+  align-items: start;
+}
+.occupation-detail-main {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+.occupation-detail-panel,
+.occupation-salary-box,
+.occupation-register-box {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+}
+.occupation-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.occupation-panel-heading > svg {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  padding: 10px;
+  color: var(--red);
+  background: #fff3f4;
+  border-radius: 50%;
+}
+.occupation-panel-heading span {
+  color: #63718b;
+  font-size: 0.79rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.occupation-panel-heading h2 {
+  color: var(--navy);
+  font-size: 1.3rem;
+  line-height: 1.25;
+  margin: 2px 0 0;
+}
+.occupation-requirement-list,
+.occupation-document-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.occupation-requirement-list li,
+.occupation-document-list li {
+  padding: 13px 0;
+  border-top: 1px solid var(--border);
+  line-height: 1.45;
+}
+.occupation-requirement-list li::before {
+  content: "✓";
+  color: var(--red);
+  font-weight: 800;
+  margin-right: 12px;
+}
+.occupation-document-list {
+  counter-reset: documents;
+}
+.occupation-document-list li {
+  counter-increment: documents;
+  display: flex;
+  gap: 13px;
+}
+.occupation-document-list li::before {
+  content: counter(documents, decimal-leading-zero);
+  color: var(--red);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.occupation-document-help {
+  color: #5f6c85;
+  font-size: 0.88rem;
+  margin: 18px 0 0;
+}
+.occupation-detail-aside {
+  display: grid;
+  gap: 16px;
+}
+.occupation-salary-box > svg {
+  color: var(--red);
+  width: 25px;
+}
+.occupation-salary-box > span {
+  display: block;
+  color: #5f6c85;
+  margin-top: 12px;
+}
+.occupation-salary-box > strong {
+  display: block;
+  color: var(--navy);
+  font-size: 1.65rem;
+  line-height: 1.2;
+  margin-top: 5px;
+}
+.occupation-salary-box p,
+.occupation-register-box p {
+  color: #5f6c85;
+  line-height: 1.45;
+  margin: 12px 0 0;
+}
+.occupation-register-box h2 {
+  color: var(--navy);
+  font-size: 1.28rem;
+  margin: 0;
+}
+.occupation-register-box .button {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin-top: 22px;
+}
+.occupation-register-box .text-link {
+  display: inline-block;
+  margin-top: 18px;
+}
+@media (max-width: 900px) {
+  .country-occupation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .occupation-detail-layout {
+    grid-template-columns: 1fr;
+  }
+  .occupation-detail-aside {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 620px) {
+  .country-occupation-intro {
+    display: block;
+  }
+  .country-occupation-count {
+    display: inline-block;
+    margin-top: 18px;
+  }
+  .country-occupation-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .country-occupation-card {
+    padding: 18px;
+  }
+  .country-occupation-card h3 {
+    margin: 13px 0;
+  }
+  .country-occupation-card dl {
+    margin-bottom: 12px;
+  }
+  .country-occupation-card dl > div {
+    padding: 8px 0;
+  }
+  .occupation-detail-aside {
+    grid-template-columns: 1fr;
+  }
+  .occupation-detail-panel,
+  .occupation-salary-box,
+  .occupation-register-box {
+    padding: 20px;
+  }
+  .occupation-panel-heading h2 {
+    font-size: 1.14rem;
+  }
+}

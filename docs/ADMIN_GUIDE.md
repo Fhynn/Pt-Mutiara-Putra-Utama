@@ -15,17 +15,18 @@ NIK dan foto pendaftar hanya dapat dibuka oleh admin yang berwenang. Klik **Liha
 
 Kolom pencarian mencari semua data yang tersimpan, termasuk halaman lama. Gunakan **Berikutnya** untuk melihat data berikutnya. Tombol **Perbarui daftar** menampilkan data terbaru jika ada formulir yang baru dikirim.
 
-Formulir meminta **Pekerjaan yang diminati** setelah negara dan jenis kelamin dipilih. Pada Malaysia, pilihan perempuan dan laki-laki berbeda. Pilihan ini muncul di detail **Pendaftar**, terpisah dari lowongan aktif. Jika daftar pekerjaan negara diubah di **Negara Tujuan**, pilihan formulir ikut berubah setelah halaman publik diperbarui.
+Formulir meminta **Pekerjaan yang diminati**. Jika pengunjung masuk dari halaman pekerjaan, negara dan pekerjaan otomatis terisi; jenis kelamin ikut terisi hanya bila pekerjaan memang mensyaratkannya. Ketiganya masih bisa diubah sebelum formulir dikirim. Pilihan tersimpan di detail **Pendaftar**.
 
 ## Mengubah isi website
 
-- **Negara Tujuan**: ubah informasi negara, kriteria, dan persyaratan. Buka negara dari daftar, ubah kolom yang diperlukan, lalu simpan.
+- **Negara Tujuan**: ubah nama, foto, ringkasan, dan daftar dokumen umum yang berlaku untuk semua pekerjaan di negara tersebut.
+- **Pekerjaan Negara**: pilih negara, lalu ubah atau tambah pekerjaan. Isi jenis kelamin jika dibatasi, batas usia, pengalaman, syarat kesehatan, kriteria tambahan, serta gaji pokok. Biarkan gaji kosong bila belum dicantumkan. Pilih **Tampilkan di website** setelah data siap.
 - **Lowongan**: tambahkan atau ubah lowongan. Pilih status **Draf** sampai informasinya siap ditampilkan.
 - **Galeri** dan **Foto & Video**: unggah media, lalu kelola album yang tampil di website. Tombol **Ubah** digunakan untuk judul, deskripsi, dan keterangan foto.
 - **Konten lainnya**: buka menu ini jika ingin mengubah isi beranda, profil perusahaan, layanan, berita, FAQ, legalitas, dan bagian lain yang jarang diperbarui.
 - **Akun & pengaturan**: ubah kontak website atau password akun. Menu pengguna dan riwayat aktivitas hanya terlihat untuk staf yang berwenang.
 
-Untuk negara dengan syarat berbeda bagi perempuan dan laki-laki, buka **Negara Tujuan → Ubah**, aktifkan **Pisahkan persyaratan perempuan dan laki-laki**, lalu isi pekerjaan dan kriteria pada masing-masing bagian. Kosongkan syarat yang belum dipastikan; website tidak akan membuat angkanya sendiri. Daftar dokumen di bawahnya berlaku untuk kedua bagian. Klik **Simpan perubahan** agar halaman negara diperbarui.
+Halaman negara menampilkan pekerjaan yang sudah diterbitkan. Pengunjung membuka pekerjaan untuk melihat syarat, dokumen, dan gajinya. Pekerjaan yang disimpan sebagai draf tidak tampil dan tidak bisa dipilih di formulir.
 
 Kolom **Pengaturan lanjutan** biasanya tidak perlu diubah. Alamat halaman dan beberapa pengaturan teknis dibuat otomatis atau sudah diisi dari data website.
 

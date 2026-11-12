@@ -79,7 +79,10 @@ const resourceDescriptions: Record<string, string> = {
   halaman: "Perubahan teks dan foto akan muncul di halaman Beranda setelah ditampilkan di website.",
   profil: "Perubahan akan muncul di halaman Tentang Kami.",
   pengaturan: "Ubah kontak, alamat, dan identitas yang dipakai di seluruh website.",
-  negara: "Informasi negara muncul di halaman Negara Tujuan dan detailnya.",
+  negara:
+    "Atur nama, foto, ringkasan, dan dokumen umum negara. Rincian tiap pekerjaan diubah lewat menu Pekerjaan Negara.",
+  "pekerjaan-negara":
+    "Setiap pekerjaan muncul pada halaman negara yang dipilih. Usia, pengalaman, gaji, dan jenis kelamin tampil di halaman rincian pekerjaan.",
   lowongan: "Lowongan yang dibuka muncul di halaman Lowongan dan halaman negara terkait.",
   galeri:
     "Album yang ditampilkan muncul di halaman Galeri. Setelah membuat album, tambahkan fotonya.",
@@ -153,18 +156,9 @@ const advancedFieldKeys = new Set([
 
 const detailGroups: Record<string, { title: string; keys: string[]; description: string }> = {
   negara: {
-    title: "Kriteria, dokumen, dan pekerjaan",
-    description:
-      "Isi sesuai informasi program yang sudah disetujui. Bagian ini muncul di halaman detail negara.",
-    keys: [
-      "programDescription",
-      "criteria",
-      "requirements",
-      "salaryDetails",
-      "informalSectorInfo",
-      "formalSectorInfo",
-      "sectors"
-    ]
+    title: "Dokumen umum",
+    description: "Dokumen ini berlaku pada semua pekerjaan di negara tersebut.",
+    keys: ["programDescription", "requirements"]
   },
   lowongan: {
     title: "Rincian pekerjaan dan persyaratan",

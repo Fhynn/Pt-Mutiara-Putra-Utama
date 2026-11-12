@@ -3,7 +3,10 @@ import { stat } from "node:fs/promises";
 import path from "node:path";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
-import { initialCountryGenderCriteria } from "../src/lib/country-gender-defaults";
+import {
+  clientOccupationRevision,
+  sharedOccupationDocuments
+} from "../src/lib/client-occupation-revision";
 
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL wajib diisi sebelum menjalankan seed.");
@@ -430,21 +433,19 @@ async function main() {
   }
 
   for (const [index, country] of countries.entries()) {
-    const genderCriteria =
-      country.slug === "malaysia" || country.slug === "taiwan"
-        ? initialCountryGenderCriteria[country.slug]
-        : null;
+    const revision = clientOccupationRevision[country.slug];
     const countryData = {
       name: country.name,
       isoCode: country.isoCode,
-      summary: country.summary,
-      programDescription: country.programDescription,
-      criteria: [...country.criteria],
-      requirements: [...country.requirements],
-      salaryDetails: [...country.salaryDetails],
-      informalSectorInfo: country.informalSectorInfo,
-      formalSectorInfo: country.formalSectorInfo,
-      sectors: [...country.sectors],
+      summary: revision.summary,
+      programDescription:
+        "Pilih pekerjaan untuk melihat persyaratan, gaji pokok, dan dokumen yang perlu disiapkan.",
+      criteria: [],
+      requirements: [...sharedOccupationDocuments],
+      salaryDetails: [],
+      informalSectorInfo: null,
+      formalSectorInfo: null,
+      sectors: revision.occupations.map((occupation) => occupation.title),
       requirementsDisclaimer: null,
       requirementsSourceUrl: null,
       requirementsReviewedAt: null,
@@ -453,15 +454,23 @@ async function main() {
       isFeatured: true,
       displayOrder: index
     };
-    await prisma.country.upsert({
+    const savedCountry = await prisma.country.upsert({
       where: { slug: country.slug },
       update: countryData,
       create: {
         ...countryData,
-        ...(genderCriteria ? { genderCriteria } : {}),
         slug: country.slug,
         publishedAt: new Date()
       }
+    });
+    await prisma.countryOccupation.createMany({
+      data: revision.occupations.map((occupation, order) => ({
+        ...occupation,
+        countryId: savedCountry.id,
+        displayOrder: order,
+        status: "PUBLISHED" as const
+      })),
+      skipDuplicates: true
     });
   }
 

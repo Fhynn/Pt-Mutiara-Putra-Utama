@@ -46,8 +46,12 @@ export default async function ApplyPage() {
               id: country.id,
               name: country.name,
               slug: country.slug,
-              sectors: country.sectors,
-              genderCriteria: country.genderCriteria
+              occupations: country.occupations.map((occupation) => ({
+                slug: occupation.slug,
+                title: occupation.title,
+                gender: occupation.gender,
+                status: occupation.status
+              }))
             }))}
             jobs={jobs.map((job) => ({
               id: job.id,

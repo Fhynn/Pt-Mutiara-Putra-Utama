@@ -289,9 +289,9 @@ model GalleryItem {
 }
 
 model Country {
-  id                     String            @id @default(cuid())
+  id                     String              @id @default(cuid())
   name                   String
-  slug                   String            @unique
+  slug                   String              @unique
   isoCode                String?
   flagUrl                String?
   coverMediaId           String?
@@ -306,21 +306,44 @@ model Country {
   requirementsDisclaimer String?
   requirementsSourceUrl  String?
   requirementsReviewedAt DateTime?
-  sectors                String[]          @default([])
-  programStatus          ProgramStatus     @default(MORE_INFO)
-  status                 PublicationStatus @default(DRAFT)
-  isFeatured             Boolean           @default(false)
-  displayOrder           Int               @default(0)
+  sectors                String[]            @default([])
+  programStatus          ProgramStatus       @default(MORE_INFO)
+  status                 PublicationStatus   @default(DRAFT)
+  isFeatured             Boolean             @default(false)
+  displayOrder           Int                 @default(0)
   metaTitle              String?
   metaDescription        String?
   publishedAt            DateTime?
   updatedById            String?
-  createdAt              DateTime          @default(now())
-  updatedAt              DateTime          @updatedAt
+  createdAt              DateTime            @default(now())
+  updatedAt              DateTime            @updatedAt
   jobs                   Job[]
+  occupations            CountryOccupation[]
   applications           Application[]
 
   @@index([status, programStatus, displayOrder])
+}
+
+model CountryOccupation {
+  id                    String            @id @default(cuid())
+  countryId             String
+  slug                  String
+  title                 String
+  gender                String?
+  ageMin                Int?
+  ageMax                Int?
+  experienceRequirement String?
+  healthRequirement     String?
+  additionalCriteria    Json?
+  salaryLabel           String?
+  status                PublicationStatus @default(DRAFT)
+  displayOrder          Int               @default(0)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  country               Country           @relation(fields: [countryId], references: [id], onDelete: Restrict)
+
+  @@unique([countryId, slug])
+  @@index([countryId, status, displayOrder])
 }
 
 model Sector {

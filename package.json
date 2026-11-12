@@ -28,6 +28,7 @@
     "content:apply-client-revision": "tsx scripts/apply-client-revision-2026-11-10.ts",
     "content:apply-application-policy": "tsx scripts/apply-application-policy-2026-11-11.ts",
     "content:apply-gender-criteria": "tsx scripts/apply-country-gender-criteria-2026-11-11.ts --apply",
+    "content:apply-occupations": "tsx scripts/apply-client-occupations-2026-11-12.ts --apply",
     "postinstall": "prisma generate"
   },
   "dependencies": {

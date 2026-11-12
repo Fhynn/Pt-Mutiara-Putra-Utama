@@ -2,6 +2,26 @@
 
 Tanggal inventarisasi: 5 November 2026. Status `confirmed` berarti tercantum jelas pada sumber yang disebut; bukan jaminan masih mutakhir tanpa konfirmasi klien.
 
+## Revisi persyaratan pekerjaan — 12 November 2026
+
+Pemilik proyek menyampaikan naskah revisi klien berjudul **Persyaratan Dokumen dan Informasi Lowongan Kerja Luar Negeri** pada 12 November 2026. Seluruh rincian di bawah berstatus `confirmed` sebagai isi revisi klien dan **menggantikan angka usia, tinggi badan, pendidikan, dan gaji dari halaman lama** untuk tampilan pekerjaan negara. Catatan lama pada tabel berikutnya adalah arsip sumber historis, bukan syarat aktif pada halaman pekerjaan baru.
+
+| Negara            | Pekerjaan                  | Jenis kelamin disebut | Usia  | Pengalaman minimum | Gaji pokok        |
+| ----------------- | -------------------------- | --------------------- | ----- | ------------------ | ----------------- |
+| Malaysia          | Asisten Rumah Tangga (ART) | Perempuan             | 21–45 | Tidak disebut      | RM 1.500          |
+| Malaysia          | Terapis SPA                | Tidak disebut         | 21–45 | Tidak disebut      | Belum dicantumkan |
+| Malaysia          | Konstruksi                 | Laki-laki             | 18–43 | 1 tahun            | RM 1.700          |
+| Malaysia          | Perkebunan Karet           | Laki-laki             | 18–43 | 1 tahun            | RM 1.700          |
+| Malaysia          | Perkebunan Sawit           | Laki-laki             | 18–43 | Tidak disebut      | RM 1.700          |
+| Hong Kong         | Asisten Rumah Tangga (ART) | Perempuan             | 21–45 | Tidak disebut      | HKD 5.220         |
+| Taiwan            | Asisten Rumah Tangga (ART) | Tidak disebut         | 20–45 | Tidak disebut      | NTD 20.000        |
+| Taiwan            | Anak Buah Kapal (ABK)      | Tidak disebut         | 18–43 | Tidak disebut      | Belum dicantumkan |
+| Singapura         | Asisten Rumah Tangga (ART) | Perempuan             | 23–45 | Tidak disebut      | SGD 550           |
+| Brunei Darussalam | Konstruksi                 | Tidak disebut         | 18–43 | Tidak disebut      | Belum dicantumkan |
+| Brunei Darussalam | Baker (Pembuat Kue)        | Tidak disebut         | 21–43 | Tidak disebut      | Belum dicantumkan |
+
+Syarat kesehatan **sehat jasmani dan rohani** berlaku untuk kesebelas pekerjaan. Dokumen umum: KTP, KK, akta kelahiran atau ijazah, serta dokumen pernikahan/perceraian dan izin keluarga sesuai status calon pekerja. Sumber: naskah revisi klien yang diteruskan pemilik proyek pada 12 November 2026; status `confirmed` sebagai materi yang akan ditayangkan. Ketersediaan lowongan aktif, kuota, fasilitas, dan potongan gaji tidak dinyatakan oleh naskah ini.
+
 | Informasi                    | Nilai                                                                                | Sumber                                                                                                 | Status                                                                                   |
 | ---------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
 | Nama hukum                   | PT. MUTIARA PUTRA UTAMA                                                              | Company profile PDF, website perusahaan, SISKOP2MI                                                     | confirmed                                                                                |

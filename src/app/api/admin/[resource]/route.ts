@@ -71,6 +71,23 @@ export async function POST(
     if (access.config.noCreate && !parsed.id)
       return NextResponse.json({ error: "Data hanya dapat diperbarui." }, { status: 400 });
     const data = normalizeAdminPayload(access.config, parsed.data);
+    if (resource === "pekerjaan-negara") {
+      const min = data.ageMin;
+      const max = data.ageMax;
+      if (
+        !data.countryId ||
+        !data.title ||
+        (min != null && (!Number.isInteger(min) || Number(min) < 18 || Number(min) > 70)) ||
+        (max != null && (!Number.isInteger(max) || Number(max) < 18 || Number(max) > 70)) ||
+        (min != null && max != null && Number(min) > Number(max)) ||
+        (data.gender && !["PEREMPUAN", "LAKI_LAKI"].includes(String(data.gender)))
+      ) {
+        return NextResponse.json(
+          { error: "Periksa negara, pekerjaan, jenis kelamin, dan rentang usia." },
+          { status: 400 }
+        );
+      }
+    }
     for (const key of [
       "body",
       "detail",
@@ -204,6 +221,20 @@ export async function DELETE(
   const id = request.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "ID tidak valid." }, { status: 400 });
   try {
+    if (resource === "negara") {
+      const [occupations, jobs] = await Promise.all([
+        prisma.countryOccupation.count({ where: { countryId: id } }),
+        prisma.job.count({ where: { countryId: id } })
+      ]);
+      if (occupations || jobs)
+        return NextResponse.json(
+          {
+            error:
+              "Negara ini memiliki pekerjaan atau lowongan. Pilih Sembunyikan dari website jika tidak ingin menampilkannya."
+          },
+          { status: 409 }
+        );
+    }
     await deleteAdminResource(resource, id);
     await writeAudit({
       actorId: access.session.user.id,

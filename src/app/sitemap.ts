@@ -24,10 +24,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date()
   }));
   try {
-    const [countries, jobs, albums, articles] = await Promise.all([
+    const [countries, occupations, jobs, albums, articles] = await Promise.all([
       prisma.country.findMany({
         where: { status: "PUBLISHED" },
         select: { slug: true, updatedAt: true }
+      }),
+      prisma.countryOccupation.findMany({
+        where: { status: "PUBLISHED", country: { status: "PUBLISHED" } },
+        select: { slug: true, updatedAt: true, country: { select: { slug: true } } }
       }),
       prisma.job.findMany({ where: { status: "OPEN" }, select: { slug: true, updatedAt: true } }),
       prisma.galleryAlbum.findMany({
@@ -42,6 +46,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     rows.push(
       ...countries.map((x) => ({
         url: `${base}/negara-tujuan/${x.slug}`,
+        lastModified: x.updatedAt
+      })),
+      ...occupations.map((x) => ({
+        url: `${base}/negara-tujuan/${x.country.slug}/pekerjaan/${x.slug}`,
         lastModified: x.updatedAt
       })),
       ...jobs.map((x) => ({ url: `${base}/lowongan/${x.slug}`, lastModified: x.updatedAt })),

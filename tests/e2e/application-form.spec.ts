@@ -5,7 +5,7 @@ test("formulir CPMI mengirim biodata dan satu foto setelah persetujuan", async (
   await expect(page.locator("#countryId option:checked")).toHaveText("Hong Kong");
   await page.getByLabel("Sektor *").selectOption("INFORMAL");
   await page.getByLabel("Jenis kelamin *").selectOption("PEREMPUAN");
-  await page.getByLabel("Pekerjaan yang diminati *").selectOption("Asisten rumah tangga");
+  await page.getByLabel("Pekerjaan yang diminati *").selectOption("Asisten Rumah Tangga (ART)");
   await page.getByLabel("Nama lengkap sesuai KTP *").fill("Pendaftar Uji");
   await page.getByLabel("Nomor NIK *").fill("0000000000000000");
   await page.getByLabel("Tempat lahir *").fill("Bogor");
@@ -36,7 +36,7 @@ test("formulir CPMI mengirim biodata dan satu foto setelah persetujuan", async (
     const data = route.request().postDataBuffer()?.toString("utf8") ?? "";
     expect(data).toContain("0000000000000000");
     expect(data).toContain("foto.png");
-    expect(data).toContain("Asisten rumah tangga");
+    expect(data).toContain("Asisten Rumah Tangga (ART)");
     submitted = true;
     await route.fulfill({
       status: 201,
@@ -52,20 +52,23 @@ test("formulir CPMI mengirim biodata dan satu foto setelah persetujuan", async (
 test("pilihan pekerjaan Malaysia mengikuti jenis kelamin", async ({ page }) => {
   await page.goto("/daftar?country=malaysia");
   const occupation = page.getByLabel("Pekerjaan yang diminati *");
-  await expect(occupation).toBeDisabled();
+  await expect(occupation.locator("option")).toContainText(["Pilih pekerjaan", "Terapis SPA"]);
   await page.getByLabel("Jenis kelamin *").selectOption("PEREMPUAN");
   await expect(occupation.locator("option")).toContainText([
     "Pilih pekerjaan",
-    "Asisten rumah tangga (ART)"
+    "Asisten Rumah Tangga (ART)",
+    "Terapis SPA"
   ]);
   await expect(occupation.locator("option")).not.toContainText(["Konstruksi"]);
-  await occupation.selectOption("Asisten rumah tangga (ART)");
+  await occupation.selectOption("Asisten Rumah Tangga (ART)");
   await page.getByLabel("Jenis kelamin *").selectOption("LAKI_LAKI");
   await expect(occupation).toHaveValue("");
   await expect(occupation.locator("option")).toContainText([
     "Pilih pekerjaan",
+    "Terapis SPA",
     "Konstruksi",
-    "Perkebunan sawit dan karet"
+    "Perkebunan Karet",
+    "Perkebunan Sawit"
   ]);
-  await expect(occupation.locator("option")).not.toContainText(["Asisten rumah tangga (ART)"]);
+  await expect(occupation.locator("option")).not.toContainText(["Asisten Rumah Tangga (ART)"]);
 });

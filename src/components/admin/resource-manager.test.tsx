@@ -17,39 +17,42 @@ afterEach(() => {
 });
 
 describe("foto negara di admin", () => {
-  it("mengedit pekerjaan dan kriteria laki-laki tanpa JSON", async () => {
+  it("mengedit syarat dan gaji tiap pekerjaan tanpa JSON", async () => {
     const fetchMock = vi.fn(async (_url: string, options?: RequestInit) =>
       options?.method === "POST"
-        ? { ok: true, json: async () => ({ item: { id: "malaysia" } }) }
+        ? { ok: true, json: async () => ({ item: { id: "konstruksi" } }) }
         : { ok: true, json: async () => ({ items: [] }) }
     );
     vi.stubGlobal("fetch", fetchMock);
     render(
       <ResourceManager
-        resource="negara"
-        config={adminResources.negara}
+        resource="pekerjaan-negara"
+        config={adminResources["pekerjaan-negara"]}
         initialItems={[
-          { id: "malaysia", name: "Malaysia", slug: "malaysia", genderCriteria: null }
+          {
+            id: "konstruksi",
+            countryId: "malaysia",
+            title: "Konstruksi",
+            ageMin: 18,
+            ageMax: 43,
+            salaryLabel: "RM 1.700",
+            status: "PUBLISHED"
+          }
         ]}
-        relationOptions={{ mediaImages: [] }}
+        relationOptions={{ countries: [{ value: "malaysia", label: "Malaysia" }] }}
       />
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Ubah" }));
-    fireEvent.click(screen.getByRole("button", { name: "Tidak aktif" }));
-    fireEvent.change(screen.getByLabelText("Pekerjaan laki-laki 1"), {
-      target: { value: "Konstruksi" }
-    });
-    fireEvent.change(screen.getByLabelText("Kriteria perempuan 1"), {
-      target: { value: "Tinggi badan minimal 145 cm" }
-    });
+    fireEvent.change(screen.getByLabelText("Usia maksimum (tahun)"), { target: { value: "44" } });
+    fireEvent.change(screen.getByLabelText(/Gaji pokok/), { target: { value: "RM 1.800" } });
     fireEvent.click(screen.getByRole("button", { name: "Simpan perubahan" }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     const saveCall = fetchMock.mock.calls.find(([, options]) => options?.method === "POST");
-    expect(JSON.parse(String(saveCall?.[1]?.body)).data.genderCriteria).toMatchObject({
-      women: { criteria: ["Tinggi badan minimal 145 cm"] },
-      men: { jobs: ["Konstruksi"] }
+    expect(JSON.parse(String(saveCall?.[1]?.body)).data).toMatchObject({
+      ageMax: "44",
+      salaryLabel: "RM 1.800"
     });
   });
 
